@@ -1,0 +1,69 @@
+cod_qualificacao,descricao,vinculo,duvidoso,linhas
+00,Não informada,ADMINISTRADOR_NAO_SOCIO,true,37
+05,Administrador,ADMINISTRADOR_NAO_SOCIO,false,632018
+08,Conselheiro de Administração,ADMINISTRADOR_NAO_SOCIO,false,15009
+09,Curador,ADMINISTRADOR_NAO_SOCIO,true,15
+10,Diretor,ADMINISTRADOR_NAO_SOCIO,false,379523
+11,Interventor,ADMINISTRADOR_NAO_SOCIO,true,0
+12,Inventariante,ADMINISTRADOR_NAO_SOCIO,true,0
+13,Liquidante,ADMINISTRADOR_NAO_SOCIO,true,
+14,Mãe,ADMINISTRADOR_NAO_SOCIO,true,11
+15,Pai,ADMINISTRADOR_NAO_SOCIO,true,
+16,Presidente,ADMINISTRADOR_NAO_SOCIO,false,1436970
+17,Procurador,ADMINISTRADOR_NAO_SOCIO,true,21
+18,Secretário,ADMINISTRADOR_NAO_SOCIO,false,2119
+19,Síndico (Condomínio),ADMINISTRADOR_NAO_SOCIO,true,0
+20,Sociedade Consorciada,SOCIO,true,58993
+21,Sociedade Filiada,SOCIO,true,262
+22,Sócio,SOCIO,false,5684770
+23,Sócio Capitalista,SOCIO,false,382
+24,Sócio Comanditado,SOCIO,false,400
+25,Sócio Comanditário,SOCIO,false,236
+26,Sócio de Indústria,SOCIO,false,1008
+28,Sócio-Gerente,SOCIO,false,51175
+29,Sócio Incapaz ou Relat.Incapaz (exceto menor),SOCIO,false,1830
+30,Sócio Menor (Assistido/Representado),SOCIO,false,143418
+31,Sócio Ostensivo,SOCIO,false,53336
+32,Tabelião,ADMINISTRADOR_NAO_SOCIO,true,0
+33,Tesoureiro,ADMINISTRADOR_NAO_SOCIO,false,1435
+34,Titular de Empresa Individual Imobiliária,SOCIO,false,0
+35,Tutor,ADMINISTRADOR_NAO_SOCIO,true,0
+37,Sócio Pessoa Jurídica Domiciliado no Exterior,SOCIO,false,49137
+38,Sócio Pessoa Física Residente no Exterior,SOCIO,false,31784
+39,Diplomata,ADMINISTRADOR_NAO_SOCIO,true,0
+40,Cônsul,ADMINISTRADOR_NAO_SOCIO,true,0
+41,Representante de Organização Internacional,ADMINISTRADOR_NAO_SOCIO,true,0
+42,Oficial de Registro,ADMINISTRADOR_NAO_SOCIO,true,0
+43,Responsável,ADMINISTRADOR_NAO_SOCIO,true,0
+46,Ministro de Estado das Relações Exteriores,ADMINISTRADOR_NAO_SOCIO,true,0
+47,Sócio Pessoa Física Residente no Brasil,SOCIO,false,
+48,Sócio Pessoa Jurídica Domiciliado no Brasil,SOCIO,false,0
+49,Sócio-Administrador,SOCIO,false,15270571
+50,Empresário,SOCIO,false,20
+51,Candidato a cargo Político Eletivo,ADMINISTRADOR_NAO_SOCIO,true,0
+52,Sócio com Capital,SOCIO,false,86394
+53,Sócio sem Capital,SOCIO,false,23278
+54,Fundador,SOCIO,true,3005
+55,Sócio Comanditado Residente no Exterior,SOCIO,false,0
+56,Sócio Comanditário Pessoa Física Residente no Exterior,SOCIO,false,
+57,Sócio Comanditário Pessoa Jurídica Domiciliado no Exterior,SOCIO,false,
+58,Sócio Comanditário Incapaz,SOCIO,false,
+59,Produtor Rural,SOCIO,true,415116
+60,Cônsul Honorário,ADMINISTRADOR_NAO_SOCIO,true,0
+61,Responsável indígena,ADMINISTRADOR_NAO_SOCIO,true,0
+62,Representante da Instituição Extraterritorial,ADMINISTRADOR_NAO_SOCIO,true,0
+63,Cotas em Tesouraria,SOCIO,true,12389
+64,Administrador Judicial,ADMINISTRADOR_NAO_SOCIO,true,
+65,Titular Pessoa Física Residente ou Domiciliado no Brasil,SOCIO,false,335370
+66,Titular Pessoa Física Residente ou Domiciliado no Exterior,SOCIO,false,125
+67,Titular Pessoa Física Incapaz ou Relativamente Incapaz (exceto menor),SOCIO,false,
+68,Titular Pessoa Física Menor (Assistido/Representado),SOCIO,false,28
+69,Beneficiário Final,SOCIO,true,
+70,Administrador Residente ou Domiciliado no Exterior,ADMINISTRADOR_NAO_SOCIO,false,289
+71,Conselheiro de Administração Residente ou Domiciliado no Exterior,ADMINISTRADOR_NAO_SOCIO,false,193
+72,Diretor Residente ou Domiciliado no Exterior,ADMINISTRADOR_NAO_SOCIO,false,620
+73,Presidente Residente ou Domiciliado no Exterior,ADMINISTRADOR_NAO_SOCIO,false,129
+74,Sócio-Administrador Residente ou Domiciliado no Exterior,SOCIO,false,181
+75,Fundador Residente ou Domiciliado no Exterior,SOCIO,true,29
+78,Titular Pessoa Jurídica Domiciliada no Brasil,SOCIO,false,742
+79,Titular Pessoa Jurídica Domiciliada no Exterior,SOCIO,false,69

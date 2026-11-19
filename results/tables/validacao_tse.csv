@@ -1,0 +1,35 @@
+indicador,recorte,valor
+candidatos,2020 ORDINARIA,2675.0
+candidatos,2021 SUPLEMENTAR,50.0
+candidatos,2022 SUPLEMENTAR,15.0
+candidatos,2023 SUPLEMENTAR,6.0
+candidatos,2024 ORDINARIA,2097.0
+candidatos,2024 SUPLEMENTAR,
+eleicoes_suplementares_carregadas,2021,17.0
+eleicoes_suplementares_carregadas,2022,
+eleicoes_suplementares_carregadas,2023,
+eleicoes_suplementares_carregadas,2024,
+eleicoes_suplementares_na_lista_oficial,,23.0
+municipios_2024,,644.0
+municipios_segundo_turno_2024,,17.0
+eleicoes_sem_eleito_unico,,39.0
+cpf_candidato_2024,TITULO_2020,555.0
+cpf_candidato_2024,RECURSOS_PROPRIOS,408.0
+cpf_candidato_2024,TITULO_E_PROPRIOS,761.0
+cpf_candidato_2024,CONFLITO,0.0
+cpf_candidato_2024,SEM_CPF,373.0
+cpf_candidato_anterior,SEM_CPF,9.0
+candidato_2024_com_nome_diferente_do_anterior,,13.0
+receitas,PESSOA_FISICA,15205.0
+receitas,RECURSOS_PROPRIOS,3381.0
+receitas,REPASSE,5451.0
+receitas,OUTRA,30.0
+receitas_apos_limite,2024-10-05,3369.0
+receitas_pessoa_fisica_sem_cpf,,66.0
+doadores_pf_distintos,,12150.0
+doadores_pf_sem_nome_rfb,,0.0
+receitas_pf_de_terceiros_feitas_pelo_proprio_candidato,,0.0
+cpfs_com_digito_verificador_invalido,,
+pseudonimos,,16112.0
+pseudonimos_com_mais_de_um_cpf,,0.0
+doadores_originarios_pf_distintos,,7011.0

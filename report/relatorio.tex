@@ -1,0 +1,191 @@
+% Relatório de até cinco páginas. Compilado por `python -m redes report` (src/redes/report.py),
+% que grava `numeros.tex` (macros de números) ao lado deste arquivo antes de chamar o latexmk.
+% Nenhum número de resultado é digitado aqui: use as macros de numeros.tex.
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+% O babel desta instalação não traz brazilian.ldf nem padrões de hifenização do português;
+% os nomes em português vêm do arquivo de localização, e \emergencystretch evita linhas largas.
+\usepackage[english]{babel}
+\babelprovide[import=pt-BR,main]{brazilian}
+\emergencystretch=3em
+\usepackage{mathptmx}
+\usepackage[scaled=.92]{helvet}
+\usepackage[margin=2.3cm,top=2.4cm,bottom=2.3cm]{geometry}
+\usepackage{microtype}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{setspace}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+% hyperref antes de abntex2cite: na ordem inversa o .aux quebra em \abntnextkey.
+\usepackage[hidelinks]{hyperref}
+\usepackage[alf,abnt-full-initials=yes,abnt-etal-text=it]{abntex2cite}
+
+\input{numeros}
+
+% Aparência do projeto: Times, seções em caixa alta e negrito, parágrafo recuado, número da
+% página no canto superior direito.
+\setstretch{1.08}
+\setlength{\parindent}{1.0cm}
+\setlength{\parskip}{0pt}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[R]{\small\thepage}
+\renewcommand{\headrulewidth}{0pt}
+\fancypagestyle{plain}{\fancyhf{}\fancyhead[R]{\small\thepage}\renewcommand{\headrulewidth}{0pt}}
+\titleformat{\section}{\normalfont\normalsize\bfseries\MakeUppercase}{\thesection}{0.6em}{}
+\titlespacing*{\section}{0pt}{1.1ex plus .3ex}{0.6ex}
+\newcommand{\paragrafo}[1]{\par\noindent\textbf{#1}\ }
+
+% Legendas no padrão ABNT: título acima, fonte abaixo.
+\newcounter{figura}
+\newcommand{\legendafigura}[2]{\refstepcounter{figura}{\centering\small Figura~\thefigura\ --- #2\label{#1}\par}\vspace{0.8ex}}
+\newcounter{quadro}
+\newsavebox{\caixaquadro}
+\newcommand{\legendaquadro}[2]{\refstepcounter{quadro}{\centering\small Quadro~\thequadro\ --- #2\label{#1}\par}\vspace{0.8ex}}
+\newcommand{\fonteabnt}[1]{\par\vspace{0.6ex}{\centering\footnotesize #1\par}}
+
+\newcommand{\figura}[2]{\includegraphics[width=#2]{#1}}
+
+\begin{document}
+
+\begin{center}
+{\bfseries\MakeUppercase{Universidade de São Paulo}}\\
+{\bfseries\MakeUppercase{Faculdade de Economia, Administração, Contabilidade e Atuária}}\\[0.5ex]
+{\small EAE1429 --- Redes Econômicas e Sociais, 2.º semestre de 2026}\\[1.4ex]
+{\large\bfseries\MakeUppercase{Redes empresariais e persistência econômica sob alternância política: evidências das compras públicas municipais no estado de São Paulo}}\\[1.4ex]
+{\small\scshape Felipe Ferreira Alexandre --- 13963144 \quad Andrei Schoschlakow Bonifácio --- 14558482\\
+Rafael Eiki Teruya --- 14604204 \quad João Pedro Ferreira --- 14582312}\\[0.4ex]
+{\small São Paulo, 2026}\par
+\avisoAmostra
+\end{center}
+\vspace{-0.6ex}\hrule\vspace{1.2ex}
+
+\section{Motivação}
+A alternância no governo municipal costuma ser avaliada pelos nomes que entram e saem da
+prefeitura. Para quem vende ao município, a questão é outra: o acesso aos contratos sobrevive à
+troca? Olhando apenas os CNPJs, vê-se renovação de fornecedores; olhando as redes de sócios,
+pode haver continuidade na alocação dos contratos, padrão próximo ao que
+\citeonline{acemoglu2008} chamam de democracia capturada. Mas a continuidade dentro de uma rede
+também pode refletir capacidade produtiva ou reorganização empresarial, sem favorecimento. O
+desenho identifica o efeito da vitória eleitoral sobre a alocação, não a transmissão da vantagem
+pela rede, que é examinada como hipótese. Nesta literatura a conexão costuma ser atributo de uma
+empresa isolada \cite{boas2014,baltrunaite2020}; aqui ela circula pela rede societária, como nas redes de elites e de parentesco de
+\citeonline{schisani2021} e \citeonline{cruz2017}.
+
+\section{Dados e rede}
+\label{sec:dados}
+Combinamos as despesas municipais do TCESP, as eleições e doações do TSE e o quadro de sócios da
+Receita Federal \cite{tcesp2026,tse2026,rfb2026}. Os fornecedores anteriores são definidos pelos
+empenhos de janeiro de 2021 a setembro de 2024. As doações entram pela data da receita, até 5 de
+outubro, véspera da eleição. Pessoas jurídicas não doam desde a ADI 4650 \cite{adi4650}, então
+as conexões passam pelos sócios pessoas físicas. Para empresas sem sócios na fotografia de
+setembro, a rede usa vínculos observados na extração de 12/10/2024, após a eleição, com entrada
+até 13/09/2024. Esse complemento pode perder vínculos encerrados antes da extração.
+São \empresasRede{} empresas, \pessoasRede{}
+pessoas e \vinculosRede{} vínculos. Duas empresas são vizinhas quando compartilham um sócio. Uma empresa
+tem conexão direta com um grupo quando algum sócio doou ao seu candidato, e $\delta_{ik}$ conta
+as vizinhanças até a empresa conectada mais próxima (Figura~\ref{fig:exemplo}).
+
+Dos doadores pessoa física, \taxaCruzamentoA{} do grupo A e \taxaCruzamentoB{} do grupo B são
+sócios de alguma empresa, o que liga \empresasConectadasA{} e \empresasConectadasB{} empresas
+aos grupos A e B. Em \munAnalisaveis{} municípios analisáveis, \munConexaoA{} têm empresa
+conectada ao grupo A e \munConexaoB{} ao grupo B. O maior componente reúne \fracGigante{} das
+empresas; sem as pessoas cuja retirada divide componentes, \fracGiganteSemArt{}
+(Figura~\ref{fig:rede}). Na comparação com a fotografia recente filtrada pela data de entrada,
+\fracVinculosPerdidos{} dos vínculos de setembro ficam de fora e \fracVinculosExtras{} dos
+vínculos reconstruídos não aparecem em setembro. A reconstrução serve apenas para este
+diagnóstico. A referência de setembro tem a lacuna do arquivo de agosto. Entre os vínculos
+adicionais da reconstrução, \fracVinculosLacuna{} já aparecem no preenchimento de outubro de
+2024. A vinculação entre empenhos e ajustes cobre \taxaVinculacao{} do valor de 2025 no painel.
+
+\begin{figure}[t]
+\centering
+\legendafigura{fig:exemplo}{Rede societária de exemplo}%
+\figura{figura1_exemplo}{0.62\linewidth}
+\fonteabnt{Fonte: elaboração própria. Círculos são pessoas; retângulos, empresas; linhas, participação societária; setas tracejadas, doações anteriores à eleição.}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\legendafigura{fig:rede}{Componentes e distâncias na rede de 2024-09}%
+\figura{rede_componentes}{0.43\linewidth}\hfill
+\figura{rede_distancias}{0.43\linewidth}
+\fonteabnt{Fonte: elaboração própria, com dados da Receita Federal, do TSE e do TCESP.}
+\end{figure}
+
+\section{Desenho empírico}
+Usamos eleições municipais apertadas, desenho com precedente em \citeonline{oliveira2025}. A
+decisão de doar é individual e aproxima do candidato também as empresas vizinhas, benefício que
+o doador não internaliza \cite{jackson1996}. A variável de corte $M_m$ é a diferença de votos válidos,
+em pontos percentuais, entre o candidato do grupo incumbente e o adversário mais votado; o
+tratamento $T_m$ vale 1 quando o incumbente perde. O grupo incumbente segue um protocolo fixado
+antes da análise (prefeito, partido do prefeito, coligação), e rupturas e casos sem candidato
+identificável são excluídos e listados. Para cada resultado $Y$ e categoria de conexão $\ell$,
+\begin{equation}
+  Y_{jm}^{\ell} = \alpha^{\ell} + \beta^{\ell} T_m + \gamma^{\ell} M_m + \delta^{\ell} T_m M_m + u_{jm}^{\ell},
+  \qquad |M_m| \le b,
+\end{equation}
+estimada por regressão linear local com banda e intervalos com correção de viés de
+\citeonline{calonico2014}, núcleo triangular e erros agrupados por município. Reportamos também
+$b/2$ e $2b$, o número de municípios de cada lado do corte, o teste de densidade
+\cite{cattaneo2020}, placebos com a participação pré-eleitoral e o efeito mínimo detectável.
+H1 compara fornecedores anteriores diretamente conectados ao incumbente com os sem conexão; H2
+compara os efeitos por faixa de $\delta$. As participações de 2025 usam o empenho líquido
+positivo do elemento. Em mercados sem empenho positivo, os fornecedores anteriores ficam na
+amostra com participação zero. A tabela de mercados sem empenho registra a frequência por
+coorte e lado do corte. H3 decompõe a variação de participação da
+rede em três termos; H4 examina a manutenção da posição das principais redes. As comparações
+secundárias recebem correção de Holm.
+
+%%RESULTADOS-INICIO
+\section{Resultados}
+O Quadro~\ref{tab:estimativas} reúne os contrastes. Em H2, as categorias são fixadas pela
+distância a cada grupo na rede descrita na Seção~\ref{sec:dados}. A sobreposição em mercado e porte
+das coortes de conexão direta é \sobreposicaoDireta{}. O contraste resume heterogeneidade entre coortes.
+A análise de sensibilidade usa apenas estratos de município, elemento e porte presentes nas
+duas coortes (\texttt{h2\_comparaveis.csv}). \leituraHDoisComparaveis{}
+Em H3, comparamos redes ligadas aos dois grupos com as
+demais. O total combina a variação entre as fornecedoras diretamente ligadas ao incumbente (R1),
+as demais fornecedoras anteriores (R2) e as novas fornecedoras (R3). Para H4, a comparação
+descritiva em disputas de até cinco p.p. agrupa redes com e sem ligação ao vencedor.
+No limiar central, as taxas de permanência correspondentes são \permanenciaComLigacao{} e
+\permanenciaSemLigacao{}. No corte, o contraste usa as redes de ligação exclusiva, cujo estado
+muda com o resultado. O Quadro~\ref{tab:categorias} inclui ainda as redes ligadas a ambos e a nenhum.
+\tabelaEstimativas
+\tabelaCategorias
+\leituraResultados
+
+\begin{figure}[t]
+\centering
+\legendafigura{fig:rdd}{Gradiente por distância e decomposição da variação da rede}%
+\figura{gradiente_h2}{0.43\linewidth}\hfill\figura{decomposicao_h3}{0.43\linewidth}
+\fonteabnt{Fonte: elaboração própria. Barras indicam intervalos dos contrastes por reamostragem de municípios.}
+\end{figure}
+
+\section{Robustez}
+\tabelaRobustez
+%%RESULTADOS-FIM
+
+\section{Discussão e limitações}
+Um ganho concentrado nas conexões diretas indica redirecionamento para as firmas dos doadores.
+Um gradiente decrescente é compatível com transmissão ao longo dos vínculos. Em H3, a
+compensação exige que ganhos em R2 ou R3 contrabalancem perdas em R1. A leitura depende da
+precisão dos termos e do total. Se os intervalos admitem perdas e ganhos ou o placebo também
+salta, a evidência sobre persistência é limitada.
+Os resultados valem para os municípios paulistas fiscalizados pelo TCESP. A doação é medida
+parcial de conexão: vínculos informais, doações por interpostas pessoas e parentesco não são
+observados, e compartilhar sócios não informa controle nem distribuição de direitos
+econômicos. O cruzamento por nome e seis dígitos do CPF erra com homônimos, as despesas são
+informadas pelos municípios e empenho não é contrato. Com um único ciclo eleitoral o número de
+disputas apertadas limita o poder estatístico, e efeitos indistinguíveis não são tratados como
+iguais; perdas semelhantes podem refletir desorganização administrativa
+\cite{akhtari2022}. CPFs são pseudonimizados e só resultados agregados são divulgados.
+
+\bibliographystyle{abntex2-alf}
+\bibliography{referencias}
+
+\end{document}

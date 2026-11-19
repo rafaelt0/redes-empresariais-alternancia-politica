@@ -1,0 +1,36 @@
+# Dados brutos e intermediários, inclusive a amostra sintética gerada
+/data/
+/.claude/worktrees/
+
+# Chave HMAC da pseudonimização
+/.chave_pseudonimo
+*.key
+
+# Python e ferramentas
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+build/
+dist/
+
+# Auxiliares de LaTeX
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.run.xml
+*.synctex.gz
+*.toc
+*.xdv
+
+# Editores e sistema
+.DS_Store
+.idea/
+.vscode/
