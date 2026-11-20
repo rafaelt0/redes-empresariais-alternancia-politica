@@ -311,6 +311,41 @@ def _intercepto_corrigido(somas: np.ndarray, h: float, b: float) -> np.ndarray:
     return intercepto - projecao_quadratica * (h / b) ** 2 * curvatura
 
 
+def replicas_por_categoria(
+    amostras: Sequence[pl.DataFrame],
+    bandas: Sequence[tuple[float, float]],
+    *,
+    repeticoes: int = config.REPETICOES_BOOTSTRAP,
+    semente: int = config.SEMENTE_BOOTSTRAP,
+) -> np.ndarray:
+    """Reamostra conjuntamente os saltos corrigidos das categorias, uma coluna por amostra."""
+    momentos = [_momentos(a, h, b) for a, (h, b) in zip(amostras, bandas, strict=True)]
+    municipios = (
+        pl.concat(m.select("municipio", "tratado") for m in momentos).unique().sort("municipio")
+    )
+    matrizes = [
+        municipios.join(m, on=["municipio", "tratado"], how="left")
+        .select(pl.exclude("municipio", "tratado"))
+        .fill_null(0)
+        .to_numpy()
+        for m in momentos
+    ]
+    rng = np.random.default_rng(semente)
+    lados = []
+    for tratado in (True, False):
+        indices = np.flatnonzero(municipios["tratado"].to_numpy() == tratado)
+        sorteio = rng.multinomial(len(indices), np.full(len(indices), 1 / len(indices)), repeticoes)
+        lados.append((indices, sorteio))
+    (ind_t, sorteio_t), (ind_c, sorteio_c) = lados
+    return np.column_stack(
+        [
+            _intercepto_corrigido(sorteio_t @ m[ind_t], h, b)
+            - _intercepto_corrigido(sorteio_c @ m[ind_c], h, b)
+            for m, (h, b) in zip(matrizes, bandas, strict=True)
+        ]
+    )
+
+
 def contraste(
     painel: pl.DataFrame,
     resultado: str,
@@ -337,34 +372,13 @@ def contraste(
             a.filter(pl.col("x").abs() < r.banda) for a, r in zip(amostras, estimados, strict=True)
         )
     )
-    momentos = [
-        _momentos(a, r.banda, r.banda_vies) for a, r in zip(amostras, estimados, strict=True)
-    ]
-    municipios = (
-        pl.concat(m.select("municipio", "tratado") for m in momentos).unique().sort("municipio")
+    por_categoria = replicas_por_categoria(
+        amostras,
+        [(r.banda, r.banda_vies) for r in estimados],
+        repeticoes=repeticoes,
+        semente=semente,
     )
-    matrizes = [
-        municipios.join(m, on=["municipio", "tratado"], how="left")
-        .select(pl.exclude("municipio", "tratado"))
-        .fill_null(0)
-        .to_numpy()
-        for m in momentos
-    ]
-    rng = np.random.default_rng(semente)
-    lados = []
-    for tratado in (True, False):
-        indices = np.flatnonzero(municipios["tratado"].to_numpy() == tratado)
-        sorteio = rng.multinomial(len(indices), np.full(len(indices), 1 / len(indices)), repeticoes)
-        lados.append((indices, sorteio))
-    (ind_t, sorteio_t), (ind_c, sorteio_c) = lados
-    replicas = sum(
-        c
-        * (
-            _intercepto_corrigido(sorteio_t @ m[ind_t], r.banda, r.banda_vies)
-            - _intercepto_corrigido(sorteio_c @ m[ind_c], r.banda, r.banda_vies)
-        )
-        for c, m, r in zip(coeficientes, matrizes, estimados, strict=True)
-    )
+    replicas = sum(c * salto for c, salto in zip(coeficientes, por_categoria.T, strict=True))
     ep = float(np.nanstd(replicas, ddof=1))
     if not (math.isfinite(ep) and ep > 0):
         return NaoEstimavel("erro-padrão degenerado", contagem)

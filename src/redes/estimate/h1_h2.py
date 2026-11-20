@@ -51,18 +51,24 @@ def h1(painel: pl.DataFrame) -> pl.DataFrame:
 def h2(painel: pl.DataFrame, *, recorte_comparavel: bool = False) -> pl.DataFrame:
     categorias = CATEGORIAS_H2
     if recorte_comparavel:
-        painel = _com_porte(painel).with_columns(
-            (
-                (pl.col("faixa_a") == faixa).any().over(ESTRATOS_H2)
-                & (pl.col("faixa_b") == faixa).any().over(ESTRATOS_H2)
-            ).alias(f"comparavel_{faixa}")
-            for faixa in FAIXAS_H2
-        )
-        categorias = {
-            nome: filtro & pl.col(f"comparavel_{nome.rsplit('_', 1)[1]}")
-            for nome, filtro in categorias.items()
-        }
+        painel, categorias = preparar_recorte_comparavel(painel)
     return rdd.tabela(painel, "H2", categorias, [RESULTADO], PLACEBO, CONTRASTES_H2)
+
+
+def preparar_recorte_comparavel(painel: pl.DataFrame) -> tuple[pl.DataFrame, dict[str, pl.Expr]]:
+    """Marca os estratos com as duas coortes e retorna os filtros por categoria."""
+    painel = _com_porte(painel).with_columns(
+        (
+            (pl.col("faixa_a") == faixa).any().over(ESTRATOS_H2)
+            & (pl.col("faixa_b") == faixa).any().over(ESTRATOS_H2)
+        ).alias(f"comparavel_{faixa}")
+        for faixa in FAIXAS_H2
+    )
+    categorias = {
+        nome: filtro & pl.col(f"comparavel_{nome.rsplit('_', 1)[1]}")
+        for nome, filtro in CATEGORIAS_H2.items()
+    }
+    return painel, categorias
 
 
 def diagnosticos_h2(
