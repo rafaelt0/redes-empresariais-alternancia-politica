@@ -245,7 +245,7 @@ def _detalhes(linha: dict | None, componentes: tuple[dict | None, ...]) -> str:
         f"Bandas das categorias direta / sem conexão: {bandas} p.p.; municípios (esq./dir.): {n}. "
         f"b/2 = {_numero(linha.get('estimativa_meia_banda'))}; "
         f"2b = {_numero(linha.get('estimativa_dobro_banda'))}; "
-        f"placebo = {_numero(linha.get('placebo_estimativa'))} "
+        f"placebo de nível pré (fração) = {_numero(linha.get('placebo_estimativa'))} "
         f"(p = {_numero(linha.get('placebo_p_valor'))})."
     )
 
@@ -714,8 +714,8 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Presentation, list[
     _marcadores(
         slide,
         [
-            "Resultado: Δempenho / gasto anual médio pré, em redes com fornecedoras anteriores "
-            "no município. Peso municipal um antes do núcleo; média das redes, não gasto agregado.",
+            "Resultado: Δempenho da rede / gasto anual médio pré do município. Inclui redes com "
+            "fornecedoras anteriores no município. Peso municipal um por coorte antes do núcleo.",
             *termos,
             f"Dentro das redes ligadas a ambos: R1, {_efeito(r1_ambos, casas=4)}; "
             f"R2+R3, {_efeito(r23_ambos, casas=4)}.",
@@ -739,7 +739,7 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Presentation, list[
     _fonte(
         slide,
         "Fonte: elaboração própria. Quatro linhas/gráfico: AMBOS menos demais. Linhas internas: "
-        "efeitos em AMBOS. Unidade: Δempenho / gasto anual médio prévio. "
+        "efeitos em AMBOS. Unidade: Δempenho da rede / gasto anual médio pré do município. "
         "Demais: só A, só B ou nenhum. AMBOS é dominada por uma rede.",
     )
     notas.append(
@@ -777,7 +777,7 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Presentation, list[
         slide,
         [
             "Contraste = (βB − βA)/2 nas redes de ligação exclusiva. Principais: ranking "
-            "acumulado até o limiar e fornecimento em três dos quatro anos prévios. "
+            "acumulado até o limiar e fornecimento em pelo menos três dos quatro anos prévios. "
             "O ranking de 2025 inclui entrantes.",
             *limiares,
             f"Permanência em disputas de até cinco p.p., no limiar central: "
@@ -795,7 +795,7 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Presentation, list[
     _fonte(
         slide,
         "Fonte: elaboração própria. Unidade: probabilidade de permanência entre as principais "
-        "redes. A regra de três dos quatro anos define elegibilidade apenas no pré-eleitoral.",
+        "redes. O critério de fornecimento vale para o período pré-eleitoral.",
     )
     notas.append(
         Nota(
