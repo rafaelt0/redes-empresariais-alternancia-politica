@@ -18,6 +18,7 @@ from redes.amostra import MARCADOR
 from redes.config import RAIZ, Caminhos
 from redes.etapas import Contexto, Etapa
 from redes.leitura_sensibilidades import leitura as leitura_sensibilidades
+from redes.leitura_sensibilidades import limite_h2
 from redes.numeros import ND, Numeros, decimal, escrever_macros, leitura_h2_comparaveis
 
 ETAPA = Etapa(
@@ -165,12 +166,24 @@ def tabela_estimativas(resumo: pl.DataFrame) -> str:
     return _quadro(
         "tab:estimativas",
         "Contrastes no corte eleitoral",
-        ("Hipótese", "Efeito", "IC", "$b/2$", "$2b$", "Placebo", "$p_{pl}$", "EMD", "$p_{Holm}$"),
+        (
+            "Hipótese",
+            "Efeito",
+            "IC",
+            "$b/2$",
+            "$2b$",
+            "Pré (nível)",
+            "$p_{pl}$",
+            "EMD",
+            "$p_{Holm}$",
+        ),
         corpo,
         rf"Unidades: fração da participação no elemento (H1--H2), fração do gasto anual médio "
         rf"pré-eleitoral (H3) e probabilidade de permanência (H4). Pontos corrigidos pelo viés; "
         rf"IC normal de 95\% com erro-padrão por reamostragem de municípios e bandas fixas. "
-        rf"Placebo: participação prévia (o mesmo teste nas linhas R1--R3 de H3). Densidade: "
+        rf"Pré (nível): participação anterior, inclusive em H4; "
+        rf"H3 repete o mesmo teste nos termos. "
+        rf"n.d.: sem suporte/ajuste estimável. Densidade: "
         rf"{densidade}. EMD: poder de 80\%, nível de 5\%. Bandas e suporte por categoria no CSV."
         + nota_holm,
     )
@@ -231,7 +244,10 @@ def tabela_categorias(resumo: pl.DataFrame) -> str:
         r"Pontos e IC robusto de 95\% corrigidos pelo viés (CCT). Bandas em p.p.; Esq./Dir. contam "
         r"municípios com derrota ($T_m=1$) e vitória ($T_m=0$) na banda. O valor-p por rede "
         r"exige ao menos dez redes por lado. Contagens por rede e demais recortes em "
-        r"resumo\_estimacao.csv. A aproximação assintótica é frágil com poucas unidades.",
+        r"resumo\_estimacao.csv. Linhas em AMBOS são saltos internos (IC CCT); o Quadro 1 "
+        r"subtrai o salto nas demais redes (IC bootstrap). "
+        r"Pontos próximos não implicam ICs iguais. "
+        r"A aproximação assintótica é frágil com poucas unidades.",
     )
 
 
@@ -266,7 +282,8 @@ def tabela_robustez(robustez: pl.DataFrame) -> str:
         corpo,
         r"Unidades como no Quadro~\ref{tab:estimativas}. Asterisco indica IC de 95\% que exclui "
         r"zero; n.d.\ indica suporte insuficiente (menos de dez municípios em um dos lados). "
-        r"Intervalos completos em robustez.csv.",
+        r"Sem articulação: sementes reselecionadas, como em robustez.csv. A sensibilidade "
+        r"adicional com sementes fixas é distinta. Intervalos completos nos respectivos CSVs.",
     )
 
 
@@ -279,8 +296,6 @@ def sintese_principal(resumo: pl.DataFrame) -> str:
     h2_0 = linhas.get(("H2", "vencedor_faixa_0", "participacao_2025", "contraste"), {})
     h2_1 = linhas.get(("H2", "vencedor_faixa_1", "participacao_2025", "contraste"), {})
     h3 = linhas.get(("H3", "ambos_menos_demais", "variacao_total", "contraste"), {})
-    h4 = linhas.get(("H4", "ligada_ao_vencedor_50", "mantem_posicao_50", "contraste"), {})
-
     nulos = []
     destaques = []
     for nome, linha, unidade, h in (
@@ -322,24 +337,14 @@ def sintese_principal(resumo: pl.DataFrame) -> str:
     st_h2_1 = _status_contraste(h2_1, "H2")
     if st_h2_1 == "negativo":
         extras.append(
-            rf"o contraste a um passo ($\delta=1$) é negativo ({_pp(h2_1, 'estimativa')} p.p.), "
-            r"sinal oposto ao previsto para vantagem do vencedor"
+            rf"o IC nominal a um passo ($\delta=1$) exclui zero na especificação principal "
+            rf"({_pp(h2_1, 'estimativa')} p.p.), mas a leitura depende dos diagnósticos "
+            r"pré-eleitorais"
         )
     elif st_h2_1 == "positivo":
         extras.append(
             rf"o contraste a um passo ($\delta=1$) é positivo ({_pp(h2_1, 'estimativa')} p.p.)"
         )
-
-    r1 = linhas.get(("H3", "ambos", "termo_r1", "categoria"), {})
-    comp = linhas.get(("H3", "ambos", "termo_compensacao", "categoria"), {})
-    if r1.get("ic_sup") is not None and comp.get("ic_inf") is not None:
-        if r1["ic_sup"] < 0 < comp["ic_inf"]:
-            extras.append("há indício de compensação interna (R1 cai e R2+R3 sobe)")
-        else:
-            extras.append("não se confirma compensação interna nas redes ligadas aos dois grupos")
-
-    if _status_contraste(h4, "H4") == "inconclusivo_holm":
-        extras.append("H4 permanece inconclusiva após a correção de Holm")
 
     if extras:
         primeira = extras[0][0].upper() + extras[0][1:]
@@ -397,6 +402,17 @@ def leitura_resultados(resumo: pl.DataFrame) -> str:
             f"Os contrastes de {_juntar_lista(nulos_imprecisos)} cruzam zero com intervalos "
             f"largos, o que impede descartar efeitos economicamente relevantes."
         )
+    instaveis = [
+        nome
+        for nome, linha in (("H1", h1), (r"H2 em $\delta=0$", h2_0))
+        if linha.get("estimativa") is not None
+        and linha.get("estimativa_meia_banda") is not None
+        and linha["estimativa"] * linha["estimativa_meia_banda"] < 0
+    ]
+    if instaveis:
+        frases.append(
+            f"{_juntar_lista(instaveis)} mudam de sinal em meia banda, reforçando a instabilidade."
+        )
 
     if (
         _status_contraste(h2_3, "H2") == "nulo"
@@ -404,7 +420,8 @@ def leitura_resultados(resumo: pl.DataFrame) -> str:
         and h2_3["emd"] < 0.01
     ):
         frases.append(
-            rf"Já o contraste médio entre coortes em $\delta=3+$ fica restrito a magnitudes "
+            r"Condicional às coortes e à inferência municipal, o contraste em $\delta=3+$ "
+            r"tem magnitudes "
             rf"pequenas ({_pp(h2_3, 'estimativa')} p.p.; EMD de {_pp(h2_3, 'emd')} p.p.)."
         )
 
@@ -424,6 +441,11 @@ def leitura_resultados(resumo: pl.DataFrame) -> str:
             rf"Em H2 ($\delta=1$), o contraste foi {direcao} "
             rf"({_pp(h2_1, 'estimativa')} p.p.){nota_pl}."
         )
+        if direcao == "negativo":
+            frases.append(
+                "O ponto contraria a vantagem ao vencedor prevista sob comparabilidade; "
+                "os diagnósticos fragilizam essa leitura."
+            )
     elif st_h2_1 == "nulo":
         frases.append(r"O contraste de H2 ($\delta=1$) também inclui zero.")
 
@@ -434,10 +456,16 @@ def leitura_resultados(resumo: pl.DataFrame) -> str:
             rf"passo tem $p_{{Holm}}={_decimal_math(b1['p_holm'], 3)}$ na família secundária."
         )
 
-    if h3.get("placebo_p_valor") is not None and h3["placebo_p_valor"] < 0.10:
+    if h3.get("placebo_p_valor") is not None and h3.get("placebo_estimativa") is not None:
+        direcao = (
+            " no mesmo sentido do contraste pós,"
+            if h3.get("estimativa") is not None and h3["placebo_estimativa"] * h3["estimativa"] > 0
+            else ""
+        )
         frases.append(
-            rf"Em H3, o placebo pré-eleitoral fica próximo da fronteira de significância "
-            rf"($p = {_decimal_math(h3['placebo_p_valor'], 3)}$), reforçando cautela na leitura."
+            rf"O placebo de nível de H3 é {_pp(h3, 'placebo_estimativa')} p.p. de participação "
+            rf"prévia ($p={_decimal_math(h3['placebo_p_valor'], 3)}$),{direcao} exigindo cautela "
+            r"sobre continuidade; ele mede nível prévio, não a variação normalizada do pós."
         )
 
     st_h4 = _status_contraste(h4, "H4")
@@ -447,6 +475,16 @@ def leitura_resultados(resumo: pl.DataFrame) -> str:
         frases.append(
             rf"O contraste de H4 (50\%) permaneceu inconclusivo após a correção de Holm{sufixo}."
         )
+        if h4.get("emd") is not None and h4["emd"] > 1:
+            frases.append(
+                "Seu EMD excede o suporte probabilístico: o teste tem pouco poder prático."
+            )
+        b75 = linhas.get(("H4", "ligada_b_75", "mantem_posicao_75", "categoria"), {})
+        if b75.get("banda") is not None:
+            frases.append(
+                rf"A banda de H4 (75\%), coorte B, é {_numero(b75, 'banda', 1)} p.p., "
+                "restringindo sua leitura como comparação local."
+            )
     elif st_h4 in ("positivo", "negativo"):
         frases.append(
             rf"O contraste de H4 (50\%) foi {st_h4} ({_pp(h4, 'estimativa')} p.p.) mesmo após Holm."
@@ -467,6 +505,15 @@ def leitura_resultados(resumo: pl.DataFrame) -> str:
             "Dentro das redes ligadas a ambos, os intervalos de R1 e R2+R3 "
             "não confirmam compensação."
         )
+        if (
+            _status_contraste(r1) == _status_contraste(compensacao) == "nulo"
+            and (r1.get("estimativa") or 0) > 0
+            and (compensacao.get("estimativa") or 0) < 0
+        ):
+            frases.append(
+                "Os pontos têm sinais inversos aos previstos para compensação "
+                "(R1 negativo e R2+R3 positivo), sem rejeitar zero."
+            )
     return " ".join(frases)
 
 
@@ -488,7 +535,10 @@ def leitura_robustez(robustez: pl.DataFrame) -> str:
     h3_tot = linhas.get(("H3", "ambos_menos_demais", "variacao_total", "contraste"), {})
     h3_r2 = linhas.get(("H3", "ambos_menos_demais", "termo_r2", "contraste"), {})
 
-    frases = []
+    frases = [
+        "As variantes reconstroem coortes e reselecionam bandas; diferenças entre colunas "
+        "também refletem composição, sem manter fixo o estimando."
+    ]
     estaveis_nulos = []
     for nome, linha in (("H1", h1), (r"H2 em $\delta=0$", h2_0)):
         validos = [e for v in variantes if (e := _significativa(linha, v)) is not None]
@@ -507,7 +557,7 @@ def leitura_robustez(robustez: pl.DataFrame) -> str:
     if pj_sig:
         frases.append(
             f"Sem sócios PJ, {_juntar_lista(pj_sig)} passam a excluir zero no sentido negativo, "
-            f"mas sem ganho compensatório em R3."
+            f"mas sem evidência de ganho compensatório em R3."
         )
 
     tem_nd = any(
@@ -519,7 +569,7 @@ def leitura_robustez(robustez: pl.DataFrame) -> str:
     if tem_nd:
         frases.append(
             "A remoção de pontos de articulação ou de administradores fragmenta os componentes "
-            "e reduz o suporte municipal abaixo de dez municípios por lado nos contrastes "
+            "e reduz o suporte municipal abaixo de dez municípios por lado em alguns contrastes "
             "indiretos e de rede (n.d.)."
         )
     return " ".join(frases)
@@ -546,17 +596,13 @@ def sintese_discussao(resumo: pl.DataFrame) -> str:
     )
     if sem_ganho_direto and sem_comp:
         return (
-            r"No conjunto das quatro hipóteses, a alternância nas eleições municipais paulistas "
-            r"não produz evidência consistente de ganho para firmas ligadas ao vencedor nem de "
-            r"compensação interna na rede que domina a coorte AMBOS, em comparação com retornos "
-            r"positivos encontrados sob doações empresariais ou em compras federais "
-            r"\cite{boas2014,baltrunaite2020}. "
-            r"A leitura distingue imprecisão de efeito pequeno: intervalos largos e EMDs elevados "
-            r"em H1, H2 ($\delta=0$), H3 e H4 ainda admitem efeitos economicamente relevantes, "
-            r"enquanto o contraste médio entre coortes em $\delta=3+$ tem IC estreito. "
-            r"O poder limitado impede avaliar mudanças modestas. Doações PF podem sinalizar "
-            r"conexões de modo mais fraco que doações PJ; o desenho não distingue essa hipótese "
-            r"de ausência de transmissão."
+            r"Não há evidência consistente de ganho para firmas ligadas ao vencedor nem de "
+            r"compensação interna na rede dominante. Os ICs admitem efeitos relevantes. "
+            r"A precisão de H2 indireta é condicional à inferência municipal na rede observada; "
+            r"seu alcance não se estende a outros componentes. "
+            r"Diferimos dos retornos sob doações "
+            r"PJ ou compras federais \cite{boas2014,baltrunaite2020}: doações PF podem ser sinal "
+            r"mais fraco de conexão; o desenho não distingue isso de ausência de transmissão."
         )
     if _status_contraste(h3, "H3") in ("positivo", "negativo") or not sem_comp:
         return (
@@ -580,6 +626,25 @@ def numeros_tex(pasta: Path, sintetica: bool = False) -> str:
     resumo = _ler_tabela(pasta, "resumo_estimacao.csv")
     robustez = _ler_tabela(pasta, "robustez.csv")
     h2_comparaveis = _ler_tabela(pasta, "h2_comparaveis.csv")
+    auditoria = _ler_tabela(pasta, "auditoria_h2_comparaveis.csv")
+    nota_auditoria = ""
+    if not auditoria.is_empty():
+        a = auditoria.row(0, named=True)
+        if all(a.get(c) is not None for c in ("estratos", "jaccard", "correlacao_bootstrap")):
+            nota_auditoria = (
+                f"Nesse recorte exploratório, há {decimal(a['estratos'], 0)} estratos e "
+                f"Jaccard de {decimal(100 * a['jaccard'], 1)}\\%; nas bandas próprias, "
+                "a correlação "
+                f"dos saltos reamostrados é {decimal(a['correlacao_bootstrap'], 3)} "
+                f"({decimal(a['replicas_validas'], 0)} réplicas válidas), explicando o IC estreito "
+                "da pequena diferença entre coortes quase coincidentes."
+            )
+    verificacoes = leitura_sensibilidades(pasta)
+    estrutural = [f for f in verificacoes if f.startswith("O gigante")]
+
+    def texto_verificacoes(frases: list[str]) -> str:
+        return " ".join(frases).replace("%", r"\%").replace("δ = 1", r"$\delta=1$")
+
     campos = {
         "tabelaEstimativas": tabela_estimativas(resumo),
         "tabelaCategorias": tabela_categorias(resumo),
@@ -587,13 +652,20 @@ def numeros_tex(pasta: Path, sintetica: bool = False) -> str:
         "sintesePrincipal": sintese_principal(resumo),
         "leituraResultados": leitura_resultados(resumo),
         "leituraRobustez": leitura_robustez(robustez),
-        "leituraSensibilidades": " ".join(leitura_sensibilidades(pasta))
-        .replace("%", r"\%")
-        .replace("δ = 1", r"$\delta=1$"),
+        "leituraSensibilidades": texto_verificacoes(
+            [f for f in verificacoes if f not in estrutural]
+        ),
+        "sinteseEstrutural": texto_verificacoes(estrutural).replace(
+            "AMBOS", "redes ligadas aos dois grupos"
+        ),
         "sinteseDiscussao": sintese_discussao(resumo),
         "leituraHDoisComparaveis": leitura_h2_comparaveis(
             h2_comparaveis.iter_rows(named=True)
-        ).replace("%", r"\%"),
+        ).replace("%", r"\%")
+        + " "
+        + nota_auditoria
+        + " "
+        + limite_h2(pasta).replace("%", r"\%"),
         "avisoAmostra": r"\textbf{Amostra sintética para teste.}" if sintetica else "",
     }
     return escrever_macros(Numeros.ler(pasta)) + "".join(

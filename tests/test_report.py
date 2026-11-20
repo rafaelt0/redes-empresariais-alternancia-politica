@@ -10,6 +10,26 @@ from redes.report import (
 )
 
 
+def test_h3_discute_placebo_de_nivel_mesmo_sem_rejeicao():
+    resumo = pl.DataFrame(
+        {
+            "hipotese": ["H3"],
+            "categoria": ["ambos_menos_demais"],
+            "tipo": ["contraste"],
+            "resultado": ["variacao_total"],
+            "estimativa": [-0.04],
+            "ic_inf": [-0.10],
+            "ic_sup": [0.02],
+            "placebo_estimativa": [-0.11],
+            "placebo_p_valor": [0.13],
+        }
+    )
+    texto = leitura_resultados(resumo)
+    assert "placebo de nível de H3 é -11,0 p.p. de participação" in texto
+    assert "no mesmo sentido do contraste pós" in texto
+    assert "não a variação normalizada do pós" in texto
+
+
 def test_relatorio_le_o_resumo_real_e_distingue_o_intervalo_do_contraste():
     resumo = pl.DataFrame(
         {

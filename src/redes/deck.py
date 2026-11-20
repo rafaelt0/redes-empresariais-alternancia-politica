@@ -27,6 +27,7 @@ from redes.amostra import MARCADOR
 from redes.config import Caminhos
 from redes.etapas import Contexto, Etapa
 from redes.leitura_sensibilidades import leitura as leitura_sensibilidades
+from redes.leitura_sensibilidades import limite_h2
 from redes.numeros import Numeros, decimal, leitura_h2_comparaveis
 
 ETAPA = Etapa(
@@ -185,7 +186,7 @@ def _sintese_final(resumo: pl.DataFrame | None) -> list[str]:
                 if emd != "n.d."
                 else f"{est}, intervalo cruza zero"
             )
-        return f"{est} ({st} a 5%)"
+        return f"{est} (IC nominal exclui zero na principal)" if h == "H2" else f"{est} ({st} a 5%)"
 
     comp_ok = (
         r1 is not None
@@ -205,14 +206,17 @@ def _sintese_final(resumo: pl.DataFrame | None) -> list[str]:
         if h2_1 is not None or h2_3 is not None
         else "Sem gradiente consistente por distância."
     )
-    h2_extra += " O sinal em δ = 1 depende da especificação e do pré-período."
+    h2_extra += (
+        " A precisão depende da especificação; o pré-eleitoral fragiliza a leitura de δ = 1."
+    )
     return [
         f"H1 (conexão direta ao incumbente): {_desc(h1, 'p.p.', 'p.p.', 'H1')}.",
         f"H2 (coortes de distância): δ = 0 em {_desc(h2_0, 'p.p.', 'p.p.', 'H2')}; {h2_extra}",
         f"H3 (redes): total em {_desc(h3, '% do gasto prévio', '%', 'H3')}; {comp_txt}.",
         f"H4 (principais redes, 50%): {_desc(h4, 'p.p.', 'p.p.', 'H4')}.",
         "Imprecisão não é ausência de efeito: intervalos largos ainda admitem efeitos relevantes, "
-        "enquanto o contraste médio entre coortes em δ = 3+ tem IC estreito.",
+        "e o IC estreito em δ = 3+ é condicional a coortes dominadas pelo gigante "
+        "e à inferência municipal.",
     ]
 
 
@@ -222,7 +226,8 @@ def _nota_robustez(robustez: pl.DataFrame | None) -> str:
         return "Fonte: elaboração própria. H2 usa δ = 0 e H3 usa o total."
     return (
         "Fonte: elaboração própria. H2 usa δ = 0 e H3 usa o total; IC de 95% por reamostragem "
-        "de municípios. n.d. indica menos de dez municípios por lado após remover vínculos."
+        "de municípios. Sem articulação: sementes reselecionadas; sementes fixas são uma "
+        "sensibilidade adicional distinta. n.d.: menos de dez municípios por lado."
     )
 
 
@@ -237,7 +242,7 @@ def _detalhes(linha: dict | None, componentes: tuple[dict | None, ...]) -> str:
         for c in componentes
     )
     return (
-        f"Bandas: {bandas} p.p.; municípios (esq./dir.): {n}. "
+        f"Bandas das categorias direta / sem conexão: {bandas} p.p.; municípios (esq./dir.): {n}. "
         f"b/2 = {_numero(linha.get('estimativa_meia_banda'))}; "
         f"2b = {_numero(linha.get('estimativa_dobro_banda'))}; "
         f"placebo = {_numero(linha.get('placebo_estimativa'))} "
@@ -371,6 +376,7 @@ def _tabelas(resultados: Path) -> dict[str, pl.DataFrame | None]:
             "resumo_estimacao",
             "robustez",
             "rede_resumo",
+            "rede_componentes",
             "links_pc1",
             "reconstrucao",
             "h2_comparaveis",
@@ -448,6 +454,7 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Presentation, list[
             "O desenho identifica o efeito da vitória eleitoral sobre a alocação; a transmissão "
             "pela rede é a hipótese examinada (e não corrupção por definição).",
             _sintese_curta(resumo),
+            *(f for f in verificacoes if f.startswith("O gigante")),
         ],
         largura=Inches(11.9),
         tamanho=17,
@@ -476,8 +483,8 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Presentation, list[
             f"{_destaque(numeros, 'munAnalisaveis')} municípios analisáveis, sem a capital e sem "
             "segundo turno; cada coorte RDD tem suporte próprio.",
             f"{_destaque(numeros, 'empresasRede')} empresas, "
-            f"{_destaque(numeros, 'pessoasRede')} pessoas e "
-            f"{_destaque(numeros, 'vinculosRede')} vínculos na fotografia.",
+            f"{_destaque(numeros, 'pessoasRede')} vértices de sócios/administradores PF/PJ e "
+            f"{_destaque(numeros, 'vinculosRede')} vínculos na rede principal.",
             "Vizinhança é compartilhar sócio ou administrador. δ conta passos entre empresas "
             "(dois no bipartido). δ = 0 quando um sócio ou administrador PF doa ao candidato.",
             "O complemento societário foi extraído após a eleição (12/10/2024) e inclui "
@@ -506,14 +513,22 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Presentation, list[
 
     # 4. Descritivas
     slide = prs.slides.add_slide(vazio)
-    _titulo(slide, "A rede é fragmentada, mas tem um núcleo", 4)
+    _titulo(slide, "A rede e seu componente gigante", 4)
+    componentes = tabelas["rede_componentes"]
+    unitarios = ""
+    if componentes is not None:
+        principal = componentes.filter(pl.col("variante") == "PRINCIPAL")
+        total = principal["componentes"].sum()
+        um = principal.filter(pl.col("faixa_tamanho").cast(pl.Utf8) == "1")["componentes"]
+        if total and um.len() == 1 and um.item() is not None:
+            unitarios = f"{_numero(100 * um.item() / total, 1)}% têm uma empresa. "
     _marcadores(
         slide,
         [
             f"O maior componente reúne {_destaque(numeros, 'fracGigante')} das empresas; "
             f"sem os pontos de articulação, {_destaque(numeros, 'fracGiganteSemArt')}.",
-            f"{_destaque(numeros, 'componentesRede')} componentes; a maioria é pequena e ligada a "
-            "poucas empresas.",
+            f"{_destaque(numeros, 'componentesRede')} componentes; {unitarios}"
+            "O gráfico distribui empresas, não componentes.",
             f"Na reconstrução com a fotografia recente, "
             f"{_destaque(numeros, 'fracVinculosPerdidos')} dos vínculos de setembro ficam de fora; "
             f"{_destaque(numeros, 'fracVinculosExtras')} dos reconstruídos faltam em setembro.",
@@ -531,7 +546,7 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Presentation, list[
             (
                 "Mostrar que a rede nacional não é um bloco único.",
                 "Explicar o que muda ao remover pontos de articulação.",
-                "Ligar a decisão de PC2 à robustez.",
+                "Relacionar o componente gigante às sensibilidades de caminhos e sementes.",
             ),
         )
     )
@@ -603,8 +618,8 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Presentation, list[
     _figura(slide, figuras / "rdd_h1.png", Inches(7.9), Inches(1.7), Inches(4.8), Inches(3.9))
     _fonte(
         slide,
-        "Fonte: elaboração própria. Resultado em fração da participação no elemento (2025). "
-        "Gráfico mostra empresas diretamente ligadas ao incumbente.",
+        "Fonte: elaboração própria. Fração da participação (2025). "
+        "Gráfico: ajuste linear convencional da categoria A, não o contraste corrigido.",
     )
     notas.append(
         Nota(
@@ -622,7 +637,7 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Presentation, list[
     slide = prs.slides.add_slide(vazio)
     _titulo(slide, "H2 — contrastes entre coortes de distância", 7)
     faixas = []
-    for faixa in ("0", "1"):
+    for faixa in ("1",):
         achado = _linha(resumo, "H2", tipo="contraste", categoria=f"vencedor_faixa_{faixa}")
         faixas.append(f"δ = {faixa}: {_efeito(achado)}")
     _marcadores(
@@ -631,18 +646,21 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Presentation, list[
             *faixas,
             "Contraste = (βB − βA)/2. As coortes podem compartilhar firmas: heterogeneidade "
             "eleitoral entre coortes, sem identificar efeito causal da distância. "
-            "O teste do contraste principal é nominal.",
+            "Os contrastes de H2 são principais, com testes nominais.",
             f"Sobreposição de mercado e porte na conexão direta: "
             f"{_destaque(numeros, 'sobreposicaoDireta')}.",
             *(
                 f
                 for f in verificacoes
-                if f.startswith(("Em H2", "Sem autofinanciamento", "O placebo"))
+                if f.startswith(("Em H2", "Sem autofinanciamento", "Na coorte B"))
             ),
         ],
         largura=Inches(7.1),
+        altura=Inches(4.0),
         tamanho=15,
     )
+    if aviso_rede := limite_h2(caminhos.resultados / "tables"):
+        _marcadores(slide, [aviso_rede], y=Inches(5.65), altura=Inches(0.95), tamanho=13)
     _figura(slide, figuras / "gradiente_h2.png", Inches(7.9), Inches(1.7), Inches(4.8), Inches(3.9))
     _fonte(
         slide,
@@ -660,7 +678,8 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Presentation, list[
             "Rafael",
             55,
             (
-                "Comparar os efeitos eleitorais nas coortes definidas pela distância.",
+                "Sob comparabilidade, a vantagem prevista é positiva e decrescente. O ponto "
+                "negativo em δ = 1 contraria essa direção; os diagnósticos limitam a leitura.",
                 "Ler δ = 1 junto ao placebo, ao suporte pequeno e à sensibilidade de banda; "
                 "não interpretar composição como gradiente causal da distância.",
                 *((sensibilidade,) if sensibilidade else ()),
@@ -672,12 +691,12 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Presentation, list[
 
     # 8. H3
     slide = prs.slides.add_slide(vazio)
-    _titulo(slide, "H3 — de onde vem a variação da rede", 8)
+    _titulo(slide, "H3 — decomposição do contraste AMBOS−demais", 8)
     termos = []
     for resultado, rotulo in (
         ("variacao_total", "Total"),
-        ("termo_r1", "R1 (ligadas ao incumbente)"),
-        ("termo_r2", "R2 (demais fornecedoras)"),
+        ("termo_r1", "R1 (anteriores diretamente ligadas a A)"),
+        ("termo_r2", "R2 (demais fornecedoras anteriores)"),
         ("termo_r3", "R3 (novas fornecedoras)"),
     ):
         achado = _linha(resumo, "H3", tipo="contraste", resultado=resultado)
@@ -686,12 +705,30 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Presentation, list[
     r23_ambos = _linha(
         resumo, "H3", tipo="categoria", categoria="ambos", resultado="termo_compensacao"
     )
+    h3_total = _linha(resumo, "H3", tipo="contraste", resultado="variacao_total") or {}
+    sinais_inversos = (
+        _status(r1_ambos) == _status(r23_ambos) == "nulo"
+        and ((r1_ambos or {}).get("estimativa") or 0) > 0
+        and ((r23_ambos or {}).get("estimativa") or 0) < 0
+    )
     _marcadores(
         slide,
         [
+            "Resultado: Δempenho / gasto anual médio pré, em redes com fornecedoras anteriores "
+            "no município. Peso municipal um antes do núcleo; média das redes, não gasto agregado.",
             *termos,
             f"Dentro das redes ligadas a ambos: R1, {_efeito(r1_ambos, casas=4)}; "
             f"R2+R3, {_efeito(r23_ambos, casas=4)}.",
+            *(
+                [
+                    "Compensação exige R1 < 0 e R2+R3 > 0. Os pontos internos têm os sinais "
+                    "inversos; os dois ICs cruzam zero."
+                ]
+                if sinais_inversos
+                else []
+            ),
+            f"Placebo de nível pré: {_pp(h3_total.get('placebo_estimativa'))} p.p. de participação "
+            f"(p = {_numero(h3_total.get('placebo_p_valor'))}). Requer cautela sobre continuidade.",
         ],
         largura=Inches(7.1),
         tamanho=14,
@@ -701,8 +738,9 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Presentation, list[
     )
     _fonte(
         slide,
-        "Fonte: elaboração própria. Unidade: variação como fração do gasto anual médio "
-        "pré-eleitoral. Cada termo usa a diferença entre 2025 e a média anual prévia.",
+        "Fonte: elaboração própria. Quatro linhas/gráfico: AMBOS menos demais. Linhas internas: "
+        "efeitos em AMBOS. Unidade: Δempenho / gasto anual médio prévio. "
+        "Demais: só A, só B ou nenhum. AMBOS é dominada por uma rede.",
     )
     notas.append(
         Nota(
@@ -746,7 +784,8 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Presentation, list[
             f"{_destaque(numeros, 'permanenciaComLigacao')} com ligação ao vencedor e "
             f"{_destaque(numeros, 'permanenciaSemLigacao')} sem ligação "
             f"({_numero(n_com.get('n_municipios'), 0)} e {_numero(n_sem.get('n_municipios'), 0)} "
-            "municípios). Médias em grupos distintos, sem interpretação causal.",
+            "municípios). São médias municipais na janela; o contraste usa saltos no corte "
+            "em coortes exclusivas e não é sua diferença nem o efeito de criar uma ligação.",
             "Bandas amplas e ICs além do suporte probabilístico indicam extrapolação instável; "
             "H4 é exploratória.",
         ],
@@ -756,7 +795,7 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Presentation, list[
     _fonte(
         slide,
         "Fonte: elaboração própria. Unidade: probabilidade de permanência entre as principais "
-        "redes (empenho em ao menos três dos quatro anos).",
+        "redes. A regra de três dos quatro anos define elegibilidade apenas no pré-eleitoral.",
     )
     notas.append(
         Nota(
@@ -816,7 +855,8 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Presentation, list[
             55,
             (
                 "Amarrar os achados das quatro hipóteses com magnitudes e precisão.",
-                "Distinguir resultado impreciso (H1, H2 δ=0, H3, H4) de efeito pequeno (δ=3+).",
+                "Distinguir imprecisão de contraste médio pequeno em coortes dominadas pelo "
+                "gigante; a precisão é condicional à inferência municipal.",
                 "Relacionar à literatura (Boas et al., Baltrunaite): doações individuais pós-ADI "
                 "4650 em um ciclo municipal não reproduzem ganhos claros.",
             ),

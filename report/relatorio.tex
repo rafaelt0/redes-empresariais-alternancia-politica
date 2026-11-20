@@ -31,6 +31,8 @@
 \setstretch{1.08}
 \setlength{\parindent}{1.0cm}
 \setlength{\parskip}{0pt}
+\widowpenalty=10000
+\clubpenalty=10000
 \pagestyle{fancy}
 \fancyhf{}
 \fancyhead[R]{\small\thepage}
@@ -72,36 +74,33 @@ efeito da derrota eleitoral sobre a alocação e examinamos a transmissão pela 
 Ampliamos a conexão da firma isolada \cite{boas2014,baltrunaite2020} para a rede de sócios,
 em diálogo com estudos de elites e parentesco \cite{schisani2021,cruz2017}.
 \sintesePrincipal
+\sinteseEstrutural
 
 \section{Dados e rede}
 \label{sec:dados}
-Combinamos as despesas municipais do TCESP, as eleições e doações do TSE e o quadro de sócios da
-Receita Federal \cite{tcesp2026,tse2026,rfb2026}. Os fornecedores anteriores são definidos pelos
-empenhos de janeiro de 2021 a setembro de 2024. As doações entram pela data da receita, até 5 de
-outubro, véspera da eleição. Pessoas jurídicas não doam desde a ADI 4650 \cite{adi4650}, então
-as conexões passam por pessoas físicas. Para empresas sem sócios na fotografia de
-setembro, a rede usa vínculos observados na extração de 12/10/2024, após a eleição, com entrada
-até 13/09/2024. Esse complemento pode perder vínculos encerrados antes da extração.
-São \empresasRede{} empresas, \pessoasRede{}
-pessoas e \vinculosRede{} vínculos. O grafo bipartido inclui sócios PF/PJ e administradores;
-duas empresas são vizinhas quando compartilham um desses vínculos. Uma empresa
-tem conexão direta quando um sócio ou administrador PF doou ao candidato do grupo. Essa
-ampliação operacional do vínculo societário literal é examinada na variante sem administradores. Definimos
-$\delta_{ik}=\min_{j\in D_k}d_G(i,j)/2$, sendo $D_k$ as empresas diretamente conectadas e
-$d_G$ a distância no bipartido; $\delta=0$ nas sementes e $\infty$ sem caminho (Figura~\ref{fig:exemplo}).
+Combinamos TCESP, TSE e Receita Federal \cite{tcesp2026,tse2026,rfb2026}, sem a capital e
+sem segundo turno. Fornecedores anteriores têm empenho positivo em jan/2021--set/2024; o pós
+abrange todo 2025, nominal, sem deflação. Doações entram até 5/10/2024. Após a ADI 4650
+\cite{adi4650}, doações diretas são de PF, embora o grafo inclua sócios PJ.
+A referência é setembro de 2024. Empresas sem quadro societário recebem vínculos de 12/10/2024
+com entrada até 13/09/2024; o erro de sobrevivência dessa observação pós-eleitoral exige
+continuidade no corte. A análise só com setembro avalia essa escolha.
 
-O cruzamento liga \taxaCruzamentoA{} dos doadores de A e \taxaCruzamentoB{} dos de B a empresas.
-Em \munAnalisaveis{} municípios analisáveis, \munConexaoA{} têm conexão a A e \munConexaoB{} a B.
-O maior componente reúne \fracGigante{} das
-empresas; sem as pessoas cuja retirada divide componentes, \fracGiganteSemArt{}.
-As distribuições de grau, componentes e distâncias estão em \texttt{rede\_*.csv}.
-Na comparação com a fotografia recente filtrada pela data de entrada,
-\fracVinculosPerdidos{} dos vínculos de setembro ficam de fora e \fracVinculosExtras{} dos
-vínculos reconstruídos não aparecem em setembro. Essa reconstrução é apenas diagnóstica;
-\fracVinculosLacuna{} dos vínculos presentes na reconstrução recente mas ausentes em setembro
-também aparecem no preenchimento de outubro de
-2024. A vinculação entre empenhos e ajustes cobre \taxaVinculacao{} do valor de 2025;
-os desfechos usam todos os empenhos do painel, inclusive os não vinculados.
+Na rede principal há \empresasRede{} empresas, \pessoasRede{} vértices de pessoas/PJ e
+\vinculosRede{} vínculos. Compartilhar sócio ou administrador define vizinhança; uma doação de
+sócio ou administrador PF define conexão direta. A variante sem administradores muda sementes e caminhos.
+Rede é componente conexa; $\delta_{ik}=\min_{j\in D_k}d_G(i,j)/2$, sendo $D_k$ as sementes e
+$d_G$ a distância bipartida. Nas sementes, $\delta=0$; sem caminho, $\infty$
+(Figura~\ref{fig:exemplo}). O cruzamento liga \taxaCruzamentoA{} dos doadores de A e
+\taxaCruzamentoB{} dos de B a empresas; os demais podem não ser sócios ou falhar no cruzamento.
+Dos \munAnalisaveis{} municípios, \munConexaoA{} têm conexão a A e \munConexaoB{} a B.
+
+O maior componente tem \fracGigante{} das empresas, ou \fracGiganteSemArt{} sem articulações;
+graus, tamanhos e distâncias estão em \texttt{rede\_*.csv}. Na reconstrução recente filtrada por
+entrada, \fracVinculosPerdidos{} dos vínculos de setembro faltam e \fracVinculosExtras{} dos
+reconstruídos não constam de setembro. Desses extras, \fracVinculosLacuna{} estão no complemento
+de outubro de 2024. A reconstrução é apenas diagnóstica. A vinculação a contratos/ajustes cobre
+\taxaVinculacao{} do valor de 2025; o desfecho usa também os empenhos não vinculados.
 
 \begin{figure}[t]
 \centering
@@ -111,34 +110,30 @@ os desfechos usam todos os empenhos do painel, inclusive os não vinculados.
 \end{figure}
 
 \section{Desenho empírico}
-Usamos eleições municipais apertadas, desenho com precedente em \citeonline{oliveira2025}. A
-decisão de doar pode beneficiar empresas vizinhas se a vantagem se transmitir e o doador não
-apropriar todo o retorno; essa externalidade é uma previsão, não uma propriedade observada do
-grafo \cite{jackson1996}. A variável de corte $M_m$ é a diferença de votos válidos,
-em pontos percentuais, entre o candidato do grupo incumbente e o adversário mais votado; o
-tratamento $T_m$ vale 1 quando o incumbente perde. Sob continuidade dos resultados potenciais em
-$M_m = 0$, municípios com vitórias e derrotas apertadas são localmente comparáveis; o desenho
-identifica o efeito local da derrota no corte, e não o efeito médio em disputas folgadas. O grupo
-incumbente A segue o protocolo prévio (prefeito, partido, coligação), B é o adversário mais votado;
-casos sem candidato identificável são excluídos e listados. Para resultado $Y$ e
-categoria de conexão $\ell$,
+Comparamos eleições apertadas \cite{oliveira2025}. O grupo A segue o protocolo prefeito--partido--coligação;
+B é o adversário mais votado. A margem $M_m$ é a diferença de votos válidos A--B, em p.p.;
+$T_m=1$ quando A perde ($M_m<0$). Sob continuidade dos resultados potenciais no corte,
+identificamos o efeito local da derrota, para cada desfecho $Y$ e coorte pré-fixada $\ell$:
 \begin{equation}
-  Y_{jm}^{\ell} = \alpha^{\ell} + \beta^{\ell} T_m + \gamma^{\ell} M_m + \delta^{\ell} T_m M_m + u_{jm}^{\ell},
-  \qquad |M_m| \le b,
+Y_{jm}^{\ell}=\alpha^{\ell}+\beta^{\ell}T_m+\gamma^{\ell}M_m+\theta^{\ell}T_mM_m+u_{jm}^{\ell},
+\qquad |M_m|\le b.
 \end{equation}
-estimada por regressão linear local, núcleo triangular, banda MSE-ótima $b$ e correção de viés
-\cite{calonico2014}. As categorias usam IC robusto CCT; os contrastes reamostram municípios,
-recalculando a correção com bandas de estimação e de viés fixas por categoria. Reportamos também
-meia banda ($b/2$) e dobro ($2b$), o suporte em municípios, o teste de densidade
-\cite{cattaneo2020}, placebos com a participação pré-eleitoral e o efeito mínimo detectável.
-H1 compara fornecedores anteriores diretamente conectados ao incumbente com os sem caminho
-a ambos os grupos ($\delta_{iA}=\delta_{iB}=\infty$); H2
-compara os efeitos por faixa de $\delta$. As participações de 2025 usam o empenho líquido
-positivo do elemento. Em mercados sem empenho positivo, os fornecedores anteriores ficam na
-amostra com participação zero. H3 decompõe a variação do empenho da rede dividida pelo gasto anual
-médio pré-eleitoral do município: $Y_{Rm}=(E_{Rm,2025}-\bar E_{Rm,pre})/\bar E_{m,pre}$,
-com barras indicando médias anuais. H4 examina a manutenção da posição das principais redes. As comparações
-secundárias recebem correção de Holm.
+Usamos linear local, núcleo triangular, banda MSE-ótima e correção de viés \cite{calonico2014}.
+Categorias têm IC CCT; contrastes reamostram municípios conjuntamente, recalculando o viés com
+bandas fixas. Reportamos meia/dobra banda, suporte, densidade \cite{cattaneo2020}, placebos e EMD.
+
+H1/H2 usam empresa--município--elemento. H1 compara diretamente ligadas a A com as sem caminho
+a A nem B; H2 compara coortes de distância. A participação de 2025 divide o saldo positivo da
+firma pelo do elemento; mercados sem saldo positivo mantêm fornecedores anteriores com zero.
+H3 usa redes com fornecedoras anteriores no município e
+$Y_{Rm}=(E_{Rm,2025}-\bar E_{Rm,pre})/\bar E_{m,pre}$, com médias anuais nas barras.
+Cada município soma peso um por coorte antes do núcleo: comparamos médias das redes com peso
+municipal unitário. H4 mede permanência entre principais redes. H1--H3, inclusive os termos de
+H3, têm inferência nominal, sem controle conjunto de erro familiar; as secundárias recebem Holm.
+
+A transmissão de vantagem pela rede é hipótese: doar pode beneficiar vizinhas sem o doador
+apropriar todo o retorno \cite{jackson1996}. Sob comparabilidade, esperamos vantagem ao vencedor
+decrescente com $\delta$; compensação requer R1 negativo e R2+R3 positivo.
 
 %%RESULTADOS-INICIO
 \section{Resultados}
@@ -147,16 +142,21 @@ grupo. A sobreposição em mercado e porte
 das coortes de conexão direta é \sobreposicaoDireta{}. O contraste
 $(\hat\beta_B(d)-\hat\beta_A(d))/2$ resume heterogeneidade eleitoral entre coortes, que podem
 compartilhar firmas e diferir na ligação ao outro grupo; não identifica o efeito de reduzir a distância.
+O fator $1/2$ normaliza B--A; recuperaria uma vantagem comum apenas com respostas simétricas e
+coortes comparáveis, hipóteses não impostas.
 A análise de sensibilidade usa apenas estratos de município, elemento e porte presentes nas
 duas coortes (\texttt{h2\_comparaveis.csv}). \leituraHDoisComparaveis{}
-Em H3, comparamos redes ligadas aos dois grupos (AMBOS) com as demais. O total soma fornecedoras
-ligadas a A (R1), demais fornecedoras anteriores (R2) e entrantes (R3). Em H4, a comparação
-descritiva em disputas de até cinco p.p. agrupa redes com e sem ligação ao vencedor.
-No limiar central, as taxas de permanência correspondentes são \permanenciaComLigacao{} e
+Em H3, comparamos redes com caminho a ambos os grupos (AMBOS) com as demais: ligadas a apenas
+um grupo ou a nenhum, sem excluir delas o gigante. O total soma fornecedoras
+anteriores diretamente ligadas a A (R1), demais anteriores (R2) e entrantes dessas redes (R3). Em H4,
+as médias municipais de permanência a 50\% por ligação ao vencedor, na janela de cinco p.p.,
+são \permanenciaComLigacao{} e
 \permanenciaSemLigacao{}. No corte, o contraste usa as redes de ligação exclusiva, cujo estado
-muda com o resultado, usando a mesma meia diferença B--A. Redes principais cobrem o limiar do
-gasto acumulado e fornecem em três dos quatro anos; em 2025 o ranking inclui entrantes.
-As taxas descritivas são médias em grupos distintos, sem interpretação causal.
+muda com o resultado, usando a mesma meia diferença B--A. Principais são os componentes no
+prefixo do ranking até atingir o limiar do empenho municipal acumulado pré, com fornecimento em
+três dos quatro anos. Permanência é continuar nesse prefixo em 2025, cujo ranking inclui entrantes.
+As médias usam todas as categorias na janela; o contraste estima saltos corrigidos no corte
+em coortes exclusivas, não o efeito de criar uma ligação.
 \tabelaEstimativas
 \tabelaCategorias
 \leituraResultados
@@ -176,12 +176,10 @@ As taxas descritivas são médias em grupos distintos, sem interpretação causa
 
 \section{Discussão e limitações}
 \sinteseDiscussao{}
-Os resultados são locais aos municípios paulistas do TCESP, sem a capital. Doações omitem
-conexões informais; compartilhar sócios não mede controle. Homônimos geram erro de cruzamento,
-e empenho não é contrato. Participações medem realocação: ganhos de uma firma reduzem a fatia
-das demais. O agrupamento municipal absorve dependência interna, mas não interferência entre
-municípios da mesma rede. Poucas disputas limitam o poder; perdas semelhantes também podem
-refletir desorganização administrativa \cite{akhtari2022}. Só divulgamos agregados pseudonimizados.
+Doações omitem conexões informais; sócios comuns não medem controle. Há erro por homônimos,
+e empenho não é contrato. O agrupamento municipal não absorve interferência entre municípios
+da mesma rede. Poucas disputas limitam o poder; perdas semelhantes podem refletir desorganização
+administrativa \cite{akhtari2022}. Divulgamos apenas agregados pseudonimizados.
 Em H4, bandas amplas e ICs além do suporte probabilístico revelam instabilidade da extrapolação
 corrigida; a análise permanece exploratória.
 

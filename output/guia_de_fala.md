@@ -7,11 +7,11 @@ Deck de 12 slides, cerca de 10 minutos. Os tempos são sugestões; os pontos sã
 | 1 | Redes empresariais e persistência econômica sob alternância política | Felipe | 40 s |
 | 2 | O que sobrevive quando o governo muda | Felipe | 40 s |
 | 3 | Dados e construção da rede | Andrei | 50 s |
-| 4 | A rede é fragmentada, mas tem um núcleo | Andrei | 55 s |
+| 4 | A rede e seu componente gigante | Andrei | 55 s |
 | 5 | Eleições apertadas como choque | Andrei | 55 s |
 | 6 | H1 — conexão direta ao incumbente | Rafael | 50 s |
 | 7 | H2 — contrastes entre coortes de distância | Rafael | 55 s |
-| 8 | H3 — de onde vem a variação da rede | Rafael | 60 s |
+| 8 | H3 — decomposição do contraste AMBOS−demais | Rafael | 60 s |
 | 9 | H4 — permanência das principais redes | João Pedro | 45 s |
 | 10 | Robustez: a rede alternativa muda a conclusão? | João Pedro | 50 s |
 | 11 | O que os resultados permitem dizer | Felipe | 55 s |
@@ -35,11 +35,11 @@ Deck de 12 slides, cerca de 10 minutos. Os tempos são sugestões; os pontos sã
 - Dizer por que a fotografia é de setembro e não a atual.
 - Para empresas sem sócios em setembro, usamos a extração de 12/10/2024, após a eleição, com entrada até 13/09/2024. Vínculos encerrados antes da extração podem ficar de fora.
 
-## 4. A rede é fragmentada, mas tem um núcleo — Andrei (55 s)
+## 4. A rede e seu componente gigante — Andrei (55 s)
 
 - Mostrar que a rede nacional não é um bloco único.
 - Explicar o que muda ao remover pontos de articulação.
-- Ligar a decisão de PC2 à robustez.
+- Relacionar o componente gigante às sensibilidades de caminhos e sementes.
 
 ## 5. Eleições apertadas como choque — Andrei (55 s)
 
@@ -55,12 +55,12 @@ Deck de 12 slides, cerca de 10 minutos. Os tempos são sugestões; os pontos sã
 
 ## 7. H2 — contrastes entre coortes de distância — Rafael (55 s)
 
-- Comparar os efeitos eleitorais nas coortes definidas pela distância.
+- Sob comparabilidade, a vantagem prevista é positiva e decrescente. O ponto negativo em δ = 1 contraria essa direção; os diagnósticos limitam a leitura.
 - Ler δ = 1 junto ao placebo, ao suporte pequeno e à sensibilidade de banda; não interpretar composição como gradiente causal da distância.
 - No recorte comparável, a estimação ficou indefinida nas faixas 0, 1, 2. No recorte comparável da faixa 3+, o contraste foi de 0,055 p.p. (IC de 95% de 0,001 a 0,109).
 - Distinguir imprecisão das coortes próximas do IC estreito do contraste médio em δ = 3+, sem limitar efeitos individuais.
 
-## 8. H3 — de onde vem a variação da rede — Rafael (60 s)
+## 8. H3 — decomposição do contraste AMBOS−demais — Rafael (60 s)
 
 - Explicar R1, R2 e R3 com um exemplo de rede.
 - Mostrar que os termos somam o total, não são hipóteses separadas.
@@ -81,7 +81,7 @@ Deck de 12 slides, cerca de 10 minutos. Os tempos são sugestões; os pontos sã
 ## 11. O que os resultados permitem dizer — Felipe (55 s)
 
 - Amarrar os achados das quatro hipóteses com magnitudes e precisão.
-- Distinguir resultado impreciso (H1, H2 δ=0, H3, H4) de efeito pequeno (δ=3+).
+- Distinguir imprecisão de contraste médio pequeno em coortes dominadas pelo gigante; a precisão é condicional à inferência municipal.
 - Relacionar à literatura (Boas et al., Baltrunaite): doações individuais pós-ADI 4650 em um ciclo municipal não reproduzem ganhos claros.
 
 ## 12. Limites e o que ficou de fora — Felipe (45 s)

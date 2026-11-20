@@ -17,6 +17,22 @@ def _linha(pasta: Path, nome: str, **filtros: object) -> dict:
     return tabela.row(0, named=True) if tabela.height else {}
 
 
+def limite_h2(pasta: Path) -> str:
+    arquivo = pasta / "concentracao_gigante_h2.csv"
+    if not arquivo.is_file():
+        return ""
+    coortes = pl.read_csv(arquivo).filter((pl.col("faixa") == "3+") & (pl.col("janela") == "h"))
+    pisos = coortes["piso_fracao_observacoes"]
+    if coortes.height != 4 or pisos.null_count():
+        return ""
+    return (
+        f"Em H2, ao menos {decimal(100 * pisos.min(), 0)}% das observações 3+ nas bandas "
+        "principais e comparáveis pertencem ao gigante. O IC é condicional à inferência "
+        "municipal; não resolve dependência entre municípios da mesma rede "
+        "nem informa outros componentes."
+    )
+
+
 def leitura(pasta: Path) -> list[str]:
     frases = []
     gigante = _linha(pasta, "sensibilidade_gigante", coorte="H3_ambos")
@@ -35,6 +51,12 @@ def leitura(pasta: Path) -> list[str]:
         frases.append(
             f"Em H4 (50%), {decimal(100 * peso, 1)}% do peso das redes de ligação exclusiva "
             "na janela de cinco p.p. pertence ao gigante."
+        )
+    h4_a = _linha(pasta, "sensibilidade_gigante", coorte="H4_rdd_A_50")
+    h4_b = _linha(pasta, "sensibilidade_gigante", coorte="H4_rdd_B_50")
+    if h4_a.get("fracao_peso_gigante") == h4_b.get("fracao_peso_gigante") == 1:
+        frases.append(
+            "Em H4 (50%), o gigante também ocupa integralmente as duas coortes nas bandas do RD."
         )
     sem_gigante = _linha(
         pasta,
@@ -60,8 +82,9 @@ def leitura(pasta: Path) -> list[str]:
     if variacao.get("estimavel"):
         est, inf, sup = (decimal(100 * variacao[c], 2) for c in ("estimativa", "ic_inf", "ic_sup"))
         frases.append(
-            f"Em H2 (δ = 1), a variação pós menos pré dá {est} p.p. "
-            f"(IC [{inf}; {sup}]); são janelas distintas, sem interpretação causal automática."
+            f"Em H2 (δ = 1), o RD da diferença de participação pós menos pré é {est} p.p. "
+            f"(IC [{inf}; {sup}]); não subtrai o placebo de mudança pré-eleitoral "
+            "nem garante interpretação causal."
         )
     auto = _linha(
         pasta, "sensibilidade_sem_autofinanciamento", tipo="contraste", categoria="vencedor_faixa_1"
@@ -78,12 +101,43 @@ def leitura(pasta: Path) -> list[str]:
             f"O placebo de variação pré-eleitoral de H2 (δ = 1) é {est} p.p. "
             f"(IC [{inf}; {sup}]); não comprova continuidade."
         )
+    pre_b = _linha(pasta, "sensibilidade_pre_periodos", tipo="categoria", categoria="faixa_b_1")
+    if pre_b.get("estimavel"):
+        est, inf, sup = (decimal(100 * pre_b[c], 2) for c in ("estimativa", "ic_inf", "ic_sup"))
+        frases.append(
+            f"Na coorte B a um passo, a mudança pré-eleitoral é {est} p.p. "
+            f"(IC nominal [{inf}; {sup}]), diagnóstico que fragiliza a leitura eleitoral do pós."
+        )
     escopo = _linha(pasta, "sensibilidade_escopo_tcesp", periodo="2025", recorte="amostra")
     if (fracao := escopo.get("fracao_excluido")) is not None:
         frases.append(
             f"Pessoal ou credores públicos somam {decimal(100 * fracao, 1)}% do empenho de 2025 "
             "com CNPJ válido na amostra."
         )
+    recortes = [
+        _linha(
+            pasta,
+            "sensibilidade_sem_pessoal_ou_credor_publico",
+            tipo="contraste",
+            hipotese=h,
+            categoria=c,
+            resultado=r,
+        )
+        for h, c, r in (
+            ("H1", "conectada_menos_sem_conexao", "participacao_2025"),
+            ("H2", "vencedor_faixa_1", "participacao_2025"),
+            ("H3", "ambos_menos_demais", "variacao_total"),
+        )
+    ]
+    if all(
+        r.get("estimavel") and r.get("ic_inf") is not None and r.get("ic_sup") is not None
+        for r in recortes
+    ):
+        h1, h2, h3 = recortes
+        if h1["ic_inf"] <= 0 <= h1["ic_sup"] and h3["ic_inf"] <= 0 <= h3["ic_sup"]:
+            frases.append("Sem esses empenhos, H1 e H3 total mantêm ICs cruzando zero.")
+        if h2["ic_sup"] < 0:
+            frases.append("H2 a um passo permanece negativa com IC nominal fora de zero.")
     media = _linha(pasta, "descritivas_estimacao", categoria="faixa_a_0")
     if (valor := media.get("media_participacao_2025")) is not None:
         h1 = _linha(

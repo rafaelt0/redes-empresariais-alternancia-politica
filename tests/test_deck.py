@@ -65,7 +65,7 @@ def test_deck_usa_os_numeros_das_tabelas(tmp_path: Path) -> None:
         if forma.has_text_frame
     )
     assert "1.234 empresas" in textos
-    assert "5.678 pessoas" in textos
+    assert "5.678 vértices de sócios/administradores PF/PJ" in textos
     assert "Estimativa: -0,012 (IC 95%: -0,050 a 0,025)" in textos
 
 
