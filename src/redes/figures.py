@@ -389,7 +389,7 @@ def fig_graus(t: Tabelas) -> Figure:
     for ax, vertice, titulo in zip(
         eixos,
         ("empresa", "pessoa"),
-        ("Empresas (sócios por empresa)", "Pessoas (empresas por pessoa)"),
+        ("Empresas (vínculos por empresa)", "Pessoas/PJ (empresas por vértice)"),
         strict=True,
     ):
         sub = tabela.filter((pl.col("variante") == "PRINCIPAL") & (pl.col("vertice") == vertice))

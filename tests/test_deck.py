@@ -10,6 +10,11 @@ from redes.etapas import Contexto
 from redes.numeros import Numeros
 
 
+def test_efeito_preserva_sinal_de_intervalos_pequenos() -> None:
+    linha = {"estimativa": 0.0004, "ic_inf": -0.0002, "ic_sup": 0.0011}
+    assert deck._efeito(linha, casas=4) == "0,0004 (IC 95%: -0,0002 a 0,0011)"
+
+
 def _caminhos(tmp_path: Path) -> Caminhos:
     return Caminhos(
         dados=tmp_path / "dados",

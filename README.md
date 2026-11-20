@@ -60,6 +60,21 @@ ingestão e reconstruir os intermediários do TCESP sempre que a etapa de ingest
 for executada. O alvo opcional `fetch` cobre também arquivos auxiliares que não entram
 na análise. Em modo estrito, `fetch` baixa somente os arquivos registrados na trava.
 
+## Verificações da revisão
+
+`make entrega-revisada` recompõe as sensibilidades de origem dos vínculos,
+componente gigante, sementes diretas após remoção de articulações, autofinanciamento
+e escopo da despesa e então regenera os artefatos. Esse alvo exige os intermediários
+reais da ingestão, inclusive a pasta `tcesp/`; `PARCIAIS_TCESP=/caminho` permite
+localizá-la separadamente. As redes são processadas em sequência. Para limitar
+recursos, use `POLARS_MAX_THREADS=2 OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1`.
+As sensibilidades têm universo e hipóteses próprios, documentados em
+[sensibilidades](docs/sensibilidades.md) e na [nota de inferência](docs/inferencia.md).
+O alvo inclui o [placebo de variação pré-eleitoral](docs/pre_periodos.md), entre
+2021–2022 e 2023–setembro de 2024, que preserva as coortes e bandas do pós.
+`make all` pode ler sensibilidades já presentes em `results/tables/`; após mudar
+dados ou estimação, use `make entrega-revisada` para evitar diagnósticos antigos.
+
 ## Uso de IA
 
 Assistentes de IA foram usados para implementar o pipeline e elaborar testes.

@@ -26,16 +26,28 @@ SAIDAS_elections := $(addprefix $(DADOS)/,eleicoes.parquet exclusoes.csv)
 SAIDAS_links := $(DADOS)/conexoes_diretas.parquet $(TABELAS)/links_pc1.csv
 SAIDAS_network := $(addprefix $(DADOS)/,rede.parquet distancias.parquet) $(addprefix $(TABELAS)/,rede_resumo.csv rede_componentes.csv rede_distancias.csv rede_graus.csv)
 SAIDAS_panel := $(addprefix $(DADOS)/,painel_firma.parquet painel_rede.parquet) $(addprefix $(TABELAS)/,validacao_panel.csv mercados_sem_empenho.csv)
-SAIDAS_estimate := $(addprefix $(TABELAS)/,h1.csv h2.csv h2_comparaveis.csv h3.csv h4.csv densidade.csv resumo_estimacao.csv robustez.csv validacao.csv comparabilidade_h2.csv permanencia_h4.csv)
+SAIDAS_estimate := $(addprefix $(TABELAS)/,h1.csv h2.csv h2_comparaveis.csv h3.csv h4.csv densidade.csv resumo_estimacao.csv robustez.csv validacao.csv comparabilidade_h2.csv sensibilidade_placebo.csv descritivas_estimacao.csv permanencia_h4.csv)
 SAIDAS_estimate += $(foreach nome,rdd_h1 rdd_h2 rdd_h3 figura1_exemplo rede_componentes rede_distancias rede_graus rede_exemplo_observado gradiente_h2 decomposicao_h3,$(FIGURAS)/$(nome).pdf $(FIGURAS)/$(nome).png)
 SAIDAS_report := $(SAIDA)/relatorio.pdf
 SAIDAS_deck := $(addprefix $(SAIDA)/,deck.pptx deck.pdf guia_de_fala.md)
 ENTRADAS_PUBLICACAO := $(wildcard $(TABELAS)/*.csv)
 faltando = $(shell for arquivo in $(SAIDAS_$(1)); do if ! test -s "$$arquivo"; then echo refazer; break; fi; done)
 
-.PHONY: setup all test lint sample clean-raw dicionario refazer $(ETAPAS)
+.PHONY: setup all test lint sample clean-raw dicionario refazer sensibilidades entrega-revisada $(ETAPAS)
 
 all: report deck
+
+# As verificações adicionais recompõem redes e painéis; o alvo explícito evita reutilizar
+# diagnósticos antigos ao regenerar uma entrega após mudanças nos dados ou na estimação.
+sensibilidades: estimate
+	uv run --frozen python -m redes.sensibilidades --dados "$(abspath $(DADOS))" \
+		--cache "$(abspath $(DADOS))/sensibilidades" --tabelas "$(abspath $(TABELAS))" \
+		--parciais-tcesp "$(or $(PARCIAIS_TCESP),$(abspath $(DADOS))/tcesp)"
+	uv run --frozen python -m redes.pre_periodos
+
+entrega-revisada: sensibilidades
+	$(REDES) report
+	$(REDES) deck
 
 setup:
 	uv sync --frozen
@@ -70,8 +82,8 @@ $(FEITO)/links: $(FEITO)/ingest-rfb $(FEITO)/ingest-tse $(FEITO)/elections src/r
 $(FEITO)/network: $(FEITO)/ingest-rfb $(FEITO)/ingest-tcesp $(FEITO)/links src/redes/network.py src/redes/descritivas.py $(call faltando,network)
 $(FEITO)/panel: $(FEITO)/ingest-tcesp $(FEITO)/elections $(FEITO)/network src/redes/panel.py $(call faltando,panel)
 $(FEITO)/estimate: $(FEITO)/panel $(wildcard src/redes/estimate/*.py) src/redes/figures.py $(call faltando,estimate)
-$(FEITO)/report: $(FEITO)/estimate $(ENTRADAS_PUBLICACAO) $(wildcard $(FIGURAS)/*.pdf) src/redes/report.py src/redes/numeros.py report/relatorio.tex report/referencias.bib $(call faltando,report)
-$(FEITO)/deck: $(FEITO)/estimate $(ENTRADAS_PUBLICACAO) $(wildcard $(FIGURAS)/*.png) src/redes/deck.py src/redes/numeros.py $(call faltando,deck)
+$(FEITO)/report: $(FEITO)/estimate $(ENTRADAS_PUBLICACAO) $(wildcard $(FIGURAS)/*.pdf) src/redes/report.py src/redes/numeros.py src/redes/leitura_sensibilidades.py report/relatorio.tex report/referencias.bib $(call faltando,report)
+$(FEITO)/deck: $(FEITO)/estimate $(ENTRADAS_PUBLICACAO) $(wildcard $(FIGURAS)/*.png) src/redes/deck.py src/redes/numeros.py src/redes/leitura_sensibilidades.py $(call faltando,deck)
 
 $(MODO_FONTES):
 	@mkdir -p $(FEITO)
