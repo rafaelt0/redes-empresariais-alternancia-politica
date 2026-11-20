@@ -47,6 +47,10 @@ def test_dominancia_distingue_as_redes_principais_das_exclusivas():
     assert exclusivas.item(0, "fracao_peso_gigante") == 1.0
     assert exclusivas.item(0, "municipios_sem_gigante") == 0
     assert tabela.filter(pl.col("coorte") == "H3_ambos").item(0, "fracao_peso_gigante") is None
+    rd = sens.dominancia_gigante(redes, 10, 5.0, bandas_h4={"A": 2.0})
+    coorte_rd = rd.filter(pl.col("coorte") == "H4_rdd_A_50")
+    assert coorte_rd.item(0, "fracao_peso_gigante") == 1.0
+    assert coorte_rd.item(0, "redes_municipio") == 20
 
     pequeno_complemento = redes.filter(
         ~((pl.col("cod_municipio_tse") == "0") & (pl.col("id_rede") == 10))

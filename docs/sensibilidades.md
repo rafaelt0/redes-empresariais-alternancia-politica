@@ -23,6 +23,8 @@ anterior. As coortes de conexão direta são específicas a A e B.
 A tabela de concentração usa a banda de estimação da coorte `AMBOS` para as
 coortes de H3. Em H4 usa a janela de cinco pontos percentuais e identifica as
 redes principais e o subconjunto com ligação exclusiva a A ou B em cada limiar.
+As linhas `H4_rdd_A_50` e `H4_rdd_B_50` usam as bandas efetivas das categorias
+de H4 a 50%, com peso de núcleo positivo, para verificar a concentração no RD.
 A fração do empenho usa o valor líquido pré-eleitoral do componente dividido pelo
 valor da respectiva coorte. A fração do peso divide o peso unitário de cada
 município pelas redes que ele tem na coorte e calcula a parcela que cabe ao maior
@@ -50,6 +52,15 @@ menores que cinco e aos campos que permitiriam recuperá-las por subtração.
 Na tabela de concentração, a parcela monetária pode ser publicada mesmo quando
 a parcela do peso é suprimida. O valor em reais de cada grupo da coorte fica
 fora da tabela, e a parcela monetária independe das contagens do grupo.
+
+A variante `sem_articulacao` do Quadro 3 e do slide 10 vem de `robustez.csv`:
+remove as pessoas de articulação e **reseleciona as sementes** entre as pessoas
+restantes. A variante adicional `SEM_ARTICULACAO_SEMENTES_FIXAS` preserva as
+sementes principais e usa outro arquivo, indicado acima. São exercícios
+distintos; não se espera igualdade entre as colunas. Com sementes fixas, o
+contraste direto de H2 coincide com o principal; em 3+, o contraste permanece
+estimável com IC cruzando zero. A variante com sementes reselecionadas perde
+esse suporte. Nenhum resultado é substituído pelo da outra variante.
 
 ## Reprodução
 

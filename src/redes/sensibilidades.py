@@ -244,7 +244,11 @@ def origem_fornecedores(firma: pl.DataFrame, origens: pl.DataFrame) -> pl.DataFr
 
 
 def dominancia_gigante(
-    redes: pl.DataFrame, id_gigante: int, banda_h3: float | None
+    redes: pl.DataFrame,
+    id_gigante: int,
+    banda_h3: float | None,
+    *,
+    bandas_h4: dict[str, float] | None = None,
 ) -> pl.DataFrame:
     """Peso do componente na banda estimada de H3 e nas coortes de H4 em ±5 p.p."""
     valor = pl.col("gasto_medio_pre") * pl.col("participacao_pre")
@@ -260,13 +264,17 @@ def dominancia_gigante(
             for coorte, filtro in (("principais", pl.lit(True)), ("exclusivas", exclusivas))
             for p in panel.LIMIARES
         ),
+        *(
+            (f"H4_rdd_{grupo}_50", pl.col("principal_50") & (pl.col("ligacao") == grupo), banda)
+            for grupo, banda in (bandas_h4 or {}).items()
+        ),
     ]
     tabelas = []
     for nome, filtro, banda in recortes:
         no_recorte = (
             (
                 pl.col("margem").abs() < banda
-                if nome.startswith("H3")
+                if nome.startswith("H3") or "_rdd_" in nome
                 else pl.col("margem").abs() <= banda
             )
             if banda is not None
@@ -355,7 +363,15 @@ def diagnosticos(dados: Path, tabelas: Path) -> None:
         .filter((pl.col("categoria") == "ambos") & (pl.col("resultado") == "variacao_total"))
         .item(0, "banda")
     )
-    dominancia_gigante(redes, maior_componente(dados), banda_h3).write_csv(
+    h4_rd = pl.read_csv(tabelas / "h4.csv").filter(
+        pl.col("categoria").is_in(["ligada_a_50", "ligada_b_50"])
+        & ~pl.col("placebo")
+        & pl.col("estimavel")
+    )
+    bandas_h4 = {
+        c.split("_")[1].upper(): b for c, b in h4_rd.select("categoria", "banda").iter_rows()
+    }
+    dominancia_gigante(redes, maior_componente(dados), banda_h3, bandas_h4=bandas_h4).write_csv(
         tabelas / "sensibilidade_gigante.csv"
     )
 
