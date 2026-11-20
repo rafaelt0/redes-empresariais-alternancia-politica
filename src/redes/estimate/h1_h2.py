@@ -26,6 +26,15 @@ RESULTADO = "participacao_2025"
 PLACEBO = "participacao_pre"
 FAIXAS_H2 = ("0", "1", "2", "3+")
 ESTRATOS_H2 = ("cod_municipio_tse", "elemento_despesa", "porte")
+CATEGORIAS_H2 = {
+    f"faixa_{grupo}_{faixa}": pl.col(f"faixa_{grupo}") == faixa
+    for faixa in FAIXAS_H2
+    for grupo in ("b", "a")
+}
+CONTRASTES_H2 = tuple(
+    rdd.Contraste(f"vencedor_faixa_{faixa}", {f"faixa_b_{faixa}": 0.5, f"faixa_a_{faixa}": -0.5})
+    for faixa in FAIXAS_H2
+)
 
 
 def h1(painel: pl.DataFrame) -> pl.DataFrame:
@@ -40,6 +49,7 @@ def h1(painel: pl.DataFrame) -> pl.DataFrame:
 
 
 def h2(painel: pl.DataFrame, *, recorte_comparavel: bool = False) -> pl.DataFrame:
+    categorias = CATEGORIAS_H2
     if recorte_comparavel:
         painel = _com_porte(painel).with_columns(
             (
@@ -48,23 +58,51 @@ def h2(painel: pl.DataFrame, *, recorte_comparavel: bool = False) -> pl.DataFram
             ).alias(f"comparavel_{faixa}")
             for faixa in FAIXAS_H2
         )
-    categorias = {
-        f"faixa_{grupo}_{faixa}": pl.col(f"faixa_{grupo}") == faixa
-        for faixa in FAIXAS_H2
-        for grupo in ("b", "a")
-    }
-    if recorte_comparavel:
         categorias = {
             nome: filtro & pl.col(f"comparavel_{nome.rsplit('_', 1)[1]}")
             for nome, filtro in categorias.items()
         }
-    contrastes = [
-        rdd.Contraste(
-            f"vencedor_faixa_{faixa}", {f"faixa_b_{faixa}": 0.5, f"faixa_a_{faixa}": -0.5}
-        )
-        for faixa in FAIXAS_H2
-    ]
-    return rdd.tabela(painel, "H2", categorias, [RESULTADO], PLACEBO, contrastes)
+    return rdd.tabela(painel, "H2", categorias, [RESULTADO], PLACEBO, CONTRASTES_H2)
+
+
+def diagnosticos_h2(
+    painel: pl.DataFrame, categorias_pos: pl.DataFrame
+) -> tuple[pl.DataFrame, pl.DataFrame]:
+    """RDD da variação de participação e descritivas do pós, com bandas originais de H2.
+
+    O desfecho é a diferença entre participações no elemento de despesa em 2025 e no
+    acumulado de jan/2021 a set/2024. O mesmo sorteio municipal atua sobre os dois períodos
+    em cada réplica porque a diferença é calculada na unidade antes da estimação.
+    """
+    bandas = {
+        nome: (h, b)
+        for nome, h, b in categorias_pos.select("categoria", "banda", "banda_vies").iter_rows()
+        if h is not None and b is not None
+    }
+    resultado = "variacao_participacao"
+    sensibilidade = rdd.tabela(
+        painel.with_columns((pl.col(RESULTADO) - pl.col(PLACEBO)).alias(resultado)),
+        "H2",
+        CATEGORIAS_H2,
+        [resultado],
+        None,
+        CONTRASTES_H2,
+        bandas_fixas=bandas,
+    )
+    descritivas = pl.DataFrame(
+        [
+            (nome, h, *rdd.descrever(painel, RESULTADO, CATEGORIAS_H2[nome], h))
+            for nome, (h, _) in bandas.items()
+        ],
+        schema={
+            "categoria": pl.String,
+            "banda": pl.Float64,
+            "media_participacao_2025": pl.Float64,
+            "dp_participacao_2025": pl.Float64,
+        },
+        orient="row",
+    )
+    return sensibilidade, descritivas
 
 
 def _com_porte(painel: pl.DataFrame) -> pl.DataFrame:
