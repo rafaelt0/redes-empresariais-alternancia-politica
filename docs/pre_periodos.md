@@ -8,7 +8,7 @@ O placebo examina se a alocação já evoluía de forma descontínua no corte da
 
 ## Resultados
 
-Todos os intervalos incluem zero. Na faixa de distância 1 de H2, o ponto do placebo indica uma queda de 2,75 p.p., na mesma direção do contraste de 2025. O intervalo também admite quedas da ordem do contraste de 2025 e aumentos. A precisão do placebo limita o que podemos concluir sobre diferenças anteriores ao pleito.
+Todos os intervalos **dos contrastes** incluem zero. Isso não vale para cada categoria isolada: a coorte B a um passo já apresenta variação pré-eleitoral negativa, com IC nominal que exclui zero (CSV completo). Na faixa de distância 1 de H2, o ponto do contraste placebo indica uma queda de 2,75 p.p., na mesma direção do contraste de 2025. O intervalo também admite quedas da ordem do contraste de 2025 e aumentos. A precisão do placebo limita o que podemos concluir sobre diferenças anteriores ao pleito.
 
 | Contraste | Estimativa (p.p.) | IC de 95% (p.p.) | Valor-p |
 |---|---:|---:|---:|

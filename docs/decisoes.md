@@ -63,3 +63,5 @@ A variante adicional `SEM_ARTICULACAO_SEMENTES_FIXAS` remove os vértices interm
 ## Placebo temporal adicional (20/11/2026)
 
 Após o segundo parecer, acrescentamos a variação de participação entre 2021–2022 e 2023–setembro de 2024 para H1/H2, mantendo coortes, pesos e bandas do resultado pós. Os denominadores somam os saldos positivos de todo o mercado em cada janela. O teste é distinto do placebo de nível e da diferença pós menos pré. Resultados em `sensibilidade_pre_periodos.csv`; método em `docs/pre_periodos.md`. Janelas de durações distintas, seleção de fornecedores com informação até 2024 e intervalos largos limitam sua interpretação. Não rejeitar esse placebo não valida continuidade nem descarta reversão à média.
+
+As eleições com segundo turno ficam excluídas pelo desenho; isso consta do protocolo implementado em `elections.py` e da lista local `exclusoes.csv`. A capital também não entra no universo TCESP analisado. Esses limites se aplicam ao relatório e ao deck, independentemente do suporte de cada coorte.
