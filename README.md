@@ -72,6 +72,10 @@ As sensibilidades têm universo e hipóteses próprios, documentados em
 [sensibilidades](docs/sensibilidades.md) e na [nota de inferência](docs/inferencia.md).
 O alvo inclui o [placebo de variação pré-eleitoral](docs/pre_periodos.md), entre
 2021–2022 e 2023–setembro de 2024, que preserva as coortes e bandas do pós.
+A [auditoria do recorte comparável](docs/auditoria_h2.md) quantifica a sobreposição
+das coortes e sua covariância na reamostragem conjunta.
+O [diagnóstico de concentração de H2](docs/rede_coortes.md) verifica quanto essas
+coortes dependem do componente gigante e o suporte que resta fora dele.
 `make all` pode ler sensibilidades já presentes em `results/tables/`; após mudar
 dados ou estimação, use `make entrega-revisada` para evitar diagnósticos antigos.
 

@@ -44,6 +44,8 @@ sensibilidades: estimate
 		--cache "$(abspath $(DADOS))/sensibilidades" --tabelas "$(abspath $(TABELAS))" \
 		--parciais-tcesp "$(or $(PARCIAIS_TCESP),$(abspath $(DADOS))/tcesp)"
 	uv run --frozen python -m redes.pre_periodos
+	uv run --frozen python -m redes.auditoria_h2
+	uv run --frozen python -m redes.rede_coortes
 
 entrega-revisada: sensibilidades
 	$(REDES) report
