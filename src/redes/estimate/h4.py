@@ -2,8 +2,8 @@
 
 Unidade: rede–município, entre as principais redes de cada limiar. Resultado: continuar
 principal em 2025. Como em H2, a ligação ao vencedor muda no corte; as categorias são as redes
-ligadas só a B e só a A, e o contraste (β_B − β_A) / 2 é o efeito de estar ligada ao vencedor
-em vez de ao derrotado, no subconjunto cuja ligação ao vencedor muda com o resultado.
+ligadas só a B e só a A. O contraste (β_B − β_A) / 2 resume a heterogeneidade dos saltos
+eleitorais entre essas coortes pré-fixadas; não identifica o efeito de criar uma ligação.
 Redes ligadas aos dois grupos, ou a nenhum, entram como categorias fixas de referência.
 Placebo: a participação da rede antes da eleição.
 """

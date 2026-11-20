@@ -78,6 +78,8 @@ def test_pipeline_percorre_a_amostra(caminhos_amostra):
         "validacao.csv",
         "comparabilidade_h2.csv",
         "h2_comparaveis.csv",
+        "sensibilidade_placebo.csv",
+        "descritivas_estimacao.csv",
         "mercados_sem_empenho.csv",
         "permanencia_h4.csv",
     ):

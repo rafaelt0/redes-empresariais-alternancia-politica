@@ -10,7 +10,7 @@ Convenções:
 - a banda b do projeto é o `h` do rdrobust; o `b` do rdrobust é a banda do viés (`banda_vies`);
 - cada município soma peso 1 em cada estimação: `peso` é renormalizado dentro do município
   depois do filtro de categoria, porque o filtro muda o total de cada município;
-- a estimativa é a convencional; intervalo, erro-padrão e p-valor são os robustos.
+- a estimativa é corrigida por viés; intervalo, erro-padrão e p-valor são os robustos.
 """
 
 import contextlib
@@ -133,6 +133,20 @@ def _contagem(amostra: pl.DataFrame, banda: float = math.inf) -> Contagem:
     return Contagem(**{k: int(v) for k, v in linha.items()})
 
 
+def descrever(
+    painel: pl.DataFrame, resultado: str, categoria: pl.Expr, banda: float
+) -> tuple[float, float]:
+    """Média e desvio padrão dentro de h, com o mesmo peso total por município."""
+    y, w = pl.col("y"), pl.col("w")
+    media, segundo_momento = (
+        _amostra(painel, resultado, categoria)
+        .filter(pl.col("x").abs() < banda)
+        .select((w * y).sum() / w.sum(), (w * y**2).sum().alias("segundo") / w.sum())
+        .row(0)
+    )
+    return media, math.sqrt(max(0.0, segundo_momento - media**2))
+
+
 def _poucos_municipios(contagem: Contagem) -> bool:
     return min(contagem.municipios_tratados, contagem.municipios_controle) < _MINIMO
 
@@ -169,11 +183,11 @@ def _rdrobust(amostra: pl.DataFrame, agrupamento: Agrupamento, h: float | None, 
 
 
 def _salto(saida) -> tuple[float, float, float, float, float]:
-    """(estimativa convencional, ep robusto, ic inferior, ic superior, p robusto) do efeito de
+    """(estimativa corrigida, ep robusto, ic inferior, ic superior, p robusto) do efeito de
     T = 1, com o sinal invertido em relação ao rdrobust."""
     inferior, superior = saida.ci.loc["Robust"]
     return (
-        -float(saida.coef.loc["Conventional"].iloc[0]),
+        -float(saida.coef.loc["Bias-Corrected"].iloc[0]),
         float(saida.se.loc["Robust"].iloc[0]),
         -float(superior),
         -float(inferior),
@@ -257,29 +271,79 @@ def estimar(
     )
 
 
-def _momentos(amostra: pl.DataFrame, h: float) -> pl.DataFrame:
-    """Somas por município que bastam para a regressão linear local ponderada de cada lado."""
-    k = (1 - pl.col("x").abs() / h).clip(lower_bound=0) * pl.col("w")
-    x, y = pl.col("x"), pl.col("y")
+def _momentos(amostra: pl.DataFrame, h: float, b: float) -> pl.DataFrame:
+    """Momentos ponderados por município para os ajustes locais em h e b."""
+    x, y, w = pl.col("x"), pl.col("y"), pl.col("w")
+
+    def somas(banda: float, prefixo: str, n_x: int, n_y: int) -> list[pl.Expr]:
+        u = x / banda
+        k = (1 - u.abs()).clip(lower_bound=0) * w
+        return [
+            *((k * u**j).sum().alias(f"{prefixo}_x{j}") for j in range(n_x)),
+            *((k * u**j * y).sum().alias(f"{prefixo}_y{j}") for j in range(n_y)),
+        ]
+
     return amostra.group_by("municipio").agg(
-        tratado=(x < 0).first(),
-        s0=k.sum(),
-        s1=(k * x).sum(),
-        s2=(k * x * x).sum(),
-        ty=(k * y).sum(),
-        txy=(k * x * y).sum(),
+        (x < 0).first().alias("tratado"),
+        *somas(h, "h", 4, 2),
+        *somas(b, "b", 5, 3),
     )
 
 
-def _intercepto(somas: np.ndarray) -> np.ndarray:
-    s0, s1, s2, ty, txy = somas.T
-    determinante = s0 * s2 - s1**2
-    # Réplicas com um único valor da margem têm determinante zero em aritmética exata.
-    valido = determinante > 32 * np.finfo(float).eps * np.maximum(s0 * s2, s1**2)
-    with np.errstate(divide="ignore", invalid="ignore"):
-        return np.divide(
-            s2 * ty - s1 * txy, determinante, out=np.full_like(s0, np.nan), where=valido
-        )
+def _ajustar_polinomio(momentos_x: np.ndarray, momentos_y: np.ndarray) -> np.ndarray:
+    """Resolve as equações normais com uma linha por réplica e uma coluna por desfecho."""
+    potencias = np.arange(momentos_y.shape[1])
+    gram = momentos_x[:, potencias[:, None] + potencias]
+    autovalores = np.linalg.eigvalsh(gram)
+    # Uma réplica sem suporte para o grau pedido pode parecer invertível por arredondamento.
+    valido = autovalores[:, 0] > 32 * np.finfo(float).eps * autovalores[:, -1]
+    coeficientes = np.full_like(momentos_y, np.nan)
+    coeficientes[valido] = np.linalg.solve(gram[valido], momentos_y[valido])
+    return coeficientes
+
+
+def _intercepto_corrigido(somas: np.ndarray, h: float, b: float) -> np.ndarray:
+    x_h, y_h, x_b, y_b = np.split(somas, [4, 6, 11], axis=1)
+    ajuste_h = _ajustar_polinomio(x_h, np.stack((y_h, x_h[:, 2:4]), axis=-1))
+    intercepto, projecao_quadratica = ajuste_h[:, 0, :].T
+    curvatura = _ajustar_polinomio(x_b, y_b[..., None])[:, 2, 0]
+    # Viés do intercepto linear = intercepto da projeção de (x/h)^2 × curvatura em escala h.
+    return intercepto - projecao_quadratica * (h / b) ** 2 * curvatura
+
+
+def replicas_por_categoria(
+    amostras: Sequence[pl.DataFrame],
+    bandas: Sequence[tuple[float, float]],
+    *,
+    repeticoes: int = config.REPETICOES_BOOTSTRAP,
+    semente: int = config.SEMENTE_BOOTSTRAP,
+) -> np.ndarray:
+    """Reamostra conjuntamente os saltos corrigidos das categorias, uma coluna por amostra."""
+    momentos = [_momentos(a, h, b) for a, (h, b) in zip(amostras, bandas, strict=True)]
+    municipios = (
+        pl.concat(m.select("municipio", "tratado") for m in momentos).unique().sort("municipio")
+    )
+    matrizes = [
+        municipios.join(m, on=["municipio", "tratado"], how="left")
+        .select(pl.exclude("municipio", "tratado"))
+        .fill_null(0)
+        .to_numpy()
+        for m in momentos
+    ]
+    rng = np.random.default_rng(semente)
+    lados = []
+    for tratado in (True, False):
+        indices = np.flatnonzero(municipios["tratado"].to_numpy() == tratado)
+        sorteio = rng.multinomial(len(indices), np.full(len(indices), 1 / len(indices)), repeticoes)
+        lados.append((indices, sorteio))
+    (ind_t, sorteio_t), (ind_c, sorteio_c) = lados
+    return np.column_stack(
+        [
+            _intercepto_corrigido(sorteio_t @ m[ind_t], h, b)
+            - _intercepto_corrigido(sorteio_c @ m[ind_c], h, b)
+            for m, (h, b) in zip(matrizes, bandas, strict=True)
+        ]
+    )
 
 
 def contraste(
@@ -293,11 +357,10 @@ def contraste(
     """Σ c_j β_j sobre (c_j, categoria_j, resultado de `estimar` na categoria_j), com incerteza
     por reamostragem de municípios (seção 6 do projeto).
 
-    Cada β_j é a estimativa convencional com a banda da própria categoria, fixa nas réplicas.
-    A reamostragem é estratificada pelo lado do corte, para que toda réplica tenha os dois
-    lados, e um município sorteado k vezes entra k vezes em todas as categorias, o que preserva
-    a dependência entre categorias de um mesmo município. O intervalo é normal com o
-    erro-padrão das réplicas.
+    Cada β_j é corrigido por viés com as bandas h e b da própria categoria, fixas nas réplicas.
+    A reamostragem é estratificada pelo lado do corte, e um município sorteado k vezes entra
+    k vezes em todas as categorias, preservando a dependência dentro do município. O intervalo
+    é normal, com o erro-padrão das réplicas em que todos os ajustes são estimáveis.
     """
     coeficientes = [c for c, _, _ in componentes]
     amostras = [_amostra(painel, resultado, categoria) for _, categoria, _ in componentes]
@@ -309,28 +372,13 @@ def contraste(
             a.filter(pl.col("x").abs() < r.banda) for a, r in zip(amostras, estimados, strict=True)
         )
     )
-    momentos = [_momentos(a, r.banda) for a, r in zip(amostras, estimados, strict=True)]
-    municipios = (
-        pl.concat(m.select("municipio", "tratado") for m in momentos).unique().sort("municipio")
+    por_categoria = replicas_por_categoria(
+        amostras,
+        [(r.banda, r.banda_vies) for r in estimados],
+        repeticoes=repeticoes,
+        semente=semente,
     )
-    matrizes = [
-        municipios.join(m, on=["municipio", "tratado"], how="left")
-        .select("s0", "s1", "s2", "ty", "txy")
-        .fill_null(0)
-        .to_numpy()
-        for m in momentos
-    ]
-    rng = np.random.default_rng(semente)
-    lados = []
-    for tratado in (True, False):
-        indices = np.flatnonzero(municipios["tratado"].to_numpy() == tratado)
-        sorteio = rng.multinomial(len(indices), np.full(len(indices), 1 / len(indices)), repeticoes)
-        lados.append((indices, sorteio))
-    (ind_t, sorteio_t), (ind_c, sorteio_c) = lados
-    replicas = sum(
-        c * (_intercepto(sorteio_t @ m[ind_t]) - _intercepto(sorteio_c @ m[ind_c]))
-        for c, m in zip(coeficientes, matrizes, strict=True)
-    )
+    replicas = sum(c * salto for c, salto in zip(coeficientes, por_categoria.T, strict=True))
     ep = float(np.nanstd(replicas, ddof=1))
     if not (math.isfinite(ep) and ep > 0):
         return NaoEstimavel("erro-padrão degenerado", contagem)
@@ -422,27 +470,34 @@ def tabela(
     hipotese: str,
     categorias: dict[str, pl.Expr],
     resultados: Sequence[str],
-    placebo: str,
+    placebo: str | None,
     contrastes: Sequence[Contraste] = (),
     *,
     banda_comum: bool = False,
+    bandas_fixas: dict[str, tuple[float, float]] | None = None,
 ) -> pl.DataFrame:
     """Uma linha por categoria e por contraste, para cada resultado e para o placebo.
 
     Com `banda_comum`, o primeiro de `resultados` escolhe as bandas de cada categoria e os demais
     as herdam (H3: termos e total com a mesma amostra, banda e pesos). O placebo escolhe a própria.
+    `bandas_fixas` impõe as bandas por categoria e sinaliza categorias sem banda disponível.
     """
     estimados: dict[tuple[str, str], Resultado] = {}
     linhas = []
-    for resultado in (*resultados, placebo):
+    for resultado in (*resultados, placebo) if placebo is not None else resultados:
         e_placebo = resultado == placebo
         herda = banda_comum and resultado in resultados[1:]
         for nome, filtro in categorias.items():
             base = estimados.get((nome, resultados[0]))
             if herda and isinstance(base, NaoEstimavel):
                 r: Resultado = base
+            elif bandas_fixas is not None and nome not in bandas_fixas:
+                r = NaoEstimavel(
+                    "bandas de referência indisponíveis",
+                    _contagem(_amostra(painel, resultado, filtro)),
+                )
             else:
-                bandas = (base.banda, base.banda_vies) if herda else None
+                bandas = (base.banda, base.banda_vies) if herda else (bandas_fixas or {}).get(nome)
                 r = estimar(painel, resultado, filtro, banda=bandas)
             estimados[(nome, resultado)] = r
             rede = dict.fromkeys(

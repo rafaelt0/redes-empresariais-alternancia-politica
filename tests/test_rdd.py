@@ -58,9 +58,86 @@ def test_holm_preserva_a_ordem_das_hipoteses():
     assert h4.holm([0.04, None, 0.005, 0.01]) == pytest.approx([0.04, None, 0.015, 0.02])
 
 
-def test_intercepto_ignora_replica_singular_mesmo_com_erro_de_arredondamento():
-    somas = np.array([[2.0, 2.2, np.nextafter(2.42, np.inf), 6.0, 6.6]])
-    assert np.isnan(rdd._intercepto(somas)).all()
+@pytest.mark.parametrize("grau", [1, 2])
+def test_ajuste_ignora_replica_singular_mesmo_com_erro_de_arredondamento(grau):
+    margem = np.linspace(0.1, 0.9, grau)
+    momentos_x = np.array([np.sum(margem**j) for j in range(2 * grau + 1)])
+    momentos_x[-1] = np.nextafter(momentos_x[-1], np.inf)
+    momentos_y = np.ones((1, grau + 1, 1))
+    assert np.isnan(rdd._ajustar_polinomio(momentos_x[None, :], momentos_y)).all()
+
+
+def test_contraste_reamostra_o_salto_corrigido_do_rdrobust_com_municipios_em_comum():
+    margem = np.linspace(-10, 10, 81)
+    municipio = np.arange(len(margem))
+    rng = np.random.default_rng(82)
+    choque_municipal = rng.normal(0.0, 0.08, len(margem))
+    painel = pl.concat(
+        [
+            pl.DataFrame(
+                {
+                    "margem": margem,
+                    "cod_municipio_tse": municipio,
+                    "id_rede": municipio,
+                    "grupo": grupo,
+                    "peso": peso,
+                    "y": choque_municipal + nivel + (salto + curva * margem**2) * (margem < 0),
+                }
+            )
+            for grupo, salto, curva in [("A", 0.3, 0.06), ("B", 0.2, -0.02)]
+            for peso, nivel in [(0.15, 0.4), (0.85, 0.1)]
+        ]
+    )
+    bandas = [(5.5, 8.0), (7.5, 5.0)]
+    filtros = [pl.col("grupo") == grupo for grupo in ("A", "B")]
+    amostras = [rdd._amostra(painel, "y", filtro) for filtro in filtros]
+    saidas = [
+        rdd._rdrobust(amostra, "municipio", h, b)
+        for amostra, (h, b) in zip(amostras, bandas, strict=True)
+    ]
+    convencional = (
+        -saidas[0].coef.loc["Conventional"].iloc[0] + saidas[1].coef.loc["Conventional"].iloc[0]
+    )
+    esperados = [-float(saida.coef.loc["Bias-Corrected"].iloc[0]) for saida in saidas]
+    assert abs(esperados[0] - esperados[1] - convencional) > 0.1
+
+    estimadas = [
+        rdd.estimar(painel, "y", filtro, banda=banda)
+        for filtro, banda in zip(filtros, bandas, strict=True)
+    ]
+    repeticoes, semente = 24, 307
+    contraste = rdd.contraste(
+        painel,
+        "y",
+        list(zip([1.0, -1.0], filtros, estimadas, strict=True)),
+        repeticoes=repeticoes,
+        semente=semente,
+    )
+    assert isinstance(contraste, rdd.Estimativa)
+    assert contraste.estimativa == pytest.approx(esperados[0] - esperados[1], abs=1e-10)
+    for estimada, esperado in zip(estimadas, esperados, strict=True):
+        assert isinstance(estimada, rdd.Estimativa)
+        assert estimada.estimativa == pytest.approx(esperado, abs=1e-10)
+        assert (estimada.ic_inf + estimada.ic_sup) / 2 == pytest.approx(esperado, abs=1e-10)
+
+    # Reajusta o rdrobust nas réplicas explícitas e mantém o mesmo sorteio nas duas coortes.
+    rng = np.random.default_rng(semente)
+    multiplicidades = np.hstack(
+        [
+            rng.multinomial(n, np.full(n, 1 / n), repeticoes)
+            for n in ((margem < 0).sum(), (margem >= 0).sum())
+        ]
+    )
+    replicas = []
+    for pesos in multiplicidades:
+        saltos = []
+        for amostra, (h, b) in zip(amostras, bandas, strict=True):
+            replica = amostra.with_columns(w=pl.col("w") * pl.Series(pesos[amostra["municipio"]]))
+            saida = rdd._rdrobust(replica.filter(pl.col("w") > 0), "municipio", h, b)
+            saltos.append(-float(saida.coef.loc["Bias-Corrected"].iloc[0]))
+        replicas.append(saltos[0] - saltos[1])
+    assert contraste.ep_robusto == pytest.approx(np.std(replicas, ddof=1), abs=1e-10)
+    assert (contraste.ic_inf + contraste.ic_sup) / 2 == pytest.approx(contraste.estimativa)
 
 
 def test_h3_termos_e_total_usam_as_mesmas_bandas_e_somam():
@@ -96,6 +173,12 @@ def test_h3_termos_e_total_usam_as_mesmas_bandas_e_somam():
         efeito["termo_r1"] + efeito["termo_r2"] + efeito["termo_r3"]
     )
     assert efeito["termo_compensacao"] == pytest.approx(efeito["termo_r2"] + efeito["termo_r3"])
+    contraste = tabelas.filter((pl.col("categoria") == "ambos_menos_demais") & ~pl.col("placebo"))
+    efeitos = dict(contraste.select("resultado", "estimativa").iter_rows())
+    assert efeitos["variacao_total"] == pytest.approx(
+        efeitos["termo_r1"] + efeitos["termo_r2"] + efeitos["termo_r3"]
+    )
+    assert efeitos["termo_compensacao"] == pytest.approx(efeitos["termo_r2"] + efeitos["termo_r3"])
 
 
 def test_h2_comparavel_exige_a_outra_coorte_no_mesmo_municipio_e_elemento():
@@ -119,3 +202,40 @@ def test_h2_comparavel_exige_a_outra_coorte_no_mesmo_municipio_e_elemento():
     )
     assert resultado["unidades_controle"].to_list() == [1, 1]
     assert resultado["unidades_tratadas"].to_list() == [0, 0]
+
+
+def test_sensibilidade_h2_usa_bandas_do_pos_e_reestima_a_variacao():
+    margem = np.linspace(-10, 10, 81)
+    rng = np.random.default_rng(28)
+    anterior = 0.3 + 0.2 * (margem < 0) + rng.normal(0, 0.03, len(margem))
+    posterior = anterior + 0.02 * (margem < 0) + rng.normal(0, 0.01, len(margem))
+    painel = pl.concat(
+        [
+            pl.DataFrame(
+                {
+                    "margem": margem,
+                    "cod_municipio_tse": np.arange(len(margem)),
+                    "id_rede": np.arange(len(margem)),
+                    "peso": 1.0,
+                    "faixa_a": "0" if grupo == "A" else "inf",
+                    "faixa_b": "0" if grupo == "B" else "inf",
+                    "participacao_pre": anterior,
+                    "participacao_2025": posterior + salto * (margem < 0),
+                }
+            )
+            for grupo, salto in [("A", 0.0), ("B", 0.1)]
+        ]
+    )
+    principal = pl.DataFrame(
+        {"categoria": ["faixa_a_0", "faixa_b_0"], "banda": [6.0, 6.0], "banda_vies": [8.0, 8.0]}
+    )
+    sensibilidade, descritivas = h1_h2.diagnosticos_h2(painel, principal)
+    contraste = sensibilidade.filter(pl.col("categoria") == "vencedor_faixa_0").row(0, named=True)
+    assert contraste["estimativa"] == pytest.approx(0.05, abs=1e-10)
+    assert sensibilidade.filter(pl.col("estimavel") & (pl.col("tipo") == "categoria"))[
+        "banda_vies"
+    ].to_list() == [8.0, 8.0]
+    assert not sensibilidade.filter(pl.col("categoria") == "vencedor_faixa_1")["estimavel"].item()
+    coorte_a = descritivas.filter(pl.col("categoria") == "faixa_a_0").row(0, named=True)
+    assert coorte_a["media_participacao_2025"] == pytest.approx(posterior[abs(margem) < 6].mean())
+    assert coorte_a["dp_participacao_2025"] == pytest.approx(posterior[abs(margem) < 6].std())

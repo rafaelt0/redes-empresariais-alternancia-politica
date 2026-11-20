@@ -1,0 +1,14 @@
+coorte,lado,origem,fornecedores_municipio,municipios,fracao_fornecedores,fracao_empenho_pre
+conexao_direta_a,derrota_incumbente,2024-09,,,,
+conexao_direta_a,derrota_incumbente,2024-10,,,,
+conexao_direta_a,vitoria_incumbente,2024-09,,,,
+conexao_direta_a,vitoria_incumbente,2024-10,,,,
+conexao_direta_b,derrota_incumbente,2024-09,,,,
+conexao_direta_b,vitoria_incumbente,2024-09,,,,
+conexao_direta_b,vitoria_incumbente,2024-10,,,,
+fornecedores_anteriores,derrota_incumbente,2024-09,33519,42,0.5554101077050538,0.48286634427224057
+fornecedores_anteriores,derrota_incumbente,2024-10,7649,42,0.12674399337199668,0.0984674500326322
+fornecedores_anteriores,derrota_incumbente,SEM_QUADRO,19182,42,0.31784589892294945,0.41866620569512714
+fornecedores_anteriores,vitoria_incumbente,2024-09,31934,36,0.5724375291291722,0.46521718560718306
+fornecedores_anteriores,vitoria_incumbente,2024-10,7409,36,0.13281109955902914,0.0904655208659913
+fornecedores_anteriores,vitoria_incumbente,SEM_QUADRO,16443,36,0.2947513713117987,0.44431729352682564

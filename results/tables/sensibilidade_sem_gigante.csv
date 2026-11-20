@@ -1,0 +1,31 @@
+hipotese,categoria,tipo,resultado,estimavel,motivo,estimativa,ic_inf,ic_sup,p_valor,p_holm,n_testes_holm,banda,municipios_tratados,municipios_controle,unidades_tratadas,unidades_controle,estimativa_meia_banda,estimativa_dobro_banda,emd,p_valor_rede,redes_tratadas,redes_controle,placebo_estimativa,placebo_p_valor,densidade_p_valor
+H3,ambos,categoria,variacao_total,false,menos de 10 municípios de um lado do corte,,,,,,13,,,,,,,,,,,,,,0.9934219516282998
+H3,demais,categoria,variacao_total,true,,-3.558519106333679e-6,-0.00010198299236945286,0.0000948659541567855,0.9435074715927385,,13,19.109166655536658,107,124,128031,151686,-0.00001550243379977868,0.000011543591096553033,0.0001406885797747038,0.9672854051985139,74296,82682,0.00013066585448064496,0.19858095194565117,0.9934219516282998
+H3,ambos_menos_demais,contraste,variacao_total,false,alguma categoria não é estimável,,,,,,13,,,,,,,,,,,,,,0.9934219516282998
+H3,ambos,categoria,termo_r1,false,menos de 10 municípios de um lado do corte,,,,,,13,,,,,,,,,,,,,,0.9934219516282998
+H3,demais,categoria,termo_r1,true,,1.2935015686472271e-7,-1.4961485637168628e-7,4.083151701011317e-7,0.3634590283493747,,13,19.109166655536658,107,124,128031,151686,4.082781723770661e-8,-3.0220803355160126e-7,3.987543973351211e-7,0.37875603770636634,74296,82682,0.00013066585448064496,0.19858095194565117,0.9934219516282998
+H3,ambos_menos_demais,contraste,termo_r1,false,alguma categoria não é estimável,,,,,,13,,,,,,,,,,,,,,0.9934219516282998
+H3,ambos,categoria,termo_r2,false,menos de 10 municípios de um lado do corte,,,,,,13,,,,,,,,,,,,,,0.9934219516282998
+H3,demais,categoria,termo_r2,true,,-2.750662798504651e-6,-0.0001009925682823102,0.0000954912426853009,0.9562366261314735,,13,19.109166655536658,107,124,128031,151686,-0.000014037545343588594,0.000011145088344190527,0.00014042761620809582,0.9746945170885617,74296,82682,0.00013066585448064496,0.19858095194565117,0.9934219516282998
+H3,ambos_menos_demais,contraste,termo_r2,false,alguma categoria não é estimável,,,,,,13,,,,,,,,,,,,,,0.9934219516282998
+H3,ambos,categoria,termo_r3,false,menos de 10 municípios de um lado do corte,,,,,,13,,,,,,,,,,,,,,0.9934219516282998
+H3,demais,categoria,termo_r3,true,,-9.372064646974629e-7,-7.541221771975197e-6,5.666808842580271e-6,0.7808990678947614,,13,19.109166655536658,107,124,128031,151686,-1.5057162734287197e-6,7.007107859158234e-7,9.439822267654003e-6,0.756078982307985,74296,82682,0.00013066585448064496,0.19858095194565117,0.9934219516282998
+H3,ambos_menos_demais,contraste,termo_r3,false,alguma categoria não é estimável,,,,,,13,,,,,,,,,,,,,,0.9934219516282998
+H3,ambos,categoria,termo_compensacao,false,menos de 10 municípios de um lado do corte,,,,,,13,,,,,,,,,,,,,,0.9934219516282998
+H3,demais,categoria,termo_compensacao,true,,-3.687869263199067e-6,-0.00010210106638329601,0.00009472532785689788,0.9414509286056095,,13,19.109166655536658,107,124,128031,151686,-0.00001554326161701562,0.000011845799130103093,0.00014067246158280965,0.9660969439236521,74296,82682,0.00013066585448064496,0.19858095194565117,0.9934219516282998
+H3,ambos_menos_demais,contraste,termo_compensacao,false,alguma categoria não é estimável,,,,,,13,,,,,,,,,,,,,,0.9934219516282998
+H4,ligada_a_25,categoria,mantem_posicao_25,false,menos de 10 municípios de um lado do corte,,,,,,13,,0,0,0,0,,,,,,,,,0.9934219516282998
+H4,ligada_b_25,categoria,mantem_posicao_25,false,menos de 10 municípios de um lado do corte,,,,,,13,,0,0,0,0,,,,,,,,,0.9934219516282998
+H4,ligada_ambos_25,categoria,mantem_posicao_25,false,menos de 10 municípios de um lado do corte,,,,,,13,,0,0,0,0,,,,,,,,,0.9934219516282998
+H4,ligada_nenhum_25,categoria,mantem_posicao_25,true,,0.020901420796316073,-0.05965441287218248,0.10145725446481463,0.611073229563172,1.0,13,19.569337206948344,96,108,99,112,0.0698198823691274,0.017162153311179873,0.11514703056719376,0.623720552891283,99,112,-0.012159602808543224,0.45427452948068325,0.9934219516282998
+H4,ligada_ao_vencedor_25,contraste,mantem_posicao_25,false,alguma categoria não é estimável,,,,,,13,,,,,,,,,,,,,,0.9934219516282998
+H4,ligada_a_50,categoria,mantem_posicao_50,false,menos de 10 municípios de um lado do corte,,,,,,13,,0,,0,,,,,,,,,,0.9934219516282998
+H4,ligada_b_50,categoria,mantem_posicao_50,false,menos de 10 municípios de um lado do corte,,,,,,13,,0,0,0,0,,,,,,,,,0.9934219516282998
+H4,ligada_ambos_50,categoria,mantem_posicao_50,false,menos de 10 municípios de um lado do corte,,,,,,13,,0,0,0,0,,,,,,,,,0.9934219516282998
+H4,ligada_nenhum_50,categoria,mantem_posicao_50,true,,-0.13508247713950783,-0.29034396256416733,0.02017900828515168,0.08815123996600484,0.9696636396260532,13,16.827431544908897,101,106,201,221,-0.23068722871527658,-0.11353569646899397,0.22193177320554933,0.20897957937635803,173,186,-0.03182925890312227,0.14196953847641308,0.9934219516282998
+H4,ligada_ao_vencedor_50,contraste,mantem_posicao_50,false,alguma categoria não é estimável,,,,,,13,,,,,,,,,,,,,,0.9934219516282998
+H4,ligada_a_75,categoria,mantem_posicao_75,false,menos de 10 municípios de um lado do corte,,,,,,13,,,17,,17,,,,,,,,,0.9934219516282998
+H4,ligada_b_75,categoria,mantem_posicao_75,false,menos de 10 municípios de um lado do corte,,,,,,13,,0,5,0,5,,,,,,,,,0.9934219516282998
+H4,ligada_ambos_75,categoria,mantem_posicao_75,false,menos de 10 municípios de um lado do corte,,,,,,13,,0,,0,,,,,,,,,,0.9934219516282998
+H4,ligada_nenhum_75,categoria,mantem_posicao_75,true,,-0.12758899126367473,-0.23561181371459164,-0.019566168812757828,0.020614455161197226,0.2473734619343667,13,22.04829809562613,119,138,1838,2572,-0.15123543889253832,-0.13151887447247834,0.15440852229146956,0.010724489954141115,1376,1949,-0.017459619123107104,0.04167390444508569,0.9934219516282998
+H4,ligada_ao_vencedor_75,contraste,mantem_posicao_75,false,alguma categoria não é estimável,,,,,,13,,,,,,,,,,,,,,0.9934219516282998

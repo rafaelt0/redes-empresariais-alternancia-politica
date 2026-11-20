@@ -346,12 +346,17 @@ def fig_componentes(t: Tabelas) -> Figure:
         _distribuicao_indisponivel(ax)
         return fig
     _barras_agrupadas(ax, faixas, series)
-    ax.set_yscale("log")
+    ax.set_ylim(0, 100)
+    ax.set_yticks(range(0, 101, 20))
     ax.set_xlabel("Tamanho do componente (empresas)")
     ax.set_ylabel("Empresas (% do total)")
     ax.yaxis.set_major_formatter(FuncFormatter(lambda v, _: formato_br(v)))
-    ax.yaxis.set_minor_formatter(NullFormatter())
-    plt.setp(ax.get_xticklabels(), rotation=45, ha="right", rotation_mode="anchor")
+    for barras in ax.containers:
+        ax.bar_label(
+            barras,
+            labels=[formato_br(round(v, 1)) if math.isfinite(v) else "" for v in barras.datavalues],
+            fontsize=7,
+        )
     ax.legend(loc="upper right")
     return fig
 
@@ -389,7 +394,7 @@ def fig_graus(t: Tabelas) -> Figure:
     for ax, vertice, titulo in zip(
         eixos,
         ("empresa", "pessoa"),
-        ("Empresas (sócios por empresa)", "Pessoas (empresas por pessoa)"),
+        ("Empresas (vínculos por empresa)", "Pessoas/PJ (empresas por vértice)"),
         strict=True,
     ):
         sub = tabela.filter((pl.col("variante") == "PRINCIPAL") & (pl.col("vertice") == vertice))

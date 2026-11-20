@@ -1,6 +1,6 @@
 # Spec: Redes empresariais e persistência econômica sob alternância política
 
-Implementação reprodutível do projeto de pesquisa de mesmo título (EAE1429 — Redes Econômicas e Sociais, FEA-USP, 2º semestre de 2026). O projeto de pesquisa (`docs/projeto.pdf`) é a fonte de verdade para definições, hipóteses e desenho empírico; esta especificação diz como ele vira código. Onde os dois divergirem, vale o projeto, e a divergência é um defeito desta especificação.
+Implementação reprodutível do projeto de pesquisa de mesmo título (EAE1429 — Redes Econômicas e Sociais, FEA-USP, 2º semestre de 2026). O projeto (`docs/projeto.pdf`) define a pergunta, as hipóteses e o desenho original. Esta especificação descreve a operação vigente, com as diferenças de medida e de estimando registradas em `docs/decisoes.md`. As ampliações operacionais não devem ser atribuídas retroativamente ao projeto original.
 
 ## Objetivo
 
@@ -16,14 +16,16 @@ Os resultados são reportados como saírem, inclusive nulos ou inconclusivos, co
 
 ## Definições operacionais
 
-Todas vêm do projeto; aqui ficam apenas as escolhas necessárias para codificá-las.
+As definições abaixo descrevem a implementação vigente. Ampliações e diferenças frente ao
+projeto original estão explicitadas em [docs/decisoes.md](docs/decisoes.md), em especial
+administradores como sementes, preenchimento por outubro e contrastes entre coortes.
 
 | Conceito | Definição operacional |
 |---|---|
 | Empresa | CNPJ básico (8 primeiros dígitos). Matriz e filiais são uma empresa. |
-| Pessoa | Sócio pessoa física: par (nome normalizado, 6 dígitos centrais do CPF), pseudonimizado na ingestão. Sócio pessoa jurídica: CNPJ básico do sócio. |
-| Vizinhança | Duas empresas são vizinhas quando compartilham ao menos um sócio na fotografia de 2024-09. |
-| Conexão direta com k | Algum sócio pessoa física da empresa doou ao candidato do grupo k, com data da receita até 5/10/2024. |
+| Pessoa | Sócio ou administrador PF: par (nome normalizado, 6 dígitos centrais do CPF), pseudonimizado. Sócio PJ: CNPJ básico; estrangeiro: chave pseudonimizada por nome. |
+| Vizinhança | Duas empresas compartilham ao menos um sócio ou administrador na fotografia de 2024-09, complementada somente para empresas ausentes por vínculos de 2024-10 com entrada até 13/09/2024. O erro de sobrevivência desses vínculos após a eleição exige continuidade no corte. |
+| Conexão direta com k | Algum sócio ou administrador PF da empresa doou ao candidato do grupo k até 5/10/2024. Administradores ampliam a definição societária literal; a variante sem administradores retira essas sementes e seus canais. |
 | δ_ik | Menor número de vizinhanças entre a empresa i e uma empresa diretamente conectada a k; 0 na conexão direta, ∞ sem caminho. Calculada por busca em largura no grafo bipartido pessoa–empresa (distância bipartida ÷ 2). |
 | Faixas de distância | 0, 1, 2, 3 ou mais, ∞. |
 | Rede societária R | Componente conexo da relação de vizinhança. Serve para agregar, não é agente. |
@@ -49,7 +51,7 @@ Cada etapa lê apenas as saídas das anteriores e grava Parquet em `data/`. Os i
 | `elections` | Grupo incumbente, M_m, T_m, exclusões listadas | ingest-tse | `eleicoes.parquet`, `exclusoes.csv` |
 | `links` | Cruzamento sócio–doador por nome e 6 dígitos; conexões diretas | ingest-rfb, ingest-tse, elections | `conexoes_diretas.parquet` |
 | `network` | Grafo bipartido, componentes, δ_ik por município e grupo (só para empresas com empenho no município), descritivas de rede | ingest-rfb, ingest-tcesp, links | `rede.parquet`, `distancias.parquet` |
-| `panel` | Painéis empresa–município e rede–município; participações; R1, R2, R3; principais redes | ingest-tcesp, elections, network | `painel_firma.parquet`, `painel_rede.parquet` |
+| `panel` | Painéis empresa–município–elemento e rede–município; participações; R1, R2, R3; principais redes | ingest-tcesp, elections, network | `painel_firma.parquet`, `painel_rede.parquet` |
 | `estimate` | RDD para H1 a H4, diagnósticos, placebos, robustez | panel | `results/tables/`, `results/figures/` |
 | `report` | Relatório em PDF | estimate | `output/relatorio.pdf` |
 | `deck` | Deck `.pptx`, `.pdf` e guia de fala | estimate | `output/deck.pptx`, `output/deck.pdf`, `output/guia_de_fala.md` |
@@ -66,12 +68,18 @@ Especificação (5) do projeto, por resultado e categoria de conexão, com `rdro
 
 | Hipótese | Unidade | Resultado | Comparação |
 |---|---|---|---|
-| H1 | empresa–município, fornecedores anteriores | participação no empenhado de 2025, dentro do elemento de despesa | conectadas diretamente ao incumbente contra fornecedoras sem conexão |
-| H2 | empresa–município, fornecedores anteriores | idem | por faixa de δ até o vencedor |
+| H1 | empresa–município–elemento, fornecedores anteriores | participação no empenhado de 2025, dentro do elemento de despesa | salto eleitoral das diretamente ligadas a A menos o das sem caminho a A nem B |
+| H2 | empresa–município–elemento, fornecedores anteriores | idem | meia diferença dos saltos eleitorais em coortes de distância fixa a B e A. Resume heterogeneidade entre coortes; não identifica efeito de reduzir distância. Suporte comum de município–elemento–porte como sensibilidade. |
 | H3 | rede–município | os três termos da equação (4) e o total, divididos pelo gasto anual médio pré-eleição | redes ligadas aos dois grupos contra as demais; quatro resultados com mesma amostra, banda e pesos; incerteza das diferenças por reamostragem de municípios |
-| H4 | rede–município, principais redes | manutenção da posição | com e sem ligação ao vencedor |
+| H4 | rede–município, principais redes | manutenção da posição no ranking de 2025, incluindo entrantes | meia diferença dos saltos nas redes de ligação exclusiva B e A. Médias com/sem ligação ao vencedor na janela de cinco p.p. são descritivas em grupos distintos. |
 
 H1 a H3 são principais. H4 e as demais comparações recebem correção para múltiplas hipóteses (Holm).
+
+Categorias e contrastes usam pontos corrigidos pelo viés. Categorias usam IC robusto CCT;
+contrastes usam IC normal com EP de reamostragem municipal conjunta, estratificada por lado,
+recalculando o ajuste de viés com bandas fixas. A aproximação não trata a dependência entre
+municípios ligados à mesma rede. O diagnóstico pré-eleitoral adicional compara 2021–2022 com
+2023–setembro de 2024, sem mudar coortes, pesos ou bandas do pós. Ver [nota de inferência](docs/inferencia.md).
 
 Robustez da rede, reestimando H1 a H3: sem pessoas cuja retirada divide componentes (pontos de articulação), sem sócios pessoas jurídicas, sem administradores não sócios. Descritivas obrigatórias: distribuição do tamanho dos componentes e das distâncias, e erro de reconstrução (fotografia 2024-09 contra a mais recente filtrada pela data de entrada).
 

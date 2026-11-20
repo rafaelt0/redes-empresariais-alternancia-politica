@@ -32,6 +32,8 @@ ARQUIVOS = (
     "validacao.csv",
     "comparabilidade_h2.csv",
     "h2_comparaveis.csv",
+    "sensibilidade_placebo.csv",
+    "descritivas_estimacao.csv",
     "permanencia_h4.csv",
 )
 
@@ -55,6 +57,7 @@ COLUNAS_RESUMO = (
     "ic_sup",
     "p_valor",
     "p_holm",
+    "n_testes_holm",
     "banda",
     "municipios_tratados",
     "municipios_controle",
@@ -109,11 +112,16 @@ def resumo(principal: pl.DataFrame, densidade: pl.DataFrame) -> pl.DataFrame:
         pl.col("p_valor").alias("placebo_p_valor"),
     )
     na_familia = principal.select(h4.familia_holm()).to_series()
-    p_holm = h4.holm(
-        [p if dentro else None for p, dentro in zip(principal["p_valor"], na_familia, strict=True)]
-    )
+    p_valores = [
+        p if dentro else None for p, dentro in zip(principal["p_valor"], na_familia, strict=True)
+    ]
+    p_holm = h4.holm(p_valores)
+    n_testes_holm = sum(p is not None for p in p_valores)
     return (
-        principal.with_columns(pl.Series("p_holm", p_holm, dtype=pl.Float64))
+        principal.with_columns(
+            pl.Series("p_holm", p_holm, dtype=pl.Float64),
+            n_testes_holm=pl.lit(n_testes_holm),
+        )
         .filter(~pl.col("placebo"))
         .join(placebos, on=chave, how="left", maintain_order="left")
         .with_columns(densidade_p_valor=pl.lit(densidade["p_valor"].item(), pl.Float64))
@@ -217,6 +225,12 @@ def _estimar_dados(caminhos: Caminhos, variante: str) -> pl.DataFrame:
         h1_h2.comparabilidade(firma).write_csv(tabelas / "comparabilidade_h2.csv")
         h2_comparaveis = h1_h2.h2(firma, recorte_comparavel=True)
         suprimir_contagens(h2_comparaveis).write_csv(tabelas / "h2_comparaveis.csv")
+        categorias_h2 = resultado.filter(
+            (pl.col("hipotese") == "H2") & (pl.col("tipo") == "categoria") & ~pl.col("placebo")
+        )
+        sensibilidade, descritivas = h1_h2.diagnosticos_h2(firma, categorias_h2)
+        suprimir_contagens(sensibilidade).write_csv(tabelas / "sensibilidade_placebo.csv")
+        descritivas.write_csv(tabelas / "descritivas_estimacao.csv")
         h4.permanencia(rede).write_csv(tabelas / "permanencia_h4.csv")
         _graficos_rdd(ctx, firma, rede, resultado)
     print(f"estimate: variante {variante} concluída", file=sys.stderr)
