@@ -1,0 +1,2 @@
+faixa,estratos,observacoes_a,observacoes_b,observacoes_ambas,jaccard,na_banda_estratos,na_banda_observacoes_a,na_banda_observacoes_b,na_banda_observacoes_ambas,na_banda_jaccard,replicas,replicas_validas,ep_a_bootstrap,ep_b_bootstrap,correlacao_bootstrap,ep_contraste_bootstrap,ep_contraste_sem_covariancia
+3+,2674,29354,29464,29028,0.9744209466263847,1638,14810,16898,14566,0.8497258196243146,999,999,0.0021938544928146084,0.0022991215661589555,0.9708876038126592,0.00027602690532941746,0.0015889428491626164
