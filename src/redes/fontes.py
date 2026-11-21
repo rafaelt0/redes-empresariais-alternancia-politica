@@ -83,7 +83,7 @@ _AJUSTES = [
 
 # As pastas 2024-09 e 2024-10 foram regravadas em maio de 2025 (Last-Modified), mas são as
 # fotografias do desenho e tratamos mudança nelas como erro. A 2024-10 só preenche as empresas
-# sem sócio em 2024-09 (`docs/decisoes.md`); a 2026-10 é só para o erro de reconstrução (T10).
+# sem sócio em 2024-09; a 2026-10 é só para o erro de reconstrução (T10).
 FONTES: dict[str, tuple[Arquivo, ...]] = {
     arquivos[0].fonte: arquivos
     for arquivos in (
