@@ -17,16 +17,21 @@ def _linha(pasta: Path, nome: str, **filtros: object) -> dict:
     return tabela.row(0, named=True) if tabela.height else {}
 
 
-def limite_h2(pasta: Path) -> str:
+def piso_gigante_h2(pasta: Path) -> float | None:
     arquivo = pasta / "concentracao_gigante_h2.csv"
     if not arquivo.is_file():
-        return ""
+        return None
     coortes = pl.read_csv(arquivo).filter((pl.col("faixa") == "3+") & (pl.col("janela") == "h"))
     pisos = coortes["piso_fracao_observacoes"]
-    if coortes.height != 4 or pisos.null_count():
+    return pisos.min() if coortes.height == 4 and not pisos.null_count() else None
+
+
+def limite_h2(pasta: Path) -> str:
+    piso = piso_gigante_h2(pasta)
+    if piso is None:
         return ""
     return (
-        f"Em H2, ao menos {decimal(100 * pisos.min(), 0)}% das observações 3+ nas bandas "
+        f"Em H2, ao menos {decimal(100 * piso, 0)}% das observações 3+ nas bandas "
         "principais e comparáveis pertencem ao gigante. O IC é condicional à inferência "
         "municipal; não resolve dependência entre municípios da mesma rede "
         "nem informa outros componentes."
