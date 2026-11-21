@@ -20,7 +20,7 @@ depois dela, então a data está errada, não o vínculo (em 2024-09 há um caso
 Os arquivos de sócios são cortados por número de linhas (2.019.150 cada), não por CNPJ: uma
 empresa pode ter linhas em dois arquivos, e a mesma linha em dois arquivos conta como `DUPLICADA`.
 
-Preenchimento (`docs/decisoes.md`). A pasta 2024-09 traz o `Socios0` de agosto, e a empresa que
+Preenchimento. A pasta 2024-09 traz o `Socios0` de agosto, e a empresa que
 só o `Socios0` de setembro traria fica sem sócio. A empresa do cadastro de 2024-09 sem nenhum
 sócio na fotografia recebe os sócios da fotografia de 2024-10 (`OUTUBRO`) com data de entrada
 anterior à extração de 2024-09; `origem` diz de qual pasta veio cada vínculo.
@@ -99,8 +99,7 @@ RECENTE = Fotografia("rfb-2026-10", date(2026, 10, 10), "reconstrucao")
 """Fotografia mais recente do compartilhamento, usada só no erro de reconstrução (T10).
 
 O erro mede o que se perderia ao reconstruir a rede de 2024-09 pela fotografia atual: é o número
-que a seção 5 do projeto manda reportar, não uma substituta da fotografia do desenho
-(`docs/decisoes.md`)."""
+que a seção 5 do projeto manda reportar, não uma substituta da fotografia do desenho."""
 
 Vinculo = Literal["SOCIO", "ADMINISTRADOR_NAO_SOCIO"]
 _SOC: Vinculo = "SOCIO"
@@ -676,8 +675,8 @@ def _erro_de_reconstrucao(
     """Quanto da rede de 2024-09 se perde ao reconstruí-la pela fotografia de `RECENTE` (T10).
 
     Compara os vínculos de setembro com os da fotografia mais recente restritos ao cadastro de
-    2024-09 e à data de entrada anterior à extração de setembro, o mesmo filtro do preenchimento
-    (`docs/decisoes.md`). Devolve contagens e frações: vínculos e empresas de setembro ausentes da
+    2024-09 e à data de entrada anterior à extração de setembro, o mesmo filtro do preenchimento.
+    Devolve contagens e frações: vínculos e empresas de setembro ausentes da
     reconstrução, e vínculos e empresas reconstruídos ausentes de setembro. Sem os arquivos da
     fotografia recente (testes de outras partes da ingestão), não produz comparações.
     """
@@ -778,7 +777,7 @@ def _separar_preenchimento(
     con: duckdb.DuckDBPyConnection, pasta: Path, setembro: str
 ) -> list[tuple[str, str, int]]:
     """Cria a tabela `preenchidos`: vínculos de 2024-10 das empresas do cadastro de 2024-09
-    sem sócio em 2024-09, com entrada antes da extração de 2024-09 (`docs/decisoes.md`)."""
+    sem sócio em 2024-09, com entrada antes da extração de 2024-09."""
     outubro = sorted(pasta.glob("preenchimento_*.parquet"))
     origem = (
         f"read_parquet({[str(p) for p in outubro]})"

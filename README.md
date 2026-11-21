@@ -2,9 +2,9 @@
 
 Projeto de EAE1429 (FEA-USP) sobre como a derrota do grupo incumbente em eleições
 municipais apertadas se relaciona com a distribuição das compras públicas entre
-empresas e redes societárias paulistas. O [projeto de pesquisa](docs/projeto.pdf)
-define H1 a H4. A [especificação](SPEC.md) e o [registro de decisões](docs/decisoes.md)
-documentam a implementação.
+empresas e redes societárias paulistas. O [relatório](report/relatorio.tex) define
+H1 a H4 e o desenho; o [dicionário de dados](docs/dicionario.md) descreve as tabelas
+que o pipeline grava.
 
 Felipe Ferreira Alexandre, Andrei Schoschlakow Bonifácio, Rafael Eiki Teruya e
 João Pedro Ferreira.
