@@ -1,6 +1,5 @@
 # Dados brutos e intermediários, inclusive a amostra sintética gerada
 /data/
-/.claude/worktrees/
 
 # Chave HMAC da pseudonimização
 /.chave_pseudonimo
