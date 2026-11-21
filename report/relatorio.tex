@@ -11,7 +11,7 @@
 \emergencystretch=3em
 \usepackage{mathptmx}
 \usepackage[scaled=.92]{helvet}
-\usepackage[margin=2.3cm,top=2.4cm,bottom=2.3cm]{geometry}
+\usepackage[margin=2.1cm,top=2.1cm,bottom=1.8cm]{geometry}
 \usepackage{microtype}
 \usepackage{amsmath}
 \usepackage{graphicx}
@@ -28,9 +28,10 @@
 
 % Aparência do projeto: Times, seções em caixa alta e negrito, parágrafo recuado, número da
 % página no canto superior direito.
-\setstretch{1.08}
+\setstretch{1}
 \setlength{\parindent}{1.0cm}
 \setlength{\parskip}{0pt}
+\setlength{\textfloatsep}{12pt plus 2pt minus 2pt}
 \widowpenalty=10000
 \clubpenalty=10000
 \pagestyle{fancy}
@@ -54,7 +55,7 @@
 
 \begin{document}
 
-\begin{center}
+{\centering
 {\bfseries\MakeUppercase{Universidade de São Paulo}}\\
 {\bfseries\MakeUppercase{Faculdade de Economia, Administração, Contabilidade e Atuária}}\\[0.5ex]
 {\small EAE1429 --- Redes Econômicas e Sociais, 2.º semestre de 2026}\\[1.4ex]
@@ -62,126 +63,176 @@
 {\small\scshape Felipe Ferreira Alexandre --- 13963144 \quad Andrei Schoschlakow Bonifácio --- 14558482\\
 Rafael Eiki Teruya --- 14604204 \quad João Pedro Ferreira --- 14582312}\\[0.4ex]
 {\small São Paulo, 2026}\par
-\avisoAmostra
-\end{center}
-\vspace{-0.6ex}\hrule\vspace{1.2ex}
+\avisoAmostra\par}
+\vspace{0.8ex}\hrule\vspace{1.2ex}
 
 \section{Motivação}
-O acesso aos empenhos municipais sobrevive à alternância política? A troca de CNPJs pode
-ocultar continuidade societária, compatível tanto com persistência de poder
-\cite{acemoglu2008} quanto com capacidade produtiva ou reorganização empresarial. Estimamos o
-efeito da derrota eleitoral sobre a alocação e examinamos a transmissão pela rede como hipótese.
-Ampliamos a conexão da firma isolada \cite{boas2014,baltrunaite2020} para a rede de sócios,
-em diálogo com estudos de elites e parentesco \cite{schisani2021,cruz2017}.
+Quando o grupo no poder perde a eleição, seus fornecedores perdem espaço no orçamento municipal?
+Mesmo quando muda a fornecedora, os sócios podem ser os mesmos. Nas eleições paulistas de 2024,
+investigamos se a derrota do incumbente altera a distribuição dos compromissos de despesa da
+prefeitura, os empenhos, entre empresas e dentro de suas redes.
+
+\citeonline{boas2014} encontraram ganhos em contratos federais para empresas de obras públicas
+que doaram a candidatos vitoriosos do PT à Câmara. Em eleições municipais apertadas de 2008 e
+2012, \citeonline{duarte2025} encontrou estimativas imprecisas para os contratos das doadoras
+diretas e também explorou ligações por sócios em comum.
+\citeonline{guerra2025} associam a proibição das doações empresariais a um aumento no número
+de empresas nos mercados municipais mais expostos. Em companhias abertas que já doavam, membros
+das famílias controladoras passaram a doar como pessoas físicas \cite{balan2026}. Seguimos os
+vínculos societários dos doadores individuais para investigar se outras empresas da mesma rede
+ganham espaço quando uma fornecedora perde. Essa compensação seria uma forma de persistência
+após a alternância \cite{acemoglu2008}.
+
+Testamos se a derrota reduz a participação das fornecedoras ligadas diretamente ao grupo no
+poder em relação às sem caminho a nenhum dos grupos (H1) e se a vantagem esperada da ligação
+ao vencedor diminui com o número de passos na rede (H2). Nas redes ligadas aos dois grupos,
+outras empresas poderiam compensar perdas das ligadas ao incumbente (H3). Também testamos
+se redes ligadas ao vencedor permanecem entre as maiores fornecedoras (H4).
+
 \sintesePrincipal
-\sinteseEstrutural
 
 \section{Dados e rede}
 \label{sec:dados}
-Combinamos TCESP, TSE e Receita Federal \cite{tcesp2026,tse2026,rfb2026}, sem a capital e
-sem segundo turno. Fornecedores anteriores têm empenho positivo em jan/2021--set/2024; o pós
-abrange todo 2025, nominal, sem deflação. Doações entram até 5/10/2024. Após a ADI 4650
-\cite{adi4650}, doações diretas são de PF, embora o grafo inclua sócios PJ.
-A referência é setembro de 2024. Empresas sem quadro societário recebem vínculos de 12/10/2024
-com entrada até 13/09/2024; o erro de sobrevivência dessa observação pós-eleitoral exige
-continuidade no corte. A análise só com setembro avalia essa escolha.
+Combinamos dados de despesa municipal, eleições e sociedades \cite{tcesp2026,tse2026,rfb2026}.
+Excluímos a capital, as disputas com segundo turno e os municípios sem uma candidatura
+incumbente identificável pelo protocolo ou sem adversário. As fornecedoras anteriores têm
+saldo líquido positivo de janeiro de 2021 a setembro de 2024. Usamos empenhos nominais de
+todo 2025. O Supremo vedou doações de pessoas jurídicas a campanhas \cite{adi4650}.
+Usamos as contribuições diretas de pessoas físicas até 5/10/2024, inclusive recursos
+próprios dos candidatos.
 
-Na rede principal há \empresasRede{} empresas, \pessoasRede{} vértices de pessoas/PJ e
-\vinculosRede{} vínculos. Compartilhar sócio ou administrador define vizinhança; uma doação de
-sócio ou administrador PF define conexão direta. A variante sem administradores muda sementes e caminhos.
-Rede é componente conexa; $\delta_{ik}=\min_{j\in D_k}d_G(i,j)/2$, sendo $D_k$ as sementes e
-$d_G$ a distância bipartida. Nas sementes, $\delta=0$; sem caminho, $\infty$
-(Figura~\ref{fig:exemplo}). O cruzamento liga \taxaCruzamentoA{} dos doadores de A e
-\taxaCruzamentoB{} dos de B a empresas; os demais podem não ser sócios ou falhar no cruzamento.
-Dos \munAnalisaveis{} municípios, \munConexaoA{} têm conexão a A e \munConexaoB{} a B.
+Preenchemos quadros societários ausentes em setembro com vínculos que constam no cadastro de
+12/10/2024 e começaram até 13/09/2024. Vínculos encerrados entre as duas datas podem faltar.
+A interpretação eleitoral depende da continuidade desse erro perto do empate. Repetimos a
+análise só com setembro.
 
-O maior componente tem \fracGigante{} das empresas, ou \fracGiganteSemArt{} sem articulações;
-graus, tamanhos e distâncias estão em \texttt{rede\_*.csv}. Na reconstrução recente filtrada por
-entrada, \fracVinculosPerdidos{} dos vínculos de setembro faltam e \fracVinculosExtras{} dos
-reconstruídos não constam de setembro. Desses extras, \fracVinculosLacuna{} estão no complemento
-de outubro de 2024. A reconstrução é apenas diagnóstica. A vinculação a contratos/ajustes cobre
-\taxaVinculacao{} do valor de 2025; o desfecho usa também os empenhos não vinculados.
+Em cada município, o grupo no poder (A) é representado pelo prefeito candidato. Na ausência
+dele, buscamos uma candidatura do seu partido e, depois, de uma coligação que inclua o partido.
+B é o adversário mais votado.
+
+O grafo tem \empresasRede{} empresas, \pessoasRede{} sócios ou administradores (pessoas físicas
+ou jurídicas, PJ) e \vinculosRede{} vínculos. Duas empresas são vizinhas se compartilham um sócio
+ou administrador. Uma empresa é semente do grupo que recebeu doação de um de seus sócios ou
+administradores. A distância $\delta_{ik}$ da empresa $i$ ao grupo $k$ é o número de passos
+até a semente mais próxima ligada à candidatura local de $k$ \cite{jackson1996}. Vale zero nas sementes e
+$\infty$ onde não há caminho (Figura~\ref{fig:exemplo}).
+
+Vinculamos a empresas \taxaCruzamentoA{} dos doadores de A e \taxaCruzamentoB{} dos de B.
+Dos \munAnalisaveis{} municípios, \munConexaoA{} têm conexão com A e \munConexaoB{} com B.
+
+Cada conjunto de empresas interligadas forma uma rede. A maior, o componente gigante, reúne
+\fracGigante{} das empresas.
+A parcela cai a \fracGiganteSemArt{} se retiramos as pessoas que, ao sair, dividem uma rede
+(pontos de articulação). Graus, tamanhos e distâncias constam em \texttt{rede\_*.csv}.
+
+Na reconstrução diagnóstica com o cadastro recente e filtro por data de entrada, faltam
+\fracVinculosPerdidos{} dos vínculos de setembro. Dos reconstruídos, \fracVinculosExtras{} são
+extras, dos quais \fracVinculosLacuna{} aparecem no complemento de outubro de 2024. Vinculamos
+\taxaVinculacao{} do valor de 2025 a contratos ou ajustes. Usamos também os empenhos sem vínculo.
 
 \begin{figure}[t]
 \centering
 \legendafigura{fig:exemplo}{Rede societária de exemplo}%
-\figura{figura1_exemplo}{0.62\linewidth}
-\fonteabnt{Fonte: elaboração própria. Círculos: pessoas; retângulos: empresas. Bruno liga X a Y; Carla liga Y a Z. Ana, sócia de X, doa a A; Daniel, sócio de Z, doa a B (setas tracejadas).}
+\figura{figura1_exemplo}{0.52\linewidth}
+\fonteabnt{Fonte: elaboração própria. Os círculos são pessoas e os retângulos são empresas.
+Bruno liga X a Y e Carla liga Y a Z. As setas tracejadas mostram a doação de Ana, sócia de X,
+a A e a de Daniel, sócio de Z, a B.}
 \end{figure}
 
 \section{Desenho empírico}
-Comparamos eleições apertadas \cite{oliveira2025}. O grupo A segue o protocolo prefeito--partido--coligação;
-B é o adversário mais votado. A margem $M_m$ é a diferença de votos válidos A--B, em p.p.;
-$T_m=1$ quando A perde ($M_m<0$). Sob continuidade dos resultados potenciais no corte,
-identificamos o efeito local da derrota, para cada desfecho $Y$ e coorte pré-fixada $\ell$:
+Comparamos disputas apertadas por regressão descontínua (RD). A margem $M_m$ é a diferença A
+menos B em pontos percentuais (p.p.) dos votos válidos no município $m$. O corte é o empate
+($M_m=0$). O indicador de derrota de A, $T_m$, vale 1 se $M_m<0$ e 0 nos demais casos.
+Estimamos o salto $\beta^{\ell}$ do desfecho $Y$ na coorte $\ell$, definida antes da eleição.
+O índice $j$ identifica uma empresa em um elemento de despesa ou uma rede. Se os resultados
+potenciais de cada coorte forem contínuos no corte, o salto estima o efeito local da derrota de A.
 \begin{equation}
 Y_{jm}^{\ell}=\alpha^{\ell}+\beta^{\ell}T_m+\gamma^{\ell}M_m+\theta^{\ell}T_mM_m+u_{jm}^{\ell},
 \qquad |M_m|\le b.
 \end{equation}
-Usamos linear local, núcleo triangular, banda MSE-ótima e correção de viés \cite{calonico2014}.
-Categorias têm IC CCT; contrastes reamostram municípios conjuntamente, recalculando o viés com
-bandas fixas. Reportamos meia/dobra banda, suporte, densidade \cite{cattaneo2020}, placebos e EMD.
+Ajustamos uma regressão linear local com núcleo triangular, banda $b$ escolhida pelo erro
+quadrático médio estimado e correção de viés \cite{calonico2014}. Antes da ponderação pelo núcleo,
+cada município tem peso um por coorte. Para os intervalos de confiança (ICs) robustos de cada
+coorte, agrupamos erros por município. Nos contrastes, sorteamos os mesmos municípios por lado
+do corte para todas as coortes e mantemos as bandas fixas. Reestimamos com metade e dobro de $b$.
+Testamos a densidade da margem \cite{cattaneo2020} e usamos a participação pré-eleitoral como
+placebo. Para H1 e H2, também testamos sua mudança entre 2021--2022 e 2023--setembro de 2024.
+O efeito mínimo detectável (EMD) supõe 80\% de poder e 5\% de significância. Os testes principais
+de H1 a H3 usam ICs nominais. Os secundários recebem a correção de Holm.
 
-H1/H2 usam empresa--município--elemento. H1 compara diretamente ligadas a A com as sem caminho
-a A nem B; H2 compara coortes de distância. A participação de 2025 divide o saldo positivo da
-firma pelo do elemento; mercados sem saldo positivo mantêm fornecedores anteriores com zero.
-H3 usa redes com fornecedoras anteriores no município e
-$Y_{Rm}=(E_{Rm,2025}-\bar E_{Rm,pre})/\bar E_{m,pre}$, com médias anuais nas barras.
-Cada município soma peso um por coorte antes do núcleo: comparamos médias das redes com peso
-municipal unitário. H4 mede permanência entre principais redes. H1--H3, inclusive os termos de
-H3, têm inferência nominal, sem controle conjunto de erro familiar; as secundárias recebem Holm.
+Em H1 e H2, observamos as fornecedoras anteriores de cada município e elemento de despesa.
+A participação em 2025 divide o saldo positivo da empresa pela soma dos saldos positivos do
+elemento, incluindo entrantes. Se a soma for zero, a participação é zero. H1 subtrai do salto
+das sementes de A o salto das empresas sem caminho a A nem a B. Em H2, a cada distância finita
+$d$ (zero, um, dois ou pelo menos três passos), calculamos $(\hat\beta_B(d)-\hat\beta_A(d))/2$.
+A mesma empresa pode pertencer às duas coortes.
 
-A transmissão de vantagem pela rede é hipótese: doar pode beneficiar vizinhas sem o doador
-apropriar todo o retorno \cite{jackson1996}. Sob comparabilidade, esperamos vantagem ao vencedor
-decrescente com $\delta$; compensação requer R1 negativo e R2+R3 positivo.
+H3 inclui redes com fornecedoras anteriores no município. Uma rede é ligada a um grupo se uma
+de suas empresas tem caminho até ele. Para a rede $R$, a mudança entre a média anual pré-eleitoral
+e 2025 é expressa como fração da média anual do município,
+$Y_{Rm}=(E_{Rm,2025}-\bar E_{Rm,pre})/\bar E_{m,pre}$. Comparamos o salto das redes ligadas aos dois
+grupos (AMBOS) ao das demais. A mudança soma as contribuições das fornecedoras anteriores ligadas
+diretamente a A (R1), das demais anteriores (R2) e das empresas sem saldo prévio positivo (R3).
+Há compensação dentro de AMBOS se o salto de R1 é negativo e o de R2+R3 é positivo.
+
+Em H4, ordenamos pelo empenho acumulado as redes com saldo positivo em ao menos três dos quatro
+anos pré-eleitorais. Para cada limiar (25\%, 50\% ou 75\% do empenho municipal), entram as redes
+até atingi-lo, incluindo a que o cruza. Se as elegíveis ficam abaixo do limiar, todas entram.
+Em 2025, concorrem todas as redes com saldo positivo, inclusive as entrantes. O desfecho indica se
+uma rede principal manteve a posição no mesmo limiar. O contraste é $(\hat\beta_B-\hat\beta_A)/2$
+para as redes ligadas só a B e só a A. Em H2 e H4, interpretá-lo como vantagem do vencedor
+exige coortes comparáveis e efeitos simétricos de ganhar e perder essa ligação.
 
 %%RESULTADOS-INICIO
 \section{Resultados}
-O Quadro~\ref{tab:estimativas} reúne os contrastes. Em H2, as coortes têm distância fixa a cada
-grupo. A sobreposição em mercado e porte
-das coortes de conexão direta é \sobreposicaoDireta{}. O contraste
-$(\hat\beta_B(d)-\hat\beta_A(d))/2$ resume heterogeneidade eleitoral entre coortes, que podem
-compartilhar firmas e diferir na ligação ao outro grupo; não identifica o efeito de reduzir a distância.
-O fator $1/2$ normaliza B--A; recuperaria uma vantagem comum apenas com respostas simétricas e
-coortes comparáveis, hipóteses não impostas.
-A análise de sensibilidade usa apenas estratos de município, elemento e porte presentes nas
-duas coortes (\texttt{h2\_comparaveis.csv}). \leituraHDoisComparaveis{}
-Em H3, comparamos redes com caminho a ambos os grupos (AMBOS) com as demais: ligadas a apenas
-um grupo ou a nenhum, sem excluir delas o gigante. O total soma fornecedoras
-anteriores diretamente ligadas a A (R1), demais anteriores (R2) e entrantes dessas redes (R3). Em H4,
-as médias municipais de permanência a 50\% por ligação ao vencedor, na janela de cinco p.p.,
-são \permanenciaComLigacao{} e
-\permanenciaSemLigacao{}. No corte, o contraste usa as redes de ligação exclusiva, cujo estado
-muda com o resultado, usando a mesma meia diferença B--A. Principais são os componentes no
-prefixo do ranking pré até o limiar de empenho municipal, com fornecimento em pelo menos três
-dos quatro anos. Permanência é continuar no prefixo do ranking de 2025, que inclui entrantes.
-As médias usam todas as categorias na janela; o contraste estima saltos corrigidos no corte
-em coortes exclusivas, não o efeito de criar uma ligação.
 \tabelaEstimativas
 \tabelaCategorias
+
 \leituraResultados
 
-\begin{figure}[t]
+\concentracaoHTres
+
+A Figura~\ref{fig:rdd} mostra os contrastes por distância e por termo da decomposição.
+
+Com limiar de 50\% e a até cinco p.p. do empate, a permanência média por município é de
+\permanenciaComLigacao{} entre as redes ligadas ao vencedor e \permanenciaSemLigacao{} entre as
+demais. Essas médias descritivas incluem as quatro categorias de ligação do Quadro~\ref{tab:categorias}.
+
+\begin{figure}[!b]
 \centering
-\legendafigura{fig:rdd}{Contrastes entre coortes de distância e decomposição da variação da rede}%
-\figura{gradiente_h2}{0.38\linewidth}\hfill\figura{decomposicao_h3}{0.38\linewidth}
-\fonteabnt{Fonte: elaboração própria. Participação no elemento em H2; fração do gasto anual médio pré-eleitoral em H3. Barras indicam IC de 95\% por reamostragem de municípios.}
+\legendafigura{fig:rdd}{Distância às candidaturas (H2) e decomposição da variação dos empenhos (H3)}%
+\figura{gradiente_h2}{0.38\linewidth}\hspace{0.12\linewidth}\figura{decomposicao_h3}{0.38\linewidth}
+\fonteabnt{Fonte: elaboração própria. H2 usa a participação no elemento de despesa. H3 usa a
+fração do gasto anual médio pré-eleitoral do município. As barras indicam ICs de 95\% por reamostragem de
+municípios.}
 \end{figure}
 
 \section{Robustez}
+Em H2, agrupamos as observações por município, elemento de despesa e quintil de empenho
+pré-eleitoral da empresa. Para as coortes com ligação direta, a soma da menor proporção das duas
+coortes em cada estrato dá \sobreposicaoDireta{} de sobreposição. A cada distância, reestimamos
+os saltos nos estratos que têm empresas das duas coortes.
+\leituraHDoisComparaveis{}
+
 \tabelaRobustez
 \leituraRobustez
+
 \leituraSensibilidades
 %%RESULTADOS-FIM
 
 \section{Discussão e limitações}
 \sinteseDiscussao{}
-Doações omitem conexões informais; sócios comuns não medem controle. Há erro por homônimos,
-e empenho não é contrato. O agrupamento municipal não absorve interferência entre municípios
-da mesma rede. Poucas disputas limitam o poder; perdas semelhantes podem refletir desorganização
-administrativa \cite{akhtari2022}. Divulgamos apenas agregados pseudonimizados.
-Em H4, bandas amplas e ICs além do suporte probabilístico revelam instabilidade da extrapolação
-corrigida; a análise permanece exploratória.
+
+O cruzamento parcial de doadores pode deixar ligações sem registro. O cadastro capta vínculos
+com diferentes graus de controle e omite relações informais. Fornecedores da mesma rede podem
+gerar dependência entre municípios. Mudanças na
+burocracia após a alternância \cite{akhtari2022} também podem alterar a alocação de empenhos.
+Observamos um ciclo eleitoral e medimos a despesa posterior pelo empenho de um ano, incluindo
+pessoal e credores públicos.
+
+\noindent O \href{https://github.com/rafaelt0/redes-empresariais-alternancia-politica}{repositório}
+reúne tabelas em \texttt{results/tables/}, versões das bases em \texttt{fontes.lock.json} e
+instruções de reprodução no \texttt{README.md}.
 
 \bibliographystyle{abntex2-alf}
 \begingroup\small\setstretch{1}
