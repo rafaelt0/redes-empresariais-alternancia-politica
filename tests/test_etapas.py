@@ -25,7 +25,7 @@ def test_registro_tem_as_etapas_da_spec_em_ordem():
 
 def test_makefile_espelha_as_dependencias():
     regra = re.compile(r"^\$\(FEITO\)/(\S+):(.*)$", re.MULTILINE)
-    makefile = (RAIZ / "Makefile").read_text()
+    makefile = (RAIZ / "Makefile").read_text(encoding="utf-8")
     deps = {
         alvo: tuple(re.findall(r"\$\(FEITO\)/(\S+)", resto))
         for alvo, resto in regra.findall(makefile)
@@ -63,7 +63,16 @@ def test_etapa_falha_quando_entrada_falta(caminhos_amostra):
 
 
 def test_pipeline_percorre_a_amostra(caminhos_amostra):
-    for nome in POS_INGESTAO:
+    from redes.portabilidade import ferramenta
+
+    for nome in POS_INGESTAO[:-2]:
+        etapas.rodar(nome, caminhos_amostra)
+    for ferramenta_externa in ("latexmk", "soffice"):
+        try:
+            ferramenta(ferramenta_externa)
+        except FileNotFoundError as erro:
+            pytest.skip(str(erro))
+    for nome in POS_INGESTAO[-2:]:
         etapas.rodar(nome, caminhos_amostra)
     for tabela in schemas.TABELAS.values():
         assert (caminhos_amostra.dados / tabela.arquivo).exists(), tabela.nome

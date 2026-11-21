@@ -73,7 +73,7 @@ SAIDAS_fetch := $(DADOS)/manifest.json $(addprefix $(DADOS)/raw/,$(BRUTOS_FETCH)
 $(FEITO)/fetch: $(if $(BRUTOS_FETCH),,refazer)
 endif
 endif
-FONTES_INGESTAO := $(MODO_FONTES) fontes.lock.json $(addprefix src/redes/,fetch.py fontes.py config.py etapas.py schemas.py)
+FONTES_INGESTAO := $(MODO_FONTES) fontes.lock.json $(addprefix src/redes/,fetch.py portabilidade.py fontes.py config.py etapas.py schemas.py)
 PSEUDONIMO := src/redes/pseudonimo.py
 $(FEITO)/fetch: $(FONTES_INGESTAO) $(call faltando,fetch)
 $(FEITO)/ingest-rfb: $(FONTES_INGESTAO) $(PSEUDONIMO) src/redes/ingest/rfb.py src/redes/descritivas.py $(call faltando,ingest-rfb)
@@ -99,6 +99,10 @@ $(FEITO)/%:
 
 # A amostra substitui as saídas de fetch e ingest-*; as demais etapas rodam sobre ela, com
 # resultados e saída dentro de $(AMOSTRA) para não tocar os versionados.
+ifeq ($(REDES_SEM_PUBLICACAO),1)
+sample:
+	uv run --frozen python -m redes.tarefas sample --sem-publicacao
+else
 sample:
 	rm -rf $(AMOSTRA)
 	REDES_DATA_DIR=$(AMOSTRA) $(REDES) amostra
@@ -109,6 +113,7 @@ sample:
 	REDES_RESULTS_DIR=$(abspath $(AMOSTRA))/results \
 	REDES_OUTPUT_DIR=$(abspath $(AMOSTRA))/output \
 	$(MAKE) --no-print-directory DADOS=$(AMOSTRA) report deck
+endif
 
 clean-raw:
 	rm -rf $(DADOS)/raw
