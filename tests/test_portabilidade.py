@@ -45,13 +45,14 @@ def test_ferramenta_override_e_erro(tmp_path, monkeypatch):
 
 
 def _incrementar(caminho):
-    from redes.fetch import _gravar_json, _ler_json
-    from redes.portabilidade import trava_exclusiva
+    from redes.config import Caminhos
+    from redes.fetch import _editar_manifesto, _ler_manifesto
 
+    caminhos = Caminhos(caminho.parent, caminho.parent, caminho.parent, caminho.parent / "chave")
     for _ in range(15):
-        with trava_exclusiva(caminho.with_suffix(".trava")):
-            dados = _ler_json(caminho)
-            _gravar_json(caminho, {"ação": dados.get("ação", 0) + 1})
+        with _editar_manifesto(caminhos) as dados:
+            dados["ação"] = dados.get("ação", 0) + 1
+        assert _ler_manifesto(caminhos)["ação"] > 0
 
 
 def test_trava_entre_processos_e_json_utf8(tmp_path):

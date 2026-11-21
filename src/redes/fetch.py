@@ -52,7 +52,7 @@ class ErroDeFonte(RuntimeError):
 def garantir(arquivo: Arquivo, caminhos: Caminhos, trava: Path = TRAVA) -> Path:
     """Devolve o caminho do bruto, baixando-o se falta ou não confere com o manifesto."""
     destino = caminhos.brutos / arquivo.chave
-    anterior = _ler_json(_manifesto(caminhos)).get(arquivo.chave, {})
+    anterior = _ler_manifesto(caminhos).get(arquivo.chave, {})
     travado = _ler_json(trava).get(arquivo.chave, {})
     if os.environ.get("REDES_ESTRITO") == "1" and not travado.get("sha256"):
         raise ErroDeFonte(f"{arquivo.chave}: SHA-256 ausente na trava de fontes")
@@ -93,7 +93,7 @@ def descartar(arquivo: Arquivo, caminhos: Caminhos) -> None:
 def travar(caminhos: Caminhos, trava: Path = TRAVA) -> None:
     """Atualiza a trava com o SHA-256 e o tamanho de cada arquivo registrado no manifesto."""
     travado = _ler_json(trava)
-    for chave, registro in _ler_json(_manifesto(caminhos)).items():
+    for chave, registro in _ler_manifesto(caminhos).items():
         travado[chave] = {k: registro[k] for k in ("url", "tamanho", "sha256")}
     _gravar_json(trava, travado)
 
@@ -201,6 +201,14 @@ def _sha256(caminho: Path) -> str:
 
 def _manifesto(caminhos: Caminhos) -> Path:
     return caminhos.dados / "manifest.json"
+
+
+def _ler_manifesto(caminhos: Caminhos) -> dict:
+    """Serializa também leitores: no Windows um arquivo aberto pode impedir replace."""
+    caminho = _manifesto(caminhos)
+    caminho.parent.mkdir(parents=True, exist_ok=True)
+    with trava_exclusiva(caminho.with_name(caminho.name + ".trava")):
+        return _ler_json(caminho)
 
 
 def _ler_json(caminho: Path) -> dict:
