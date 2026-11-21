@@ -1,4 +1,3 @@
-import shutil
 from pathlib import Path
 
 import polars as pl
@@ -106,8 +105,12 @@ def test_tabela_de_robustez_usa_as_quatro_variantes() -> None:
 
 
 def test_conversao_preserva_o_numero_de_slides(tmp_path: Path) -> None:
-    if shutil.which("soffice") is None:
-        pytest.skip("LibreOffice não instalado")
+    from redes.portabilidade import ferramenta
+
+    try:
+        ferramenta("soffice")
+    except FileNotFoundError as erro:
+        pytest.skip(str(erro))
     prs, _ = deck.construir(_caminhos(tmp_path), Numeros({}))
     pptx = tmp_path / "deck.pptx"
     prs.save(str(pptx))

@@ -1,0 +1,7 @@
+# Evita CRLF em fontes, receitas e scripts mesmo com core.autocrlf=true.
+* text=auto eol=lf
+*.pdf binary
+*.png binary
+*.pptx binary
+*.zip binary
+*.parquet binary

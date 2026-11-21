@@ -20,6 +20,7 @@ from redes.etapas import Contexto, Etapa
 from redes.leitura_sensibilidades import leitura as leitura_sensibilidades
 from redes.leitura_sensibilidades import limite_h2
 from redes.numeros import ND, Numeros, decimal, escrever_macros, leitura_h2_comparaveis
+from redes.portabilidade import ferramenta
 
 ETAPA = Etapa(
     nome="report",
@@ -700,7 +701,7 @@ def contar_paginas(pdf: Path) -> int:
     """Páginas de um PDF: `pdfinfo` quando existe, senão contagem dos objetos /Type /Page."""
     if shutil.which("pdfinfo"):
         saida = subprocess.run(
-            ["pdfinfo", str(pdf)], capture_output=True, text=True, check=True
+            ["pdfinfo", str(pdf)], capture_output=True, text=True, errors="replace", check=True
         ).stdout
         return int(re.search(r"^Pages:\s+(\d+)", saida, re.MULTILINE).group(1))  # type: ignore[union-attr]
     return len(re.findall(rb"/Type\s*/Page(?![a-z])", pdf.read_bytes()))
@@ -725,11 +726,18 @@ def preparar(caminhos: Caminhos, destino: Path) -> Path:
 
 def compilar(principal: Path) -> Path:
     subprocess.run(
-        ["latexmk", "-pdf", "-interaction=nonstopmode", "-halt-on-error", principal.name],
+        [
+            ferramenta("latexmk"),
+            "-pdf",
+            "-interaction=nonstopmode",
+            "-halt-on-error",
+            principal.name,
+        ],
         cwd=principal.parent,
         check=True,
         capture_output=True,
         text=True,
+        errors="replace",
     )
     return principal.with_suffix(".pdf")
 

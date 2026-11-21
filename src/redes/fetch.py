@@ -10,7 +10,6 @@ erro numa fonte imutável e aviso numa mutável (erro com `REDES_ESTRITO=1`). Pa
 trava a partir do manifesto: `uv run python -m redes.fetch travar`.
 """
 
-import fcntl
 import hashlib
 import http.client
 import json
@@ -28,6 +27,7 @@ from pathlib import Path
 from redes.config import RAIZ, Caminhos
 from redes.etapas import Contexto, Etapa
 from redes.fontes import ARQUIVOS, Arquivo
+from redes.portabilidade import trava_exclusiva
 
 ETAPA = Etapa(
     nome="fetch",
@@ -204,13 +204,13 @@ def _manifesto(caminhos: Caminhos) -> Path:
 
 
 def _ler_json(caminho: Path) -> dict:
-    return json.loads(caminho.read_text()) if caminho.exists() else {}
+    return json.loads(caminho.read_text(encoding="utf-8")) if caminho.exists() else {}
 
 
 def _gravar_json(caminho: Path, dados: dict) -> None:
     temporario = caminho.with_name(caminho.name + ".tmp")
     texto = json.dumps(dados, indent=2, ensure_ascii=False, sort_keys=True)
-    temporario.write_text(texto + "\n")
+    temporario.write_text(texto + "\n", encoding="utf-8", newline="\n")
     temporario.replace(caminho)
 
 
@@ -219,8 +219,7 @@ def _editar_manifesto(caminhos: Caminhos) -> Iterator[dict]:
     """Ler, alterar e gravar sob trava de arquivo: as `ingest-*` rodam em paralelo."""
     caminho = _manifesto(caminhos)
     caminho.parent.mkdir(parents=True, exist_ok=True)
-    with caminho.with_name(caminho.name + ".trava").open("w") as trava:
-        fcntl.flock(trava, fcntl.LOCK_EX)
+    with trava_exclusiva(caminho.with_name(caminho.name + ".trava")):
         manifesto = _ler_json(caminho)
         yield manifesto
         _gravar_json(caminho, manifesto)

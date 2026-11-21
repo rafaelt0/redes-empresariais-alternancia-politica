@@ -24,7 +24,6 @@ e o mesmo CNPJ básico do credor. Não há ligação aproximada.
 """
 
 import csv
-import fcntl
 import hashlib
 import io
 import json
@@ -44,6 +43,7 @@ from redes import config, descritivas, fetch, pseudonimo, schemas
 from redes.config import Caminhos
 from redes.etapas import Contexto, Etapa
 from redes.fontes import ARQUIVOS, Arquivo
+from redes.portabilidade import trava_exclusiva
 from redes.pseudonimo import normalizar_nome
 from redes.schemas import EMPENHOS, EVENTO, LICITACOES, MUNICIPIOS, TIPO_ORGAO, Tabela
 
@@ -328,8 +328,7 @@ def parcial_do_ano(ano: int, caminhos: Caminhos, pasta: Path) -> list[Contagem]:
     arquivo = ARQUIVOS[f"tcesp-despesas/despesas-{ano}.zip"]
     destino, lateral = _parcial(pasta, ano), _contagens_parcial(pasta, ano)
     pasta.mkdir(parents=True, exist_ok=True)
-    with destino.with_suffix(".trava").open("a") as trava:
-        fcntl.flock(trava, fcntl.LOCK_EX)
+    with trava_exclusiva(destino.with_suffix(".trava")):
         zip_ = fetch.garantir(arquivo, caminhos)
         entradas = (zip_, Path(__file__), Path(pseudonimo.__file__))
         valido = (
