@@ -4,8 +4,8 @@
 
 | Slide | Tema | Voz | Tempo | Até |
 |---|---|---|---|---|
-| 1 | Redes empresariais e persistência econômica sob alternância política | Voz 1 | 30 s | 0:30 |
-| 2 | Os fornecedores do incumbente perdem espaço? | Voz 1 | 45 s | 1:15 |
+| 1 | Redes empresariais e persistência econômica sob alternância política | Voz 1 | 25 s | 0:25 |
+| 2 | A troca de governo e os fornecedores municipais | Voz 1 | 50 s | 1:15 |
 | 3 | Como uma empresa se liga a uma candidatura | Voz 1 | 60 s | 2:15 |
 | 4 | O maior componente da rede | Voz 2 | 35 s | 2:50 |
 | 5 | Comparação perto do empate | Voz 2 | 60 s | 3:50 |
@@ -17,17 +17,17 @@
 | 11 | O que muda com outras definições de rede | Voz 4 | 40 s | 8:15 |
 | 12 | A persistência dos empenhos após a alternância | Voz 4 | 45 s | 9:00 |
 
-## 1. Redes empresariais e persistência econômica sob alternância política — Voz 1 (30 s)
+## 1. Redes empresariais e persistência econômica sob alternância política — Voz 1 (25 s)
 
 **Na fala**
 
 Situar as eleições paulistas de 2024 e os empenhos de 2025. A prefeitura pode trocar de fornecedor e encontrar os mesmos sócios por trás do novo CNPJ.
 
-## 2. Os fornecedores do incumbente perdem espaço? — Voz 1 (45 s)
+## 2. A troca de governo e os fornecedores municipais — Voz 1 (50 s)
 
 **Na fala**
 
-Apresentar a pergunta. Quando o incumbente perde, as fornecedoras ligadas a ele perdem participação? Se perderem, outra empresa da mesma rede ganha espaço?
+Mesmo que uma fornecedora perca espaço após a eleição, parte da despesa pode continuar na mesma rede se outra empresa ligada a ela ganhar participação. Usamos os empenhos de 2025 para investigar isso nas prefeituras paulistas após as eleições de 2024. Começamos pelas empresas ligadas a quem doou às campanhas como pessoa física. A partir delas, seguimos os vínculos por sócios ou administradores em comum. O próximo slide mostra como fazemos essa ligação.
 
 **Se perguntarem**
 

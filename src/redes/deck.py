@@ -369,7 +369,7 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
     _nota(
         notas,
         "Voz 1",
-        30,
+        25,
         "Situar as eleições paulistas de 2024 e os empenhos de 2025. A prefeitura pode "
         "trocar de fornecedor e encontrar os mesmos sócios por trás do novo CNPJ.",
     )
@@ -377,17 +377,18 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
     # 2. Pergunta e contribuição
     slide = _pagina(
         prs,
-        "Os fornecedores do incumbente perdem espaço?",
+        "A troca de governo e os fornecedores municipais",
         "PERGUNTA DE PESQUISA",
         "Duarte (2025), Guerra, Mattos e Nakaguma (2025), Balán, Dodyk e Puente (2026).",
     )
     _texto(
         slide,
-        "A prefeitura pode trocar de fornecedor e os sócios continuarem os mesmos.",
+        "Quando o grupo no poder perde a eleição, as despesas da prefeitura passam "
+        "a outras redes de empresas ou continuam nas mesmas?",
         MARGEM,
-        2.30,
-        CORPO,
-        0.65,
+        1.98,
+        11.0,
+        0.88,
         tamanho=26,
         fonte=FONTE_TITULO,
         cor=ACCENT,
@@ -396,24 +397,25 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
     _bloco(
         slide,
         "O que já se estudou",
-        "Duarte investigou contratos de doadoras diretas e ligações por sócios em comum em "
-        "eleições municipais apertadas.",
+        "Duarte estudou contratos de empresas doadoras e vínculos por sócios em comum "
+        "em eleições municipais apertadas.",
         MARGEM,
         3.66,
         5.48,
     )
     _bloco(
         slide,
-        "A pergunta deste estudo",
-        "Seguimos os vínculos dos doadores individuais para ver se outra empresa da rede "
-        "ganha espaço quando uma fornecedora perde.",
+        "O que investigamos",
+        "Partimos das empresas ligadas a doadores de campanha e seguimos os vínculos "
+        "por sócios ou administradores em comum.",
         MEIO,
         3.66,
         DIREITA,
     )
     _texto(
         slide,
-        "O desfecho são os empenhos, os compromissos de despesa da prefeitura.",
+        "Em São Paulo, acompanhamos os empenhos de 2025 (compromissos de despesa) "
+        "após as eleições municipais de 2024.",
         MARGEM,
         5.85,
         CORPO,
@@ -424,9 +426,13 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
     _nota(
         notas,
         "Voz 1",
-        45,
-        "Apresentar a pergunta. Quando o incumbente perde, as fornecedoras ligadas a ele "
-        "perdem participação? Se perderem, outra empresa da mesma rede ganha espaço?",
+        50,
+        "Mesmo que uma fornecedora perca espaço após a eleição, parte da despesa pode "
+        "continuar na mesma rede se outra empresa ligada a ela ganhar participação. "
+        "Usamos os empenhos de 2025 para investigar isso nas prefeituras paulistas após "
+        "as eleições de 2024. Começamos pelas empresas ligadas a quem doou às campanhas "
+        "como pessoa física. A partir delas, seguimos os vínculos por sócios ou "
+        "administradores em comum. O próximo slide mostra como fazemos essa ligação.",
         "Duarte (2025) estudou disputas municipais de 2008 e 2012, encontrou estimativas "
         "imprecisas para doadoras diretas e explorou sócios em comum.",
         "Guerra, Mattos e Nakaguma (2025) associam a proibição de doações empresariais ao aumento "
