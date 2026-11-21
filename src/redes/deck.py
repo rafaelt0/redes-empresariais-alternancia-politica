@@ -58,6 +58,8 @@ AUTORES = (
     "João Pedro Ferreira",
 )
 NUSP = ("13963144", "14558482", "14604204", "14582312")
+# Blocos de fala de igual duração. A definição de quem apresenta cada bloco fica para a reunião.
+VOZES = ("Voz 1", "Voz 2", "Voz 3", "Voz 4")
 
 
 @dataclass(frozen=True)
@@ -366,8 +368,8 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
     _texto(slide, "São Paulo, 2026", MARGEM, 6.72, 5.4, 0.3, tamanho=14, cor=CINZA)
     _nota(
         notas,
-        "Felipe",
-        25,
+        "Voz 1",
+        30,
         "Situar as eleições paulistas de 2024 e os empenhos de 2025. A prefeitura pode "
         "trocar de fornecedor e encontrar os mesmos sócios por trás do novo CNPJ.",
     )
@@ -421,8 +423,8 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
     )
     _nota(
         notas,
-        "Felipe",
-        40,
+        "Voz 1",
+        45,
         "Apresentar a pergunta. Quando o incumbente perde, as fornecedoras ligadas a ele "
         "perdem participação? Se perderem, outra empresa da mesma rede ganha espaço?",
         "Duarte (2025) estudou disputas municipais de 2008 e 2012, encontrou estimativas "
@@ -479,8 +481,8 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
     )
     _nota(
         notas,
-        "Andrei",
-        45,
+        "Voz 1",
+        60,
         "Apontar as doações de Ana a A, o incumbente, e de Daniel a B, o adversário. X e Z "
         "são as sementes. Y compartilha sócios com X e Z, por isso está a um passo de cada grupo.",
         "Um passo entre empresas tem duas arestas no grafo bipartido. Onde não há caminho, "
@@ -532,8 +534,8 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
     )
     _nota(
         notas,
-        "Andrei",
-        30,
+        "Voz 2",
+        35,
         "Comparar a parcela de empresas no componente gigante com a parcela no maior "
         "componente depois de retirar as pessoas que ligam partes da rede.",
         f"A rede principal tem {_destaque(numeros, 'empresasRede')} empresas, "
@@ -619,8 +621,8 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
     )
     _nota(
         notas,
-        "Andrei",
-        55,
+        "Voz 2",
+        60,
         "Mostrar os dois lados do corte. Comparamos derrotas e vitórias por margem pequena. "
         "O salto estima o efeito local da derrota se os resultados potenciais forem "
         "contínuos no empate.",
@@ -699,7 +701,7 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
         )
     _nota(
         notas,
-        "Rafael",
+        "Voz 2",
         40,
         "Comparar as fornecedoras anteriores ligadas diretamente ao incumbente com as sem "
         "caminho a nenhuma candidatura. Ler o contraste e explicar o que o intervalo permite.",
@@ -803,8 +805,8 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
     _texto(slide, pre_txt, 7.81, 4.97, 4.76, 1.48, tamanho=19, cor=CINZA)
     _nota(
         notas,
-        "Rafael",
-        55,
+        "Voz 3",
+        50,
         "Explicar a comparação dos saltos por distância. Ler o contraste a um passo de 2025 "
         "e o placebo da coorte B. Dar aos dois números o tempo necessário para explicar "
         "por que a diferença anterior à eleição importa para a leitura causal.",
@@ -907,8 +909,8 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
     )
     _nota(
         notas,
-        "Rafael",
-        45,
+        "Voz 3",
+        40,
         "Mostrar o que acontece com o contraste a um passo quando mudam o desfecho e a "
         "amostra. À direita, explicar por que a concentração no componente gigante "
         "limita a leitura a três passos ou mais.",
@@ -998,8 +1000,8 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
         )
     _nota(
         notas,
-        "Rafael",
-        50,
+        "Voz 3",
+        45,
         "Explicar o que seria compensação. Nas redes ligadas a ambos, o primeiro grupo "
         "teria de perder espaço e o restante ganhar. Comparar os sinais previstos e os "
         "observados e apontar os intervalos.",
@@ -1114,8 +1116,8 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
         )
     _nota(
         notas,
-        "João Pedro",
-        55,
+        "Voz 4",
+        50,
         "Explicar como o ranking de 50% inclui a rede que cruza o limiar. As médias à "
         "esquerda descrevem as disputas próximas. O contraste à direita compara os "
         "saltos de coortes exclusivas e tem um intervalo amplo.",
@@ -1182,8 +1184,8 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
     )
     _nota(
         notas,
-        "João Pedro",
-        45,
+        "Voz 4",
+        40,
         "Escolher a linha do total da rede para mostrar como a definição do grafo muda "
         "os intervalos e o próprio suporte da comparação.",
         "Mudar a rede também altera caminhos, sementes, composição das coortes e suporte. "
@@ -1247,8 +1249,8 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
     run.font.color.rgb = ACCENT
     _nota(
         notas,
-        "Felipe",
-        55,
+        "Voz 4",
+        45,
         "Responder à pergunta da abertura. Dizer o que as estimativas permitem concluir "
         "sobre a vantagem eleitoral e a compensação. Lembrar que a comparação vale para "
         "disputas apertadas de um único ciclo.",
@@ -1312,20 +1314,35 @@ def _cronometro(segundos: int) -> str:
 
 
 def guia(notas: list[Nota], titulos: list[str]) -> str:
-    """`output/guia_de_fala.md`: pontos por slide, tempo e divisão entre as quatro pessoas."""
+    """`output/guia_de_fala.md`: pontos por slide, tempo e blocos de fala equilibrados.
+
+    Cada bloco soma o mesmo tempo, e os blocos ainda não têm dono: a distribuição entre as
+    pessoas fica para a reunião.
+    """
     total = sum(nota.segundos for nota in notas)
     margem = LIMITE_SEGUNDOS - total
     if margem < 0:
         raise ValueError("O tempo previsto no guia excede dez minutos.")
+    por_voz: dict[str, int] = {}
+    slides: dict[str, list[int]] = {}
+    for i, nota in enumerate(notas, start=1):
+        por_voz[nota.pessoa] = por_voz.get(nota.pessoa, 0) + nota.segundos
+        slides.setdefault(nota.pessoa, []).append(i)
+    if len(por_voz) != len(VOZES) or len(set(por_voz.values())) != 1:
+        detalhe = ", ".join(f"{voz}: {segundos} s" for voz, segundos in por_voz.items())
+        raise ValueError(f"os {len(VOZES)} blocos de fala precisam ter o mesmo tempo ({detalhe})")
+    bloco = por_voz[VOZES[0]]
     acumulados = accumulate(nota.segundos for nota in notas)
     linhas = [
         "# Guia de fala",
         "",
-        f"**Fala prevista de {_cronometro(total)}.** Reserve {_cronometro(margem)} para "
-        f"trocas de apresentador e variações de ritmo, dentro do limite de "
-        f"{_cronometro(LIMITE_SEGUNDOS)}. Os tempos acumulados servem de referência no ensaio.",
+        f"**Fala prevista de {_cronometro(total)}**, em {len(por_voz)} blocos iguais de "
+        f"{_cronometro(bloco)}. Reserve {_cronometro(margem)} para trocas de apresentador e "
+        f"variações de ritmo, dentro do limite de {_cronometro(LIMITE_SEGUNDOS)}. Os tempos "
+        "acumulados servem de referência no ensaio. A definição de quem apresenta cada bloco "
+        "fica para a reunião.",
         "",
-        "| Slide | Tema | Pessoa | Tempo | Até |",
+        "| Slide | Tema | Voz | Tempo | Até |",
         "|---|---|---|---|---|",
         *[
             f"| {i} | {titulo} | {nota.pessoa} | {nota.segundos} s | {_cronometro(ate)} |"
@@ -1346,13 +1363,15 @@ def guia(notas: list[Nota], titulos: list[str]) -> str:
         ]
         if nota.apoio:
             linhas += ["**Se perguntarem**", "", *(f"- {ponto}" for ponto in nota.apoio), ""]
-    por_pessoa: dict[str, int] = {}
-    for nota in notas:
-        por_pessoa[nota.pessoa] = por_pessoa.get(nota.pessoa, 0) + nota.segundos
     linhas += [
         "## Divisão",
         "",
-        *[f"- {pessoa}: {segundos} s" for pessoa, segundos in por_pessoa.items()],
+        f"Blocos iguais de {_cronometro(bloco)}, sem nomes definidos.",
+        "",
+        *[
+            f"- {voz} (slides {slides[voz][0]}–{slides[voz][-1]}): {segundos} s"
+            for voz, segundos in por_voz.items()
+        ],
         "",
     ]
     return "\n".join(linhas)
