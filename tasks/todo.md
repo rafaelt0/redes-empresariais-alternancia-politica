@@ -1,11 +1,11 @@
 # Tarefas
 
-Ordem por dependência. Cada tarefa termina com `make test` e `make lint` passando. Detalhes em `SPEC.md` e `tasks/plan.md`.
+Ordem por dependência. Cada tarefa termina com `make test` e `make lint` passando. Detalhes em `tasks/plan.md`.
 
 ## Fase 0 — Esqueleto
 
 - [x] **T01: Ambiente e estrutura**
-  - Aceite: `pyproject.toml` com Python 3.12 e dependências fixadas em `uv.lock`; `Makefile` com os alvos da especificação; `.gitignore` cobre `data/` e a chave de pseudonimização; `docs/projeto.pdf` no repositório.
+  - Aceite: `pyproject.toml` com Python 3.12 e dependências fixadas em `uv.lock`; `Makefile` com os alvos do pipeline; `.gitignore` cobre `data/` e a chave de pseudonimização.
   - Verificar: `make setup && make lint && make test` em clone limpo.
   - Arquivos: `pyproject.toml`, `uv.lock`, `Makefile`, `.gitignore`, `src/redes/__init__.py`, `src/redes/config.py`
 
@@ -46,7 +46,7 @@ Ordem por dependência. Cada tarefa termina com `make test` e `make lint` passan
   - Verificar: `tests/test_links.py` (homônimos com dígitos diferentes não se ligam; doação em 6/10 fica fora).
   - Arquivos: `src/redes/links.py`, `tests/test_links.py`
 
-- [x] **PC1: Viabilidade** (decidido em 16/11/2026, ver `docs/decisoes.md`) — levar ao grupo: eleições apertadas disponíveis, taxa de cruzamento, situação do CPF do doador. Registrar a decisão em `docs/decisoes.md`.
+- [x] **PC1: Viabilidade** (decidido em 16/11/2026) — levar ao grupo: eleições apertadas disponíveis, taxa de cruzamento, situação do CPF do doador.
 
 ## Fase 2 — Construção
 
@@ -60,7 +60,7 @@ Ordem por dependência. Cada tarefa termina com `make test` e `make lint` passan
   - Verificar: tabelas em `results/tables/rede_*.csv`; supressão de células pequenas testada.
   - Arquivos: `src/redes/network.py`, `src/redes/descritivas.py`, `tests/test_descritivas.py`
 
-- [x] **PC2: Estrutura da rede** (decidido em 16/11/2026, ver `docs/decisoes.md`) — levar ao grupo a distribuição dos componentes e a decisão sobre componente gigante.
+- [x] **PC2: Estrutura da rede** (decidido em 16/11/2026) — levar ao grupo a distribuição dos componentes e a decisão sobre componente gigante.
 
 - [ ] **T11: `panel` empresa–município**
   - Aceite: fornecedores anteriores (jan/2021 a set/2024); participação no empenhado de 2025 dentro do elemento de despesa; categoria de conexão e faixa de δ; pesos que dão a cada município o mesmo total; marca de empenho novo com taxa de vinculação.
@@ -120,7 +120,7 @@ Ordem por dependência. Cada tarefa termina com `make test` e `make lint` passan
 
 - [ ] **T21: README e publicação**
   - Aceite: README com requisitos, comandos, tempo e espaço necessários, fontes com data de acesso e declaração de uso de IA; verificação final de que não há dado pessoal no histórico do git.
-  - Verificar: `make all` em clone limpo; critérios de sucesso 1 a 8 da especificação conferidos um a um.
-  - Arquivos: `README.md`, `docs/decisoes.md`
+  - Verificar: `make all` em clone limpo; critérios de sucesso 1 a 8 conferidos um a um.
+  - Arquivos: `README.md`
 
 - [ ] **PC4: Revisão final** — o grupo revisa os artefatos e autoriza tornar o repositório público.

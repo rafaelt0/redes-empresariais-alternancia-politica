@@ -4,8 +4,8 @@ Seção 6 do projeto. No painel empresa–município (H1, H2), cada linha é uma
 de um município e elemento de despesa, e o resultado é a participação no empenhado de 2025
 dentro do elemento. No painel rede–município (H3, H4), cada linha é uma rede com fornecedora
 anterior no município, e os resultados são os três termos da equação (4), o total e a
-manutenção da posição das principais redes. As escolhas que o projeto deixa abertas estão em
-`docs/decisoes.md` (16/11/2026).
+manutenção da posição das principais redes. As escolhas que o projeto deixa abertas estão
+registradas nas notas de cada etapa.
 
 Empenho líquido é emissão + reforço − anulação, somados pela data do evento. Nos dados reais,
 reforços e anulações caem no ano do próprio empenho (três exceções em 33 milhões de eventos),

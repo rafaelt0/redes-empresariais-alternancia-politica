@@ -1,6 +1,6 @@
 # Plano de implementação
 
-Deriva de `SPEC.md`. A lista de tarefas está em `tasks/todo.md`.
+A lista de tarefas está em `tasks/todo.md`.
 
 ## Abordagem
 
