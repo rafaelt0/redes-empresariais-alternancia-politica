@@ -1,98 +1,167 @@
 # Guia de fala
 
-Deck de 12 slides, cerca de 10 minutos. Os tempos são sugestões; os pontos são o que precisa ser dito, não um texto para ler.
+**Fala prevista de 9:00.** Reserve 1:00 para trocas de apresentador e variações de ritmo, dentro do limite de 10:00. Os tempos acumulados servem de referência no ensaio.
 
-| Slide | Tema | Pessoa | Tempo |
-|---|---|---|---|
-| 1 | Redes empresariais e persistência econômica sob alternância política | Felipe | 40 s |
-| 2 | O que sobrevive quando o governo muda | Felipe | 40 s |
-| 3 | Dados e construção da rede | Andrei | 50 s |
-| 4 | A rede e seu componente gigante | Andrei | 55 s |
-| 5 | Eleições apertadas como choque | Andrei | 55 s |
-| 6 | H1 — conexão direta ao incumbente | Rafael | 50 s |
-| 7 | H2 — contrastes entre coortes de distância | Rafael | 55 s |
-| 8 | H3 — decomposição do contraste AMBOS−demais | Rafael | 60 s |
-| 9 | H4 — permanência das principais redes | João Pedro | 45 s |
-| 10 | Robustez: a rede alternativa muda a conclusão? | João Pedro | 50 s |
-| 11 | O que os resultados permitem dizer | Felipe | 55 s |
-| 12 | Limites e o que ficou de fora | Felipe | 45 s |
+| Slide | Tema | Pessoa | Tempo | Até |
+|---|---|---|---|---|
+| 1 | Redes empresariais e persistência econômica sob alternância política | Felipe | 25 s | 0:25 |
+| 2 | Os fornecedores do incumbente perdem espaço? | Felipe | 40 s | 1:05 |
+| 3 | Como uma empresa se liga a uma candidatura | Andrei | 45 s | 1:50 |
+| 4 | O maior componente da rede | Andrei | 30 s | 2:20 |
+| 5 | Comparação perto do empate | Andrei | 55 s | 3:15 |
+| 6 | A perda de espaço das ligadas ao incumbente é incerta | Rafael | 40 s | 3:55 |
+| 7 | A um passo, o contraste de 2025 é negativo | Rafael | 55 s | 4:50 |
+| 8 | O contraste sob outras especificações | Rafael | 45 s | 5:35 |
+| 9 | A compensação fica em aberto | Rafael | 50 s | 6:25 |
+| 10 | Permanência entre as principais redes | João Pedro | 55 s | 7:20 |
+| 11 | O que muda com outras definições de rede | João Pedro | 45 s | 8:05 |
+| 12 | A persistência dos empenhos após a alternância | Felipe | 55 s | 9:00 |
 
-## 1. Redes empresariais e persistência econômica sob alternância política — Felipe (40 s)
+## 1. Redes empresariais e persistência econômica sob alternância política — Felipe (25 s)
 
-- Abrir com a pergunta do projeto, não com a literatura.
-- Dizer em uma frase o que o grupo encontrou ou não encontrou.
-- Apresentar a divisão: desenho, resultados, robustez.
+**Na fala**
 
-## 2. O que sobrevive quando o governo muda — Felipe (40 s)
+Situar as eleições paulistas de 2024 e os empenhos de 2025. A prefeitura pode trocar de fornecedor e encontrar os mesmos sócios por trás do novo CNPJ.
 
-- Contraste entre rotatividade de CNPJ e continuidade de sócios.
-- Antecipar a conclusão central já aqui, sem esperar o final.
-- Deixar claro o que o desenho identifica (vitória eleitoral) e o que é hipótese.
+## 2. Os fornecedores do incumbente perdem espaço? — Felipe (40 s)
 
-## 3. Dados e construção da rede — Andrei (50 s)
+**Na fala**
 
-- Explicar a unidade empresa e a distância com o exemplo de três empresas da Figura 1.
-- Dizer por que a fotografia é de setembro e não a atual.
-- Para empresas sem sócios em setembro, usamos a extração de 12/10/2024, após a eleição, com entrada até 13/09/2024. Vínculos encerrados antes da extração podem ficar de fora.
+Apresentar a pergunta. Quando o incumbente perde, as fornecedoras ligadas a ele perdem participação? Se perderem, outra empresa da mesma rede ganha espaço?
 
-## 4. A rede e seu componente gigante — Andrei (55 s)
+**Se perguntarem**
 
-- Mostrar que a rede nacional não é um bloco único.
-- Explicar o que muda ao remover pontos de articulação.
-- Relacionar o componente gigante às sensibilidades de caminhos e sementes.
+- Duarte (2025) estudou disputas municipais de 2008 e 2012, encontrou estimativas imprecisas para doadoras diretas e explorou sócios em comum.
+- Guerra, Mattos e Nakaguma (2025) associam a proibição de doações empresariais ao aumento do número de empresas em mercados municipais mais expostos. Balán et al. (2026) observam doações individuais de famílias controladoras em companhias abertas que já doavam.
 
-## 5. Eleições apertadas como choque — Andrei (55 s)
+## 3. Como uma empresa se liga a uma candidatura — Andrei (45 s)
 
-- Explicar a hipótese de continuidade no corte sem entrar na fórmula.
-- Frisar que a estimativa de RDD é local (disputas apertadas) e que o teste de densidade não sugere manipulação.
-- Mencionar poder limitado e EMD antes dos resultados.
+**Na fala**
 
-## 6. H1 — conexão direta ao incumbente — Rafael (50 s)
+Apontar as doações de Ana a A, o incumbente, e de Daniel a B, o adversário. X e Z são as sementes. Y compartilha sócios com X e Z, por isso está a um passo de cada grupo.
 
-- Ler a estimativa em p.p. e o intervalo, não a tabela inteira.
-- Interpretar o placebo: se o pré-período também salta, o desenho tem problema.
-- Comparar o efeito com o EMD: intervalo largo é imprecisão, não zero preciso.
+**Se perguntarem**
 
-## 7. H2 — contrastes entre coortes de distância — Rafael (55 s)
+- Um passo entre empresas tem duas arestas no grafo bipartido. Onde não há caminho, a distância é infinita.
+- TCESP: empenhos pela data do evento, de 2021 a 2025. TSE: doações de pessoas físicas até 5/10/2024, incluindo recursos próprios dos candidatos.
+- Receita Federal: fotografia de setembro de 2024, com complemento de 12/10 apenas para quadros ausentes e vínculos iniciados até 13/09. Vínculos encerrados até a extração podem faltar. A leitura eleitoral exige continuidade desse erro perto do empate.
 
-- Sob comparabilidade, a vantagem prevista é positiva e decrescente. O ponto negativo em δ = 1 contraria essa direção; os diagnósticos limitam a leitura.
-- Ler δ = 1 junto ao placebo, ao suporte pequeno e à sensibilidade de banda; não interpretar composição como gradiente causal da distância.
+## 4. O maior componente da rede — Andrei (30 s)
+
+**Na fala**
+
+Comparar a parcela de empresas no componente gigante com a parcela no maior componente depois de retirar as pessoas que ligam partes da rede.
+
+**Se perguntarem**
+
+- A rede principal tem 14.069.286 empresas, 16.547.513 vértices de sócios/administradores PF/PJ e 24.689.604 vínculos.
+- Explicar um ponto de articulação voltando ao exemplo: se Bruno sair, X perde o caminho para Y e Z. Removê-lo muda quais empresas podem ficar na mesma coorte.
+- Na reconstrução com a fotografia recente, 9,4% dos vínculos de setembro ficam de fora e 21,3% dos reconstruídos não constam em setembro.
+
+## 5. Comparação perto do empate — Andrei (55 s)
+
+**Na fala**
+
+Mostrar os dois lados do corte. Comparamos derrotas e vitórias por margem pequena. O salto estima o efeito local da derrota se os resultados potenciais forem contínuos no empate.
+
+**Se perguntarem**
+
+- A margem é A menos B. O prefeito candidato representa A. Na ausência dele, buscamos o candidato do seu partido e depois de uma coligação que inclua o partido. Excluímos capital, segundo turno e disputas sem A identificável ou sem adversário.
+- Na regressão descontínua (RD), usamos ajuste linear local, núcleo triangular e banda escolhida pelo erro quadrático médio estimado. Antes do núcleo, o município tem peso um por coorte. Os ICs das coortes agrupam por município. Os contrastes reamostram os mesmos municípios por lado em todas as coortes e mantêm as bandas fixas.
+- O teste de densidade da margem deu p = 0,993. Também usamos placebos pré-eleitorais e verificamos sensibilidade à metade e ao dobro da banda.
+
+## 6. A perda de espaço das ligadas ao incumbente é incerta — Rafael (40 s)
+
+**Na fala**
+
+Comparar as fornecedoras anteriores ligadas diretamente ao incumbente com as sem caminho a nenhuma candidatura. Ler o contraste e explicar o que o intervalo permite.
+
+**Se perguntarem**
+
+- A hipótese é que a derrota reduza a participação das sementes de A em relação às fornecedoras sem caminho aos dois grupos. O contraste é o salto da primeira coorte menos o da segunda.
+- Uma fornecedora anterior tem saldo líquido positivo de janeiro de 2021 a setembro de 2024. No denominador de 2025 entram todos os saldos positivos, inclusive de entrantes. A participação é zero quando o denominador é zero.
+- O contraste com metade da banda foi 2,9 p.p. e com o dobro, -0,7 p.p.
+
+## 7. A um passo, o contraste de 2025 é negativo — Rafael (55 s)
+
+**Na fala**
+
+Explicar a comparação dos saltos por distância. Ler o contraste a um passo de 2025 e o placebo da coorte B. Dar aos dois números o tempo necessário para explicar por que a diferença anterior à eleição importa para a leitura causal.
+
+**Se perguntarem**
+
+- A previsão era uma vantagem positiva da ligação ao vencedor que diminuísse com a distância. A interpretação exige coortes comparáveis e efeitos simétricos de ganhar e perder a ligação. A mesma firma pode entrar nas duas coortes.
+- A um passo, o salto de B em 2025 foi -8,07 p.p. (p de Holm = 0,077). O IC do contraste é nominal. A correção de Holm se aplica ao salto de B na família de testes secundários.
+- O placebo da coorte B mede a mudança de participação de 2021–2022 para 2023–setembro de 2024. Ele é distinto do placebo de nível pré do contraste.
+
+## 8. O contraste sob outras especificações — Rafael (45 s)
+
+**Na fala**
+
+Mostrar o que acontece com o contraste a um passo quando mudam o desfecho e a amostra. À direita, explicar por que a concentração no componente gigante limita a leitura a três passos ou mais.
+
+**Se perguntarem**
+
+- Pós menos pré usa a diferença entre a participação de 2025 e a pré-eleitoral. O placebo anterior usa a mudança entre dois períodos anteriores à eleição.
+- A sobreposição por município, elemento de despesa e quintil de porte entre as coortes de ligação direta é de 6,3%.
 - No recorte comparável, a estimação ficou indefinida nas faixas 0, 1, 2. No recorte comparável da faixa 3+, o contraste foi de 0,055 p.p. (IC de 95% de 0,001 a 0,109).
-- Distinguir imprecisão das coortes próximas do IC estreito do contraste médio em δ = 3+, sem limitar efeitos individuais.
+- O intervalo a três passos ou mais pressupõe inferência municipal. A mesma rede pode gerar dependência entre municípios.
 
-## 8. H3 — decomposição do contraste AMBOS−demais — Rafael (60 s)
+## 9. A compensação fica em aberto — Rafael (50 s)
 
-- Explicar R1, R2 e R3 com um exemplo de rede.
-- Mostrar que os termos somam o total, não são hipóteses separadas.
-- Apontar que os intervalos não confirmam compensação interna e notar o placebo pré-eleitoral de H3.
+**Na fala**
 
-## 9. H4 — permanência das principais redes — João Pedro (45 s)
+Explicar o que seria compensação. Nas redes ligadas a ambos, o primeiro grupo teria de perder espaço e o restante ganhar. Comparar os sinais previstos e os observados e apontar os intervalos.
 
-- Explicar o que é uma rede principal e por que o limiar muda a amostra.
-- Mostrar os p-valores ajustados (Holm), não os brutos.
-- Lembrar que H4 é secundária e tem EMD muito alto no limiar de 50%.
+**Se perguntarem**
 
-## 10. Robustez: a rede alternativa muda a conclusão? — João Pedro (50 s)
+- R1 são as fornecedoras anteriores diretamente ligadas a A. R2 são as demais fornecedoras anteriores. R3 são as novas. Os termos somam a mudança total da rede, normalizada pelo empenho anual médio pré-eleitoral do município.
+- O contraste do total, redes ligadas a ambos menos as demais, foi -4,06 (-10,20 a 2,08)% do empenho prévio (estimativa e IC de 95%). Na tela estão os saltos dentro de AMBOS.
+- Placebo de nível pré-eleitoral dentro de AMBOS: -11,09 p.p. (p nominal = 0,0501). Para o contraste do total: -11,11 p.p. (p nominal = 0,130).
 
-- Não ler a tabela: apontar que H1 e H2 (δ = 0) seguem cruzando zero em todas as variantes.
-- Explicar por que aparecem n.d.: remover pontos de articulação ou administradores fragmenta componentes e derruba o suporte municipal.
-- Comparar H3 total sem sócios PJ com o intervalo da versão principal; a mudança do grafo também reclassifica as coortes.
+## 10. Permanência entre as principais redes — João Pedro (55 s)
 
-## 11. O que os resultados permitem dizer — Felipe (55 s)
+**Na fala**
 
-- Amarrar os achados das quatro hipóteses com magnitudes e precisão.
-- Distinguir imprecisão de contraste médio pequeno em coortes dominadas pelo gigante; a precisão é condicional à inferência municipal.
-- Relacionar à literatura (Boas et al., Baltrunaite): doações individuais pós-ADI 4650 em um ciclo municipal não reproduzem ganhos claros.
+Explicar como o ranking de 50% inclui a rede que cruza o limiar. As médias à esquerda descrevem as disputas próximas. O contraste à direita compara os saltos de coortes exclusivas e tem um intervalo amplo.
 
-## 12. Limites e o que ficou de fora — Felipe (45 s)
+**Se perguntarem**
 
-- Fechar com o que o grupo faria diferente com mais ciclos eleitorais.
-- Deixar claro o que é limitação de medida, de validade local e de poder.
-- Convidar à pergunta sobre o mecanismo.
+- O ranking pré exige saldo positivo em pelo menos três dos quatro anos pré-eleitorais. Se as elegíveis ficarem abaixo do limiar, todas entram. Em 2025 entram todas as redes de saldo positivo, inclusive estreantes. Usamos o mesmo percentual sobre o total de cada período.
+- As médias na janela incluem as quatro categorias de ligação. O contraste de RD é metade da diferença dos saltos de redes ligadas só a B e só a A. A leitura como vantagem do vencedor exige comparabilidade e simetria.
+- Estimativas e ICs de 95% em p.p. nos outros limiares: 25%, n.d. e 75%, 0,4 (-8,0 a 8,8). No limiar de 50%, o EMD é de 277,1 p.p. e o IC amplo indica instabilidade.
+- Em H4 (50%), 100,0% do peso das redes de ligação exclusiva na janela de cinco p.p. pertence ao gigante.
+- Em H4 (50%), o gigante também ocupa integralmente as duas coortes nas bandas do RD.
+
+## 11. O que muda com outras definições de rede — João Pedro (45 s)
+
+**Na fala**
+
+Escolher a linha do total da rede para mostrar como a definição do grafo muda os intervalos e o próprio suporte da comparação.
+
+**Se perguntarem**
+
+- Mudar a rede também altera caminhos, sementes, composição das coortes e suporte. Na versão sem pontos de articulação, as sementes foram selecionadas de novo.
+- Quando o total fica sem estimativa, verificar quantos municípios restam de cada lado.
+- Sem o gigante, os contrastes de H3 e H4 (50%) ficam sem suporte.
+- Pessoal ou credores públicos somam 50,7% do empenho de 2025 com CNPJ válido na amostra.
+- Sem esses empenhos, H1 e H3 total mantêm ICs cruzando zero.
+
+## 12. A persistência dos empenhos após a alternância — Felipe (55 s)
+
+**Na fala**
+
+Responder à pergunta da abertura. Dizer o que as estimativas permitem concluir sobre a vantagem eleitoral e a compensação. Lembrar que a comparação vale para disputas apertadas de um único ciclo.
+
+**Se perguntarem**
+
+- Retomar a pergunta da abertura. A leitura do contraste a um passo depende da especificação. Os intervalos amplos em várias comparações admitem efeitos relevantes. A concentração em uma rede pode gerar dependência entre municípios.
+- Foi possível ligar a empresas 41,0% dos doadores de A e 43,4% dos de B. Vínculos informais ficam fora do cadastro.
+- A alternância também pode mudar a burocracia municipal, como estudado por Akhtari, Moreira e Trucco (2022). O possível efeito desse canal nos empenhos fica em aberto.
 
 ## Divisão
 
-- Felipe: 180 s
-- Andrei: 160 s
-- Rafael: 165 s
-- João Pedro: 95 s
+- Felipe: 120 s
+- Andrei: 130 s
+- Rafael: 190 s
+- João Pedro: 100 s

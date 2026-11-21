@@ -12,7 +12,7 @@ from redes.numeros import Numeros
 
 def test_efeito_preserva_sinal_de_intervalos_pequenos() -> None:
     linha = {"estimativa": 0.0004, "ic_inf": -0.0002, "ic_sup": 0.0011}
-    assert deck._efeito(linha, casas=4) == "0,0004 (IC 95%: -0,0002 a 0,0011)"
+    assert deck._efeito(linha, casas=2) == "0,04 (-0,02 a 0,11)"
 
 
 def _caminhos(tmp_path: Path) -> Caminhos:
@@ -28,13 +28,15 @@ def test_deck_tem_de_10_a_12_slides(tmp_path: Path) -> None:
     prs, notas = deck.construir(_caminhos(tmp_path), Numeros({}))
     assert deck.MINIMO_SLIDES <= len(prs.slides) <= deck.MAXIMO_SLIDES
     assert len(notas) == len(prs.slides)
-    assert 540 <= sum(nota.segundos for nota in notas) <= 660
+    assert 540 <= sum(nota.segundos for nota in notas) < deck.LIMITE_SEGUNDOS
     assert {nota.pessoa for nota in notas} == {
         "Felipe",
         "Andrei",
         "Rafael",
         "João Pedro",
     }
+    for slide, nota in zip(prs.slides, notas, strict=True):
+        assert slide.notes_slide.notes_text_frame.text == nota.texto()
 
 
 def test_deck_usa_os_numeros_das_tabelas(tmp_path: Path) -> None:
@@ -57,16 +59,18 @@ def test_deck_usa_os_numeros_das_tabelas(tmp_path: Path) -> None:
         }
     ).write_csv(caminhos.resultados / "tables" / "resumo_estimacao.csv")
     numeros = Numeros.ler(caminhos.resultados / "tables")
-    prs, _ = deck.construir(caminhos, numeros)
+    prs, notas = deck.construir(caminhos, numeros)
     textos = " ".join(
         forma.text_frame.text
         for slide in prs.slides
         for forma in slide.shapes
         if forma.has_text_frame
     )
-    assert "1.234 empresas" in textos
-    assert "5.678 vértices de sócios/administradores PF/PJ" in textos
-    assert "Estimativa: -0,012 (IC 95%: -0,050 a 0,025)" in textos
+    notas_texto = " ".join(nota.texto() for nota in notas)
+    assert "1.234 empresas" in notas_texto
+    assert "5.678 vértices de sócios/administradores PF/PJ" in notas_texto
+    assert "-1,2 p.p." in textos
+    assert "IC de 95% de -5,0 a 2,5 p.p." in textos
 
 
 def test_tabela_de_robustez_usa_as_quatro_variantes() -> None:
@@ -92,7 +96,12 @@ def test_tabela_de_robustez_usa_as_quatro_variantes() -> None:
     )
     linhas = deck._linhas_robustez(robustez)
     assert [linha[0] for linha in linhas] == ["H1", "H2", "H3"]
-    assert linhas[0][1].startswith("0,100")
+    assert linhas[0][1:] == [
+        "10,0 (0,0 a 20,0)",
+        "11,0 (1,0 a 21,0)",
+        "12,0 (2,0 a 22,0)",
+        "13,0 (3,0 a 23,0)",
+    ]
     assert linhas[1][1] == "n.d."
 
 
