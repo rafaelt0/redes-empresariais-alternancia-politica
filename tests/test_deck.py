@@ -28,14 +28,33 @@ def test_deck_tem_de_10_a_12_slides(tmp_path: Path) -> None:
     assert deck.MINIMO_SLIDES <= len(prs.slides) <= deck.MAXIMO_SLIDES
     assert len(notas) == len(prs.slides)
     assert 540 <= sum(nota.segundos for nota in notas) < deck.LIMITE_SEGUNDOS
-    assert {nota.pessoa for nota in notas} == {
-        "Felipe",
-        "Andrei",
-        "Rafael",
-        "João Pedro",
-    }
+    assert {nota.pessoa for nota in notas} == set(deck.VOZES)
     for slide, nota in zip(prs.slides, notas, strict=True):
         assert slide.notes_slide.notes_text_frame.text == nota.texto()
+
+
+def test_guia_equilibra_os_blocos_e_nao_define_pessoas(tmp_path: Path) -> None:
+    prs, notas = deck.construir(_caminhos(tmp_path), Numeros({}))
+    titulos = [slide.shapes[0].text_frame.text for slide in prs.slides]
+    texto = deck.guia(notas, titulos)
+    por_bloco: dict[str, int] = {}
+    for nota in notas:
+        por_bloco[nota.pessoa] = por_bloco.get(nota.pessoa, 0) + nota.segundos
+    assert set(por_bloco) == set(deck.VOZES)
+    assert set(por_bloco.values()) == {135}
+    assert "2:15" in texto
+    assert "1:00" in texto
+    for autor in ("Felipe", "Andrei", "Rafael", "João Pedro"):
+        assert autor not in texto
+
+
+def test_guia_recusa_blocos_com_tempos_desiguais() -> None:
+    notas = [
+        deck.Nota("Voz 1", 10, "fala", ()),
+        deck.Nota("Voz 2", 20, "fala", ()),
+    ]
+    with pytest.raises(ValueError, match="mesmo tempo"):
+        deck.guia(notas, ["a", "b"])
 
 
 def test_deck_usa_os_numeros_das_tabelas(tmp_path: Path) -> None:
