@@ -1,21 +1,21 @@
 # Guia de fala
 
-**Fala prevista de 9:00.** Reserve 1:00 para trocas de apresentador e variações de ritmo, dentro do limite de 10:00. Os tempos acumulados servem de referência no ensaio.
+**Fala prevista de 9:10.** Reserve 0:50 para trocas de apresentador e variações de ritmo, dentro do limite de 10:00. Os tempos acumulados servem de referência no ensaio.
 
 | Slide | Tema | Pessoa | Tempo | Até |
 |---|---|---|---|---|
 | 1 | Redes empresariais e persistência econômica sob alternância política | Felipe | 25 s | 0:25 |
-| 2 | Os fornecedores do incumbente perdem espaço? | Felipe | 40 s | 1:05 |
-| 3 | Como uma empresa se liga a uma candidatura | Andrei | 45 s | 1:50 |
-| 4 | O maior componente da rede | Andrei | 30 s | 2:20 |
-| 5 | Comparação perto do empate | Andrei | 55 s | 3:15 |
-| 6 | A perda de espaço das ligadas ao incumbente é incerta | Rafael | 40 s | 3:55 |
-| 7 | A um passo, o contraste de 2025 é negativo | Rafael | 55 s | 4:50 |
-| 8 | O contraste sob outras especificações | Rafael | 45 s | 5:35 |
-| 9 | A compensação fica em aberto | Rafael | 50 s | 6:25 |
-| 10 | Permanência entre as principais redes | João Pedro | 55 s | 7:20 |
-| 11 | O que muda com outras definições de rede | João Pedro | 45 s | 8:05 |
-| 12 | A persistência dos empenhos após a alternância | Felipe | 55 s | 9:00 |
+| 2 | A troca de governo e os fornecedores municipais | Felipe | 50 s | 1:15 |
+| 3 | Como uma empresa se liga a uma candidatura | Andrei | 45 s | 2:00 |
+| 4 | O maior componente da rede | Andrei | 30 s | 2:30 |
+| 5 | Comparação perto do empate | Andrei | 55 s | 3:25 |
+| 6 | A perda de espaço das ligadas ao incumbente é incerta | Rafael | 40 s | 4:05 |
+| 7 | A um passo, o contraste de 2025 é negativo | Rafael | 55 s | 5:00 |
+| 8 | O contraste sob outras especificações | Rafael | 45 s | 5:45 |
+| 9 | A compensação fica em aberto | Rafael | 50 s | 6:35 |
+| 10 | Permanência entre as principais redes | João Pedro | 55 s | 7:30 |
+| 11 | O que muda com outras definições de rede | João Pedro | 45 s | 8:15 |
+| 12 | A persistência dos empenhos após a alternância | Felipe | 55 s | 9:10 |
 
 ## 1. Redes empresariais e persistência econômica sob alternância política — Felipe (25 s)
 
@@ -23,11 +23,11 @@
 
 Situar as eleições paulistas de 2024 e os empenhos de 2025. A prefeitura pode trocar de fornecedor e encontrar os mesmos sócios por trás do novo CNPJ.
 
-## 2. Os fornecedores do incumbente perdem espaço? — Felipe (40 s)
+## 2. A troca de governo e os fornecedores municipais — Felipe (50 s)
 
 **Na fala**
 
-Apresentar a pergunta. Quando o incumbente perde, as fornecedoras ligadas a ele perdem participação? Se perderem, outra empresa da mesma rede ganha espaço?
+Mesmo que uma fornecedora perca espaço após a eleição, parte da despesa pode continuar na mesma rede se outra empresa ligada a ela ganhar participação. Usamos os empenhos de 2025 para investigar isso nas prefeituras paulistas após as eleições de 2024. Começamos pelas empresas ligadas a quem doou às campanhas como pessoa física. A partir delas, seguimos os vínculos por sócios ou administradores em comum. O próximo slide mostra como fazemos essa ligação.
 
 **Se perguntarem**
 
@@ -161,7 +161,7 @@ Responder à pergunta da abertura. Dizer o que as estimativas permitem concluir 
 
 ## Divisão
 
-- Felipe: 120 s
+- Felipe: 130 s
 - Andrei: 130 s
 - Rafael: 190 s
 - João Pedro: 100 s
