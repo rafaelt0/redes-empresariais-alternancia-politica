@@ -25,9 +25,9 @@ def test_h3_discute_placebo_de_nivel_mesmo_sem_rejeicao():
         }
     )
     texto = leitura_resultados(resumo)
-    assert "placebo de nível de H3 é -11,0 p.p. de participação" in texto
-    assert "no mesmo sentido do contraste pós" in texto
-    assert "não a variação normalizada do pós" in texto
+    assert "O placebo de H3 usa o nível da participação pré-eleitoral" in texto
+    assert "O salto é de -11,0 p.p." in texto
+    assert "O sinal coincide com o do contraste pós-eleitoral" in texto
 
 
 def test_relatorio_le_o_resumo_real_e_distingue_o_intervalo_do_contraste():
@@ -97,11 +97,12 @@ def test_relatorio_sintese_e_leitura_usam_formato_ptbr_e_emd():
         }
     )
     sintese = sintese_principal(resumo)
-    assert "EMD de 14,8 p.p." in sintese
+    assert "H2 (ligações diretas)" in sintese
+    assert "efeito mínimo detectável é de 14,8 pontos percentuais." in sintese
     leitura = leitura_resultados(resumo)
     assert "$p = 0{,}993$" in leitura
-    assert r"-3,9\% do gasto prévio; EMD 7,2\%" in leitura
-    assert "magnitudes pequenas (0,1 p.p.; EMD de 0,4 p.p.)" in leitura
+    assert r"-3,9\% do gasto prévio, com EMD de 7,2\%" in leitura
+    assert "o contraste é de 0,1 p.p. e o EMD é de 0,4 p.p. sob inferência municipal" in leitura
 
 
 def test_leitura_robustez_destaca_estabilidade_e_suporte_nd():
@@ -126,6 +127,6 @@ def test_leitura_robustez_destaca_estabilidade_e_suporte_nd():
         }
     )
     texto = leitura_robustez(robustez)
-    assert "permanecem indistinguíveis de zero" in texto
+    assert "incluem zero em todas as variantes estimáveis" in texto
     assert r"H3 total (-7,3\%)" in texto
-    assert "suporte municipal abaixo de dez municípios" in texto
+    assert "menos de dez municípios em um dos lados do corte" in texto
