@@ -93,7 +93,12 @@ Robustez da rede, reestimando H1 a H3: sem pessoas cuja retirada divide componen
 - Deck com `python-pptx`; PDF por conversão do `.pptx` com LibreOffice em modo headless.
 - `pytest` e `ruff`.
 
-Dependências de sistema, documentadas no README: `uv`, `make`, uma distribuição TeX com `latexmk`, LibreOffice.
+Dependências de sistema, documentadas no README: `uv`, GNU make no Linux/macOS
+(opcional com o executor Python), uma distribuição TeX completa com `latexmk`, pdfLaTeX, BibTeX e `abntex2cite`, LibreOffice.
+No macOS, MacTeX/TeX Live completo (BasicTeX não basta); no Windows, TeX Live ou
+MiKTeX com Perl. Locais conhecidos e overrides `REDES_SOFFICE`/`REDES_LATEXMK`
+são documentados na seção Reprodução do README, junto com NTFS para a chave HMAC
+e ext4 para os dados no WSL.
 
 ## Comandos
 
@@ -106,6 +111,18 @@ make lint         # uv run ruff check . && uv run ruff format --check .
 make sample       # pipeline inteiro sobre a amostra sintética de tests/fixtures
 make clean-raw    # apaga data/raw após a ingestão
 ```
+
+No Windows nativo, substitua `make <alvo>` por
+`uv run --frozen python -m redes.tarefas <alvo>`; para preparar o ambiente,
+`uv sync --frozen` ou o alvo `setup`. Todos os alvos acima e os auxiliares
+`dicionario`, `sensibilidades` e `entrega-revisada` são preservados. As dependências
+vêm de `ETAPA`; o executor reexecuta os pré-requisitos em cada chamada, enquanto
+make usa marcadores incrementais. Não é necessário instalar make ou bash no Windows.
+
+A opção `sample --sem-publicacao` (ou `REDES_SEM_PUBLICACAO=1 make sample` no POSIX)
+roda até `estimate` sem TeX/LibreOffice. Essa execução reduzida é explícita e não
+satisfaz os critérios de publicação. A CI usa apenas dados sintéticos nos três
+sistemas, omitindo publicação explicitamente quando as ferramentas estão ausentes.
 
 `REDES_DATA_DIR` aponta o diretório de dados (padrão `./data`), para permitir disco externo.
 
@@ -184,8 +201,11 @@ Nunca:
 
 ## Critérios de sucesso
 
-1. Em um clone limpo, `make setup && make all` termina sem erro e gera `output/relatorio.pdf`, `output/deck.pptx`, `output/deck.pdf` e `output/guia_de_fala.md`.
-2. `make sample` termina em menos de dois minutos e `make test` passa.
+1. Em um clone limpo com as dependências de publicação instaladas, `make setup && make all`
+   (Linux/macOS), ou `uv sync --frozen` seguido de
+   `uv run --frozen python -m redes.tarefas all` (Windows nativo), termina sem erro e gera `output/relatorio.pdf`, `output/deck.pptx`, `output/deck.pdf` e `output/guia_de_fala.md`.
+2. `make sample` termina em menos de dois minutos e `make test` passa; no Windows,
+   valem os alvos `sample` e `test` do executor Python, com TeX/LibreOffice para a amostra completa.
 3. Todo número do relatório e do deck vem de arquivo em `results/`; nenhum é digitado à mão.
 4. O relatório tem no máximo cinco páginas e reporta, para H1 a H4: estimativa, intervalo robusto, banda, número de municípios de cada lado, b/2 e 2b, teste de densidade e placebo.
 5. As descritivas de rede (componentes, distâncias, erro de reconstrução) e as três reestimações de robustez estão em `results/`.
