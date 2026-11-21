@@ -11,11 +11,35 @@ João Pedro Ferreira.
 
 ## Reprodução
 
-Em Linux, use Python 3.12 com `uv`, GNU Make, LibreOffice (`soffice`), Poppler
-(`pdfinfo`) e uma distribuição TeX com `latexmk`, pdfLaTeX, BibTeX e
-`abntex2cite`. Reserve cerca de 25 GB de disco livre para os ZIPs, Parquet e
-temporários e 8 GB de RAM. O tempo com dados reais depende da conexão e da máquina.
-A amostra sintética normalmente termina em menos de dois minutos.
+O pipeline usa Python 3.12 e `uv` com `uv.lock`. Reserve cerca de 25 GB de
+disco livre para ZIPs, Parquet e temporários e 8 GB de RAM. O tempo com dados
+reais depende da conexão e da máquina. A amostra normalmente termina em menos
+de dois minutos.
+
+- **Linux:** instale `uv`, GNU Make, LibreOffice e TeX Live com `latexmk`,
+  pdfLaTeX, BibTeX e `abntex2cite` (em Debian/Ubuntu, os pacotes TeX de português
+  e bibliografias adicionais são necessários).
+- **macOS:** instale `uv`, GNU Make (o `/usr/bin/make` 3.81 é suficiente),
+  LibreOffice e MacTeX/TeX Live completo. BasicTeX não inclui `abntex2cite`.
+  O executor encontra `/Applications/LibreOffice.app/Contents/MacOS/soffice`
+  e `/Library/TeX/texbin/latexmk`; alternativamente, inclua essas pastas no
+  PATH ou crie um symlink de `soffice` em uma pasta do PATH.
+- **Windows nativo:** instale `uv` (por exemplo, `winget install --id astral-sh.uv`),
+  LibreOffice e TeX Live completo ou MiKTeX com `latexmk`, `abntex2cite` e Perl
+  (por exemplo, Strawberry Perl). Reabra o terminal após instalar. Use o
+  executor Python abaixo no PowerShell; não precisa de bash nem de make.
+  Use disco NTFS local para dados e chave HMAC, que exige links físicos atômicos;
+  volumes sem suporte a links físicos, como exFAT, não são suportados para a chave.
+- **WSL:** siga as instruções Linux e mantenha os cerca de 25 GB de dados no
+  sistema ext4 da distribuição, evitando `/mnt/c` para o processamento.
+
+Poppler (`pdfinfo`) é opcional: há contagem de páginas alternativa em Python.
+`REDES_SOFFICE` e `REDES_LATEXMK` aceitam o caminho completo do executável, sem
+argumentos. Têm prioridade sobre PATH e locais conhecidos do sistema. Exemplo
+no PowerShell: `$env:REDES_SOFFICE = 'C:\Program Files\LibreOffice\program\soffice.exe'`.
+Para instalações TeX personalizadas, inclua também pdfLaTeX e BibTeX no PATH.
+
+No Linux e macOS:
 
 ```sh
 make setup
@@ -24,6 +48,30 @@ make test
 make lint
 make all
 ```
+
+No Windows nativo (também funciona nos outros sistemas), na raiz do clone:
+
+```powershell
+uv sync --frozen
+uv run --frozen python -m redes.tarefas sample
+uv run --frozen python -m redes.tarefas test
+uv run --frozen python -m redes.tarefas lint
+uv run --frozen python -m redes.tarefas all
+```
+
+Todo alvo público do make tem equivalente `uv run --frozen python -m redes.tarefas <alvo>`,
+inclusive `setup`, etapas individuais, `clean-raw`, `dicionario`, `sensibilidades` e
+`entrega-revisada`. O executor usa as dependências declaradas em `ETAPA` e reexecuta
+os pré-requisitos em cada chamada; o make conserva a reconstrução incremental por
+marcadores. Ambos respeitam `REDES_DATA_DIR`, `REDES_RESULTS_DIR`, `REDES_OUTPUT_DIR`,
+`REDES_ESTRITO` e `PARCIAIS_TCESP`. No PowerShell, configure variáveis com
+`$env:REDES_DATA_DIR = 'D:\dados'`; `DADOS=...` é uma opção exclusiva do make.
+
+Sem TeX/LibreOffice, `uv run python -m redes.tarefas sample --sem-publicacao`
+executa explicitamente só até `estimate`, sem gerar os artefatos finais. No make,
+o equivalente é `REDES_SEM_PUBLICACAO=1 make sample`. A CI roda essa amostra nos
+três sistemas e informa quando omite a publicação por ausência de ferramentas.
+Os testes dependentes de ferramentas ausentes mostram o motivo com `pytest -rs`.
 
 `make sample` gera os artefatos em `data/amostra/output/`. `make all` baixa as
 fontes necessárias, constrói os painéis e gera em `output/` o relatório PDF, o

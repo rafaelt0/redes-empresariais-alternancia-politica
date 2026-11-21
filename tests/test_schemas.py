@@ -61,7 +61,7 @@ def test_gravar_recusa_tabela_invalida_sem_deixar_arquivo(tmp_path, tabelas_amos
 
 
 def test_dicionario_esta_atualizado():
-    assert (RAIZ / "docs" / "dicionario.md").read_text() == dicionario.gerar(), (
+    assert (RAIZ / "docs" / "dicionario.md").read_text(encoding="utf-8") == dicionario.gerar(), (
         "rode `make dicionario`"
     )
 

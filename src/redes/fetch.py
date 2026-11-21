@@ -10,7 +10,6 @@ erro numa fonte imutável e aviso numa mutável (erro com `REDES_ESTRITO=1`). Pa
 trava a partir do manifesto: `uv run python -m redes.fetch travar`.
 """
 
-import fcntl
 import hashlib
 import http.client
 import json
@@ -28,6 +27,7 @@ from pathlib import Path
 from redes.config import RAIZ, Caminhos
 from redes.etapas import Contexto, Etapa
 from redes.fontes import ARQUIVOS, Arquivo
+from redes.portabilidade import trava_exclusiva
 
 ETAPA = Etapa(
     nome="fetch",
@@ -52,7 +52,7 @@ class ErroDeFonte(RuntimeError):
 def garantir(arquivo: Arquivo, caminhos: Caminhos, trava: Path = TRAVA) -> Path:
     """Devolve o caminho do bruto, baixando-o se falta ou não confere com o manifesto."""
     destino = caminhos.brutos / arquivo.chave
-    anterior = _ler_json(_manifesto(caminhos)).get(arquivo.chave, {})
+    anterior = _ler_manifesto(caminhos).get(arquivo.chave, {})
     travado = _ler_json(trava).get(arquivo.chave, {})
     if os.environ.get("REDES_ESTRITO") == "1" and not travado.get("sha256"):
         raise ErroDeFonte(f"{arquivo.chave}: SHA-256 ausente na trava de fontes")
@@ -93,7 +93,7 @@ def descartar(arquivo: Arquivo, caminhos: Caminhos) -> None:
 def travar(caminhos: Caminhos, trava: Path = TRAVA) -> None:
     """Atualiza a trava com o SHA-256 e o tamanho de cada arquivo registrado no manifesto."""
     travado = _ler_json(trava)
-    for chave, registro in _ler_json(_manifesto(caminhos)).items():
+    for chave, registro in _ler_manifesto(caminhos).items():
         travado[chave] = {k: registro[k] for k in ("url", "tamanho", "sha256")}
     _gravar_json(trava, travado)
 
@@ -203,14 +203,22 @@ def _manifesto(caminhos: Caminhos) -> Path:
     return caminhos.dados / "manifest.json"
 
 
+def _ler_manifesto(caminhos: Caminhos) -> dict:
+    """Serializa também leitores: no Windows um arquivo aberto pode impedir replace."""
+    caminho = _manifesto(caminhos)
+    caminho.parent.mkdir(parents=True, exist_ok=True)
+    with trava_exclusiva(caminho.with_name(caminho.name + ".trava")):
+        return _ler_json(caminho)
+
+
 def _ler_json(caminho: Path) -> dict:
-    return json.loads(caminho.read_text()) if caminho.exists() else {}
+    return json.loads(caminho.read_text(encoding="utf-8")) if caminho.exists() else {}
 
 
 def _gravar_json(caminho: Path, dados: dict) -> None:
     temporario = caminho.with_name(caminho.name + ".tmp")
     texto = json.dumps(dados, indent=2, ensure_ascii=False, sort_keys=True)
-    temporario.write_text(texto + "\n")
+    temporario.write_text(texto + "\n", encoding="utf-8", newline="\n")
     temporario.replace(caminho)
 
 
@@ -219,8 +227,7 @@ def _editar_manifesto(caminhos: Caminhos) -> Iterator[dict]:
     """Ler, alterar e gravar sob trava de arquivo: as `ingest-*` rodam em paralelo."""
     caminho = _manifesto(caminhos)
     caminho.parent.mkdir(parents=True, exist_ok=True)
-    with caminho.with_name(caminho.name + ".trava").open("w") as trava:
-        fcntl.flock(trava, fcntl.LOCK_EX)
+    with trava_exclusiva(caminho.with_name(caminho.name + ".trava")):
         manifesto = _ler_json(caminho)
         yield manifesto
         _gravar_json(caminho, manifesto)

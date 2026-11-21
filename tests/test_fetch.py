@@ -79,7 +79,7 @@ def _arquivo(servidor: Servidor, imutavel: bool = True, nome: str = "dados.zip")
 
 
 def _manifesto(caminhos: Caminhos) -> dict:
-    return json.loads((caminhos.dados / "manifest.json").read_text())
+    return json.loads((caminhos.dados / "manifest.json").read_text(encoding="utf-8"))
 
 
 def _trava(tmp_path: Path, sha: str) -> Path:
@@ -199,7 +199,7 @@ def test_trava_igual_ao_baixado_passa_e_travar_regrava(servidor, caminhos, tmp_p
     trava.write_text("{}")
     fetch.travar(caminhos, trava)
 
-    travado = json.loads(trava.read_text())["teste/dados.zip"]
+    travado = json.loads(trava.read_text(encoding="utf-8"))["teste/dados.zip"]
     assert travado == {"url": f"{servidor.base}/dados.zip", "tamanho": len(CONTEUDO), "sha256": SHA}
 
 

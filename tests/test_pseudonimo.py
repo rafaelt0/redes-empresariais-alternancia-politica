@@ -1,3 +1,4 @@
+import os
 import stat
 from concurrent.futures import ThreadPoolExecutor
 
@@ -51,11 +52,17 @@ def test_versao_vetorial_coincide_com_a_escalar():
     ]
 
 
-def test_chave_gerada_uma_vez_e_privada(tmp_path):
+def test_chave_gerada_uma_vez(tmp_path):
     caminho = tmp_path / "sub" / "chave"
     primeira = carregar_chave(caminho)
     assert carregar_chave(caminho) == primeira
     assert len(primeira) == 32
+
+
+@pytest.mark.skipif(os.name != "posix", reason="O modo 0o600 exige permissões POSIX")
+def test_chave_gerada_com_permissoes_privadas(tmp_path):
+    caminho = tmp_path / "sub" / "chave"
+    carregar_chave(caminho)
     assert stat.S_IMODE(caminho.stat().st_mode) == 0o600
 
 
