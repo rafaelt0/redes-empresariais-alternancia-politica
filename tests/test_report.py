@@ -4,7 +4,6 @@ from redes.report import (
     leitura_resultados,
     leitura_robustez,
     numeros_tex,
-    sintese_principal,
     tabela_categorias,
     tabela_estimativas,
 )
@@ -24,7 +23,7 @@ def test_h3_discute_placebo_de_nivel_mesmo_sem_rejeicao():
             "placebo_p_valor": [0.13],
         }
     )
-    texto = leitura_resultados(resumo)
+    texto = leitura_resultados(resumo)["leituraHUmHTres"]
     assert "O placebo de H3 usa o nível da participação pré-eleitoral" in texto
     assert "O salto é de -11,0 p.p." in texto
     assert "O sinal coincide com o do contraste pós-eleitoral" in texto
@@ -71,7 +70,7 @@ def test_relatorio_mostra_o_suporte_e_o_contraste_do_recorte_comparavel(tmp_path
     assert r"faixa 3+, o contraste foi de 0,230 p.p. (IC de 95\% de 0,100 a 0,410)" in texto
 
 
-def test_relatorio_sintese_e_leitura_usam_formato_ptbr_e_emd():
+def test_leituras_por_hipotese_usam_formato_ptbr_e_emd():
     resumo = pl.DataFrame(
         {
             "hipotese": ["H1", "H2", "H2", "H3"],
@@ -96,13 +95,15 @@ def test_relatorio_sintese_e_leitura_usam_formato_ptbr_e_emd():
             "placebo_p_valor": [0.936, 0.240, 0.465, 0.060],
         }
     )
-    sintese = sintese_principal(resumo)
-    assert "H2 (ligações diretas)" in sintese
-    assert "efeito mínimo detectável é de 14,8 pontos percentuais." in sintese
     leitura = leitura_resultados(resumo)
-    assert "$p = 0{,}993$" in leitura
-    assert r"-3,9\% do gasto prévio, com EMD de 7,2\%" in leitura
-    assert "o contraste é de 0,1 p.p. e o EMD é de 0,4 p.p. sob inferência municipal" in leitura
+    assert "$p = 0{,}993$" in leitura["leituraDensidade"]
+    assert "efeito mínimo detectável é de 14,8 pontos percentuais." in leitura["leituraHUmHTres"]
+    assert r"do gasto prévio, com EMD de 7,2\%" in leitura["leituraHUmHTres"]
+    assert "O IC da faixa de ligação direta inclui zero." in leitura["leituraHDois"]
+    assert (
+        "o contraste é de 0,1 p.p. e o EMD é de 0,4 p.p. sob inferência municipal"
+        in leitura["leituraHDois"]
+    )
 
 
 def test_leitura_robustez_destaca_estabilidade_e_suporte_nd():

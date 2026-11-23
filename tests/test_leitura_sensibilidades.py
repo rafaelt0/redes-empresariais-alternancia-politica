@@ -4,7 +4,7 @@ from redes.leitura_sensibilidades import leitura, limite_h2
 
 
 def test_sem_dados_nao_afirma_robustez(tmp_path):
-    assert leitura(tmp_path) == []
+    assert not any(leitura(tmp_path).values())
     assert limite_h2(tmp_path) == ""
 
 
@@ -34,10 +34,10 @@ def test_concentracao_e_nd_nao_sao_evidencia_de_efeito_zero(tmp_path):
     pl.DataFrame(
         {"tipo": ["contraste"], "categoria": ["vencedor_faixa_1"], "estimavel": [False]}
     ).write_csv(tmp_path / "sensibilidade_apenas_setembro.csv")
-    texto = " ".join(leitura(tmp_path))
-    assert "93,5% do peso municipal" in texto
-    assert "sem suporte" in texto
-    assert "zero" not in texto
+    verificacoes = leitura(tmp_path)
+    assert "93,5% do peso municipal" in " ".join(verificacoes["H3"])
+    assert "sem suporte" in " ".join(verificacoes["sensibilidade H2"])
+    assert all("zero" not in frase for frases in verificacoes.values() for frase in frases)
 
 
 def test_escopo_discute_contrastes_sem_confundir_com_categoria_h3(tmp_path):
@@ -64,8 +64,8 @@ def test_escopo_discute_contrastes_sem_confundir_com_categoria_h3(tmp_path):
     )
     arquivo = tmp_path / "sensibilidade_sem_pessoal_ou_credor_publico.csv"
     tabela.write_csv(arquivo)
-    texto = " ".join(leitura(tmp_path))
+    texto = " ".join(leitura(tmp_path)["gerais"])
     assert "H1 e H3 total mantêm ICs cruzando zero" in texto
     assert "H2 a um passo permanece negativa com IC nominal fora de zero" in texto
     tabela.with_columns(pl.lit(False).alias("estimavel")).write_csv(arquivo)
-    assert "mantêm ICs cruzando zero" not in " ".join(leitura(tmp_path))
+    assert "mantêm ICs cruzando zero" not in " ".join(leitura(tmp_path)["gerais"])

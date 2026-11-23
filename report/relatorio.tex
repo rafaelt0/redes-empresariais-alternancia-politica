@@ -11,7 +11,7 @@
 \emergencystretch=3em
 \usepackage{mathptmx}
 \usepackage[scaled=.92]{helvet}
-\usepackage[margin=2.1cm,top=2.1cm,bottom=1.8cm]{geometry}
+\usepackage[margin=2.1cm,top=1.9cm,bottom=1.7cm]{geometry}
 \usepackage{microtype}
 \usepackage{amsmath}
 \usepackage{graphicx}
@@ -28,7 +28,7 @@
 
 % Aparência do projeto: Times, seções em caixa alta e negrito, parágrafo recuado, número da
 % página no canto superior direito.
-\setstretch{1}
+\setstretch{0.98}
 \setlength{\parindent}{1.0cm}
 \setlength{\parskip}{0pt}
 \setlength{\textfloatsep}{12pt plus 2pt minus 2pt}
@@ -41,7 +41,8 @@
 \fancypagestyle{plain}{\fancyhf{}\fancyhead[R]{\small\thepage}\renewcommand{\headrulewidth}{0pt}}
 \titleformat{\section}{\normalfont\normalsize\bfseries\MakeUppercase}{\thesection}{0.6em}{}
 \titlespacing*{\section}{0pt}{1.1ex plus .3ex}{0.6ex}
-\newcommand{\paragrafo}[1]{\par\noindent\textbf{#1}\ }
+\titleformat{\subsection}{\normalfont\normalsize\bfseries}{\thesubsection}{0.6em}{}
+\titlespacing*{\subsection}{0pt}{0.9ex plus .3ex}{0.4ex}
 
 % Legendas no padrão ABNT: título acima, fonte abaixo.
 \newcounter{figura}
@@ -66,176 +67,197 @@ Rafael Eiki Teruya --- 14604204 \quad João Pedro Ferreira --- 14582312}\\[0.4ex
 \avisoAmostra\par}
 \vspace{0.8ex}\hrule\vspace{1.2ex}
 
-\section{Motivação}
-Quando o grupo no poder perde a eleição, seus fornecedores perdem espaço no orçamento municipal?
-Mesmo quando muda a fornecedora, os sócios podem ser os mesmos. Nas eleições paulistas de 2024,
-investigamos se a derrota do incumbente altera a distribuição dos compromissos de despesa da
-prefeitura, os empenhos, entre empresas e dentro de suas redes.
+\section{Economia política}
+\citeonline{acemoglu2005} distinguem o poder formal (\textit{de jure}), conferido pelas
+instituições políticas, do poder de fato (\textit{de facto}), que resulta dos recursos com que
+os grupos se organizam e influenciam decisões. A disputa política molda as regras econômicas.
+Quem ganha recursos com essas regras pode ampliar sua influência futura, o que ajuda a explicar
+a persistência das elites econômicas \cite{acemoglu2008}.
+
+Quando o incumbente perde, outro grupo passa a decidir sobre as despesas municipais. Os vínculos
+entre as fornecedoras podem persistir, e ganhos de outras empresas da mesma rede podem compensar
+perdas das ligadas ao derrotado. Usamos doações e vínculos societários para mapear conexões nas
+eleições paulistas de 2024 e investigar como se distribuem os compromissos de despesa, registrados
+nos empenhos de 2025.
 
 \citeonline{boas2014} encontraram ganhos em contratos federais para empresas de obras públicas
 que doaram a candidatos vitoriosos do PT à Câmara. Em eleições municipais apertadas de 2008 e
-2012, \citeonline{duarte2025} encontrou estimativas imprecisas para os contratos das doadoras
-diretas e também explorou ligações por sócios em comum.
-\citeonline{guerra2025} associam a proibição das doações empresariais a um aumento no número
-de empresas nos mercados municipais mais expostos. Em companhias abertas que já doavam, membros
-das famílias controladoras passaram a doar como pessoas físicas \cite{balan2026}. Seguimos os
-vínculos societários dos doadores individuais para investigar se outras empresas da mesma rede
-ganham espaço quando uma fornecedora perde. Essa compensação seria uma forma de persistência
-após a alternância \cite{acemoglu2008}.
+2012, \citeonline{duarte2025} obteve estimativas imprecisas para doadoras diretas e também
+explorou os vínculos por sócios em comum. Após a proibição das doações empresariais, o número de
+empresas aumentou nos mercados municipais mais expostos \cite{guerra2025}. Em companhias abertas
+que doavam, membros das famílias controladoras passaram a doar como pessoas físicas \cite{balan2026}.
 
-Testamos se a derrota reduz a participação das fornecedoras ligadas diretamente ao grupo no
-poder em relação às sem caminho a nenhum dos grupos (H1) e se a vantagem esperada da ligação
-ao vencedor diminui com o número de passos na rede (H2). Nas redes ligadas aos dois grupos,
-outras empresas poderiam compensar perdas das ligadas ao incumbente (H3). Também testamos
-se redes ligadas ao vencedor permanecem entre as maiores fornecedoras (H4).
+\section{Hipóteses}
+Chamamos o grupo incumbente de A e o adversário mais votado de B. Uma empresa é semente de um
+grupo quando um de seus sócios ou administradores doa à candidatura local daquele grupo.
+Duas empresas são vizinhas quando compartilham um sócio ou administrador. A distância
+$\delta_{ik}$ da empresa $i$ ao grupo $k$ é o número de passos até a semente mais próxima
+\cite{jackson1996}. Vale zero nas sementes e $\infty$ quando não há caminho observado.
 
-\sintesePrincipal
+\par\medskip\noindent
+\begin{minipage}[c]{0.58\linewidth}
+\setlength{\parskip}{0.5ex}
+\textbf{H1. Ligação direta.} Se A perde, a participação das suas fornecedoras-semente cai em
+relação à das fornecedoras sem caminho observado para A ou B. Na Figura~\ref{fig:exemplo}, X é
+semente de A.
 
-\section{Dados e rede}
-\label{sec:dados}
-Combinamos dados de despesa municipal, eleições e sociedades \cite{tcesp2026,tse2026,rfb2026}.
-Excluímos a capital, as disputas com segundo turno e os municípios sem uma candidatura
-incumbente identificável pelo protocolo ou sem adversário. As fornecedoras anteriores têm
-saldo líquido positivo de janeiro de 2021 a setembro de 2024. Usamos empenhos nominais de
-todo 2025. O Supremo vedou doações de pessoas jurídicas a campanhas \cite{adi4650}.
-Usamos as contribuições diretas de pessoas físicas até 5/10/2024, inclusive recursos
-próprios dos candidatos.
+\textbf{H3. Compensação.} Em uma rede ligada aos dois grupos, como X, Y e Z, exploramos se ganhos
+das outras empresas compensam a perda das fornecedoras diretamente ligadas a A.
 
-Preenchemos quadros societários ausentes em setembro com vínculos que constam no cadastro de
-12/10/2024 e começaram até 13/09/2024. Vínculos encerrados entre as duas datas podem faltar.
-A interpretação eleitoral depende da continuidade desse erro perto do empate. Repetimos a
-análise só com setembro.
-
-Em cada município, o grupo no poder (A) é representado pelo prefeito candidato. Na ausência
-dele, buscamos uma candidatura do seu partido e, depois, de uma coligação que inclua o partido.
-B é o adversário mais votado.
-
-O grafo tem \empresasRede{} empresas, \pessoasRede{} sócios ou administradores (pessoas físicas
-ou jurídicas, PJ) e \vinculosRede{} vínculos. Duas empresas são vizinhas se compartilham um sócio
-ou administrador. Uma empresa é semente do grupo que recebeu doação de um de seus sócios ou
-administradores. A distância $\delta_{ik}$ da empresa $i$ ao grupo $k$ é o número de passos
-até a semente mais próxima ligada à candidatura local de $k$ \cite{jackson1996}. Vale zero nas sementes e
-$\infty$ onde não há caminho (Figura~\ref{fig:exemplo}).
-
-Vinculamos a empresas \taxaCruzamentoA{} dos doadores de A e \taxaCruzamentoB{} dos de B.
-Dos \munAnalisaveis{} municípios, \munConexaoA{} têm conexão com A e \munConexaoB{} com B.
-
-Cada conjunto de empresas interligadas forma uma rede. A maior, o componente gigante, reúne
-\fracGigante{} das empresas.
-A parcela cai a \fracGiganteSemArt{} se retiramos as pessoas que, ao sair, dividem uma rede
-(pontos de articulação). Graus, tamanhos e distâncias constam em \texttt{rede\_*.csv}.
-
-Na reconstrução diagnóstica com o cadastro recente e filtro por data de entrada, faltam
-\fracVinculosPerdidos{} dos vínculos de setembro. Dos reconstruídos, \fracVinculosExtras{} são
-extras, dos quais \fracVinculosLacuna{} aparecem no complemento de outubro de 2024. Vinculamos
-\taxaVinculacao{} do valor de 2025 a contratos ou ajustes. Usamos também os empenhos sem vínculo.
-
-\begin{figure}[t]
+\textbf{H2. Distância.} A hipótese original prevê que a vantagem da ligação ao vencedor diminui
+com a distância. Exploramos diferenças entre coortes por faixa. A partir de B, Z está a zero
+passos, Y a um e X a dois.
+\end{minipage}\hfill
+\begin{minipage}[c]{0.39\linewidth}
 \centering
 \legendafigura{fig:exemplo}{Rede societária de exemplo}%
-\figura{figura1_exemplo}{0.52\linewidth}
-\fonteabnt{Fonte: elaboração própria. Os círculos são pessoas e os retângulos são empresas.
-Bruno liga X a Y e Carla liga Y a Z. As setas tracejadas mostram a doação de Ana, sócia de X,
-a A e a de Daniel, sócio de Z, a B.}
-\end{figure}
+\figura{figura1_exemplo}{\linewidth}
+\fonteabnt{Fonte: elaboração própria. Setas tracejadas representam doações. Linhas contínuas
+representam vínculos societários.}
+\end{minipage}
+\par\medskip
+
+Em análise complementar (H4), testamos se redes ligadas ao vencedor permanecem entre as maiores
+fornecedoras. A ênfase em H1 e o tratamento exploratório de H3 e H2 foram definidos após a análise.
 
 \section{Desenho empírico}
-Comparamos disputas apertadas por regressão descontínua (RD). A margem $M_m$ é a diferença A
-menos B em pontos percentuais (p.p.) dos votos válidos no município $m$. O corte é o empate
-($M_m=0$). O indicador de derrota de A, $T_m$, vale 1 se $M_m<0$ e 0 nos demais casos.
-Estimamos o salto $\beta^{\ell}$ do desfecho $Y$ na coorte $\ell$, definida antes da eleição.
-O índice $j$ identifica uma empresa em um elemento de despesa ou uma rede. Se os resultados
-potenciais de cada coorte forem contínuos no corte, o salto estima o efeito local da derrota de A.
+Identificamos A pela candidatura do prefeito, de seu partido ou, na falta de ambas, da coligação
+que inclui o partido. Excluímos a capital, disputas com segundo turno e municípios sem A
+identificável ou sem adversário. Restam \munAnalisaveis{} municípios.
+
+A margem $M_m$ mede a diferença A menos B em pontos percentuais (p.p.) dos votos válidos.
+$T_m=\mathbf{1}\{M_m<0\}$ indica derrota de A. Por regressão descontínua (RD), estimamos o salto
+$\beta^\ell$ no desfecho $Y_{jm}^\ell$ da coorte pré-eleitoral $\ell$ no município $m$.
+$j$ identifica uma empresa por elemento de despesa ou uma rede.
 \begin{equation}
 Y_{jm}^{\ell}=\alpha^{\ell}+\beta^{\ell}T_m+\gamma^{\ell}M_m+\theta^{\ell}T_mM_m+u_{jm}^{\ell},
 \qquad |M_m|\le b.
 \end{equation}
-Ajustamos uma regressão linear local com núcleo triangular, banda $b$ escolhida pelo erro
-quadrático médio estimado e correção de viés \cite{calonico2014}. Antes da ponderação pelo núcleo,
-cada município tem peso um por coorte. Para os intervalos de confiança (ICs) robustos de cada
-coorte, agrupamos erros por município. Nos contrastes, sorteamos os mesmos municípios por lado
-do corte para todas as coortes e mantemos as bandas fixas. Reestimamos com metade e dobro de $b$.
-Testamos a densidade da margem \cite{cattaneo2020} e usamos a participação pré-eleitoral como
-placebo. Para H1 e H2, também testamos sua mudança entre 2021--2022 e 2023--setembro de 2024.
-O efeito mínimo detectável (EMD) supõe 80\% de poder e 5\% de significância. Os testes principais
-de H1 a H3 usam ICs nominais. Os secundários recebem a correção de Holm.
+Sob continuidade dos resultados potenciais no empate, o salto identifica o efeito local da
+derrota de A dentro da coorte. Os vínculos empresariais definem as coortes antes da eleição.
 
-Em H1 e H2, observamos as fornecedoras anteriores de cada município e elemento de despesa.
-A participação em 2025 divide o saldo positivo da empresa pela soma dos saldos positivos do
-elemento, incluindo entrantes. Se a soma for zero, a participação é zero. H1 subtrai do salto
-das sementes de A o salto das empresas sem caminho a A nem a B. Em H2, a cada distância finita
-$d$ (zero, um, dois ou pelo menos três passos), calculamos $(\hat\beta_B(d)-\hat\beta_A(d))/2$.
-A mesma empresa pode pertencer às duas coortes.
+Usamos ajuste linear local, núcleo triangular, banda $b$ escolhida pelo erro quadrático médio
+estimado e correção de viés \cite{calonico2014}. Antes da ponderação pelo núcleo, cada município
+tem peso um por coorte. Agrupamos erros por município nos intervalos de confiança (ICs) de cada
+coorte. Nos contrastes, reamostramos os mesmos municípios de cada lado para todas as coortes,
+com bandas fixas. Verificamos metade e dobro de $b$, a densidade da margem \cite{cattaneo2020}
+e placebos de participação pré-eleitoral. Em H1 e H2, testamos também a mudança de participação
+entre 2021--2022 e 2023--setembro de 2024. O efeito mínimo detectável (EMD) supõe 80\% de poder
+e 5\% de significância. Os contrastes originais de H1 a H3 usam ICs nominais. Os testes
+secundários recebem correção de Holm.
+\leituraDensidade{}
 
-H3 inclui redes com fornecedoras anteriores no município. Uma rede é ligada a um grupo se uma
-de suas empresas tem caminho até ele. Para a rede $R$, a mudança entre a média anual pré-eleitoral
-e 2025 é expressa como fração da média anual do município,
-$Y_{Rm}=(E_{Rm,2025}-\bar E_{Rm,pre})/\bar E_{m,pre}$. Comparamos o salto das redes ligadas aos dois
-grupos (AMBOS) ao das demais. A mudança soma as contribuições das fornecedoras anteriores ligadas
-diretamente a A (R1), das demais anteriores (R2) e das empresas sem saldo prévio positivo (R3).
-Há compensação dentro de AMBOS se o salto de R1 é negativo e o de R2+R3 é positivo.
+Em H1 e H2, observamos as fornecedoras com saldo líquido positivo de janeiro de 2021 a setembro
+de 2024 em cada município e elemento de despesa. A participação divide o saldo positivo da
+empresa em 2025 pela soma dos saldos positivos no elemento, incluindo entrantes. Se a soma é
+zero, a participação é zero. H1 subtrai do salto das sementes de A o salto das empresas sem
+caminho a A ou B. H2 calcula $(\hat\beta_B(d)-\hat\beta_A(d))/2$ para cada faixa $d$ (zero, um,
+dois ou pelo menos três passos). A mesma empresa pode entrar nas duas coortes. Interpretar
+esse contraste como vantagem do vencedor exige coortes comparáveis e efeitos simétricos de
+ganhar e perder a ligação.
 
-Em H4, ordenamos pelo empenho acumulado as redes com saldo positivo em ao menos três dos quatro
-anos pré-eleitorais. Para cada limiar (25\%, 50\% ou 75\% do empenho municipal), entram as redes
-até atingi-lo, incluindo a que o cruza. Se as elegíveis ficam abaixo do limiar, todas entram.
-Em 2025, concorrem todas as redes com saldo positivo, inclusive as entrantes. O desfecho indica se
-uma rede principal manteve a posição no mesmo limiar. O contraste é $(\hat\beta_B-\hat\beta_A)/2$
-para as redes ligadas só a B e só a A. Em H2 e H4, interpretá-lo como vantagem do vencedor
-exige coortes comparáveis e efeitos simétricos de ganhar e perder essa ligação.
+Em H3, incluímos redes com fornecedoras anteriores no município. Uma rede é ligada a um grupo
+se tem caminho até ele por alguma de suas empresas. Para a rede $R$, usamos
+$Y_{Rm}=(E_{Rm,2025}-\bar E_{Rm,pre})/\bar E_{m,pre}$, a variação dos empenhos como fração do
+gasto anual médio pré-eleitoral do município. Comparamos o salto das redes ligadas aos dois
+grupos (AMBOS) ao das demais. Dentro de AMBOS, há compensação se o salto das fornecedoras
+anteriores diretamente ligadas a A (R1) é negativo e o salto da soma das demais anteriores (R2)
+e das empresas sem saldo prévio positivo (R3) é positivo.
+
+Em H4, ordenamos pelo empenho acumulado as redes com saldo positivo em ao menos três dos
+quatro anos pré-eleitorais. Selecionamos as maiores até que atinjam 25\%, 50\% ou 75\% do
+empenho municipal, incluindo a que cruza o limiar. Se o total das elegíveis fica abaixo do
+limiar, todas entram. Verificamos se cada rede selecionada permanece nessa posição em 2025,
+quando também concorrem as entrantes com saldo positivo. O contraste $(\hat\beta_B-\hat\beta_A)/2$
+usa redes ligadas só a B e só a A e requer as mesmas condições de interpretação de H2.
+
+\section{Rede societária}
+\label{sec:dados}
+A Receita Federal fornece o quadro societário \cite{rfb2026}. Partimos do cadastro de setembro
+de 2024 e completamos quadros ausentes com vínculos registrados em 12/10/2024 e iniciados até
+13/09/2024. Vínculos encerrados entre as duas datas podem faltar. A interpretação eleitoral
+depende da continuidade desse erro perto do empate. Usamos votos e doações do TSE \cite{tse2026}.
+Após a vedação das doações de pessoas jurídicas \cite{adi4650}, identificamos as sementes pelas
+doações diretas de pessoas físicas até 5/10/2024, inclusive recursos próprios de candidatos.
+Ligamos os CNPJs aos empenhos nominais do TCESP \cite{tcesp2026}. Contratos ou ajustes associados
+cobrem \taxaVinculacao{} do valor de 2025. Os empenhos sem vínculo também entram no desfecho.
+
+A rede tem \empresasRede{} empresas, \pessoasRede{} sócios ou administradores (pessoas físicas ou
+jurídicas) e \vinculosRede{} vínculos. As empresas distribuem-se por \componentesRede{} componentes.
+\perfilRede{}
+O maior componente, chamado gigante, reúne \fracGigante{} das empresas. A parcela cai para
+\fracGiganteSemArt{} quando retiramos os sócios ou administradores cuja remoção separa partes da
+rede (pontos de articulação). Cruzamos com empresas \taxaCruzamentoA{} dos doadores de A e
+\taxaCruzamentoB{} dos de B. Há sementes de A em \munConexaoA{} municípios e de B em \munConexaoB{}.
+
+A reconstrução com o cadastro recente e filtro por data perde \fracVinculosPerdidos{} dos
+vínculos de setembro. Do total reconstruído, \fracVinculosExtras{} são extras. Desses,
+\fracVinculosLacuna{} constam no complemento de outubro de 2024.
 
 %%RESULTADOS-INICIO
-\section{Resultados}
-\tabelaEstimativas
-\tabelaCategorias
+\section{Aplicação e resultados}
+\subsection{Ligação direta e compensação na rede}
+\leituraHUmHTres{}
 
-\leituraResultados
+\concentracaoHTres{}
 
-\concentracaoHTres
+\subsection{Participação de 2025 por distância}
+\leituraHDois{}
+\placeboContrasteHDois{}
 
-A Figura~\ref{fig:rdd} mostra os contrastes por distância e por termo da decomposição.
+Os contrastes por faixa da Figura~\ref{fig:rdd} resumem diferenças entre coortes. Um teste de
+queda do efeito com a distância exigiria comparar formalmente os contrastes entre faixas.
 
-Com limiar de 50\% e a até cinco p.p. do empate, a permanência média por município é de
-\permanenciaComLigacao{} entre as redes ligadas ao vencedor e \permanenciaSemLigacao{} entre as
-demais. Essas médias descritivas incluem as quatro categorias de ligação do Quadro~\ref{tab:categorias}.
-
-\begin{figure}[!b]
+\begin{figure}[!htb]
 \centering
-\legendafigura{fig:rdd}{Distância às candidaturas (H2) e decomposição da variação dos empenhos (H3)}%
-\figura{gradiente_h2}{0.38\linewidth}\hspace{0.12\linewidth}\figura{decomposicao_h3}{0.38\linewidth}
-\fonteabnt{Fonte: elaboração própria. H2 usa a participação no elemento de despesa. H3 usa a
-fração do gasto anual médio pré-eleitoral do município. As barras indicam ICs de 95\% por reamostragem de
-municípios.}
+\legendafigura{fig:rdd}{Decomposição da variação dos empenhos (H3) e contrastes por distância (H2)}%
+\figura{decomposicao_h3}{0.37\linewidth}\hspace{0.12\linewidth}\figura{gradiente_h2}{0.37\linewidth}
+\fonteabnt{Fonte: elaboração própria. H3 compara os saltos de AMBOS e das demais redes como
+fração do gasto anual médio pré-eleitoral do município. H2 mede a participação no elemento.
+As barras indicam ICs de 95\% por reamostragem de municípios.}
 \end{figure}
 
-\section{Robustez}
-Em H2, agrupamos as observações por município, elemento de despesa e quintil de empenho
-pré-eleitoral da empresa. Para as coortes com ligação direta, a soma da menor proporção das duas
-coortes em cada estrato dá \sobreposicaoDireta{} de sobreposição. A cada distância, reestimamos
-os saltos nos estratos que têm empresas das duas coortes.
+\subsection{Sensibilidade do contraste a um passo}
+\leituraSensibilidadesHDois{}
+
+Para avaliar a comparabilidade, agrupamos as observações por município, elemento de despesa e
+quintil de empenho pré-eleitoral da empresa. Na ligação direta, a sobreposição é de
+\sobreposicaoDireta{}, calculada pela soma da menor proporção das duas coortes em cada estrato.
+Em cada faixa, reestimamos os saltos nos estratos com empresas das duas coortes.
 \leituraHDoisComparaveis{}
 
-\tabelaRobustez
-\leituraRobustez
+\subsection{Permanência entre as maiores redes}
+\leituraHQuatro{}
+Com limiar de 50\% e a até cinco p.p. do empate, a permanência média por município é de
+\permanenciaComLigacao{} entre as redes ligadas ao vencedor e \permanenciaSemLigacao{} entre as
+demais. As médias incluem as quatro categorias de ligação do Quadro~\ref{tab:categorias}.
+\concentracaoHQuatro{}
 
-\leituraSensibilidades
+\subsection{Quadros de estimação e diagnósticos}
+\tabelaEstimativas
+\tabelaCategorias
+\tabelaRobustez
+
+\leituraRobustez{}
+
+\leituraSensibilidades{}
 %%RESULTADOS-FIM
 
-\section{Discussão e limitações}
+\subsection{Conclusão e limitações}
 \sinteseDiscussao{}
 
-O cruzamento parcial de doadores pode deixar ligações sem registro. O cadastro capta vínculos
-com diferentes graus de controle e omite relações informais. Fornecedores da mesma rede podem
-gerar dependência entre municípios. Mudanças na
-burocracia após a alternância \cite{akhtari2022} também podem alterar a alocação de empenhos.
-Observamos um ciclo eleitoral e medimos a despesa posterior pelo empenho de um ano, incluindo
-pessoal e credores públicos.
+O cruzamento parcial dos doadores pode deixar ligações sem registro. O cadastro abrange graus
+distintos de controle e omite relações informais. Uma mesma rede pode gerar dependência entre
+municípios. Mudanças na burocracia após a alternância também podem afetar os empenhos
+\cite{akhtari2022}. Observamos um ciclo eleitoral e um ano de empenhos, incluindo pessoal
+e credores públicos.
 
 \noindent O \href{https://github.com/rafaelt0/redes-empresariais-alternancia-politica}{repositório}
 reúne tabelas em \texttt{results/tables/}, versões das bases em \texttt{fontes.lock.json} e
 instruções de reprodução no \texttt{README.md}.
 
 \bibliographystyle{abntex2-alf}
-\begingroup\small\setstretch{1}
+\begingroup\footnotesize\setstretch{1}
 \bibliography{referencias}
 \endgroup
 

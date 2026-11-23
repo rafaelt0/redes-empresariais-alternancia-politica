@@ -33,24 +33,37 @@ def limite_h2(pasta: Path) -> str:
     return (
         f"Em H2, ao menos {decimal(100 * piso, 0)}% das observações 3+ nas bandas "
         "principais e comparáveis pertencem ao gigante. O IC é condicional à inferência "
-        "municipal; não resolve dependência entre municípios da mesma rede "
-        "nem informa outros componentes."
+        "municipal, que trata os municípios como independentes. A concentração limita a "
+        "generalização para outros componentes."
     )
 
 
-def leitura(pasta: Path) -> list[str]:
+def leitura(pasta: Path) -> dict[str, list[str]]:
+    verificacoes = {}
     frases = []
     gigante = _linha(pasta, "sensibilidade_gigante", coorte="H3_ambos")
     if (peso := gigante.get("fracao_peso_gigante")) is not None:
         frases.append(
             f"O gigante concentra {decimal(100 * peso, 1)}% do peso municipal de AMBOS na banda "
-            "de H3; a comparação não representa muitas redes independentes."
+            "de H3. A comparação depende desse componente."
         )
     elif (valor := gigante.get("fracao_empenho_gigante")) is not None:
         frases.append(
             f"O gigante concentra {decimal(100 * valor, 2)}% do empenho prévio de AMBOS na banda "
-            "de H3; a comparação não representa muitas redes independentes."
+            "de H3. A comparação depende desse componente."
         )
+    sem_gigante = _linha(
+        pasta,
+        "sensibilidade_sem_gigante",
+        hipotese="H3",
+        categoria="ambos_menos_demais",
+        resultado="variacao_total",
+    )
+    if sem_gigante and not sem_gigante.get("estimavel"):
+        frases.append("Em H3, retirar o gigante deixa municípios insuficientes para o contraste.")
+    verificacoes["H3"] = frases
+
+    frases = []
     h4 = _linha(pasta, "sensibilidade_gigante", coorte="H4_exclusivas_50")
     if (peso := h4.get("fracao_peso_gigante")) is not None:
         frases.append(
@@ -63,24 +76,14 @@ def leitura(pasta: Path) -> list[str]:
         frases.append(
             "Em H4 (50%), o gigante também ocupa integralmente as duas coortes nas bandas do RD."
         )
-    sem_gigante = _linha(
-        pasta,
-        "sensibilidade_sem_gigante",
-        hipotese="H3",
-        categoria="ambos_menos_demais",
-        resultado="variacao_total",
+    sem_gigante_h4 = _linha(
+        pasta, "sensibilidade_sem_gigante", hipotese="H4", categoria="ligada_ao_vencedor_50"
     )
-    if sem_gigante and not sem_gigante.get("estimavel"):
-        sem_gigante_h4 = _linha(
-            pasta, "sensibilidade_sem_gigante", hipotese="H4", categoria="ligada_ao_vencedor_50"
-        )
-        nomes = "H3 e H4 (50%)" if sem_gigante_h4 and not sem_gigante_h4.get("estimavel") else "H3"
-        frases.append(f"Sem o gigante, os contrastes de {nomes} ficam sem suporte.")
-    setembro = _linha(
-        pasta, "sensibilidade_apenas_setembro", tipo="contraste", categoria="vencedor_faixa_1"
-    )
-    if setembro and not setembro.get("estimavel"):
-        frases.append("Só com setembro, H2 em δ = 1 fica sem suporte para o contraste.")
+    if sem_gigante_h4 and not sem_gigante_h4.get("estimavel"):
+        frases.append("Em H4 (50%), retirar o gigante deixa o contraste sem suporte.")
+    verificacoes["H4"] = frases
+
+    frases = []
     variacao = _linha(
         pasta, "sensibilidade_placebo", tipo="contraste", categoria="vencedor_faixa_1"
     )
@@ -88,15 +91,29 @@ def leitura(pasta: Path) -> list[str]:
         est, inf, sup = (decimal(100 * variacao[c], 2) for c in ("estimativa", "ic_inf", "ic_sup"))
         frases.append(
             f"Em H2 (δ = 1), o RD da diferença de participação pós menos pré é {est} p.p. "
-            f"(IC [{inf}; {sup}]); não subtrai o placebo de mudança pré-eleitoral "
-            "nem garante interpretação causal."
+            f"(IC de 95% de {inf} a {sup} p.p.)."
         )
     auto = _linha(
         pasta, "sensibilidade_sem_autofinanciamento", tipo="contraste", categoria="vencedor_faixa_1"
     )
     if auto.get("estimavel"):
         est, inf, sup = (decimal(100 * auto[c], 2) for c in ("estimativa", "ic_inf", "ic_sup"))
-        frases.append(f"Sem autofinanciamento, H2 (δ = 1) dá {est} p.p. (IC [{inf}; {sup}]).")
+        frases.append(
+            f"Sem autofinanciamento, H2 (δ = 1) dá {est} p.p. (IC de 95% de {inf} a {sup} p.p.)."
+        )
+    if all(
+        linha.get("estimavel") and linha["ic_inf"] <= 0 <= linha["ic_sup"]
+        for linha in (variacao, auto)
+    ):
+        frases.append("Os intervalos das duas especificações incluem zero.")
+    setembro = _linha(
+        pasta, "sensibilidade_apenas_setembro", tipo="contraste", categoria="vencedor_faixa_1"
+    )
+    if setembro and not setembro.get("estimavel"):
+        frases.append("Só com setembro, H2 em δ = 1 fica sem suporte para o contraste.")
+    verificacoes["sensibilidade H2"] = frases
+
+    frases = []
     pre = _linha(
         pasta, "sensibilidade_pre_periodos", tipo="contraste", categoria="vencedor_faixa_1"
     )
@@ -104,15 +121,11 @@ def leitura(pasta: Path) -> list[str]:
         est, inf, sup = (decimal(100 * pre[c], 2) for c in ("estimativa", "ic_inf", "ic_sup"))
         frases.append(
             f"O placebo de variação pré-eleitoral de H2 (δ = 1) é {est} p.p. "
-            f"(IC [{inf}; {sup}]); não comprova continuidade."
+            f"(IC de 95% de {inf} a {sup} p.p.)."
         )
-    pre_b = _linha(pasta, "sensibilidade_pre_periodos", tipo="categoria", categoria="faixa_b_1")
-    if pre_b.get("estimavel"):
-        est, inf, sup = (decimal(100 * pre_b[c], 2) for c in ("estimativa", "ic_inf", "ic_sup"))
-        frases.append(
-            f"Na coorte B a um passo, a mudança pré-eleitoral é {est} p.p. "
-            f"(IC nominal [{inf}; {sup}]), diagnóstico que fragiliza a leitura eleitoral do pós."
-        )
+    verificacoes["placebo H2"] = frases
+
+    frases = []
     escopo = _linha(pasta, "sensibilidade_escopo_tcesp", periodo="2025", recorte="amostra")
     if (fracao := escopo.get("fracao_excluido")) is not None:
         frases.append(
@@ -169,4 +182,5 @@ def leitura(pasta: Path) -> list[str]:
             f"No painel completo, {decimal(zeros['sem_empenho'], 0)} observações diretas a A "
             f"nas vitórias ({decimal(100 * zeros['fracao'], 1)}%) têm mercado zerado em 2025."
         )
-    return frases
+    verificacoes["gerais"] = frases
+    return verificacoes
