@@ -114,7 +114,7 @@ Ordem por dependência. Cada tarefa termina com `make test` e `make lint` passan
   - Arquivos: `src/redes/report.py`, `report/relatorio.tex`, `report/referencias.bib`, `tests/test_report.py`
 
 - [ ] **T20: Deck e guia de fala**
-  - Aceite: `output/deck.pptx` com nove slides, incluindo o contexto teórico logo após a capa, em quatro blocos de fala. `output/deck.pdf` por conversão com LibreOffice. `output/guia_de_fala.md` com pontos por slide e divisão do tempo entre quatro pessoas, dentro de dez minutos.
+  - Aceite: `output/deck.pptx` com oito slides, incluindo o contexto teórico logo após a capa e um slide para as fontes e métricas da rede, em quatro blocos de fala. `output/deck.pdf` por conversão com LibreOffice. `output/guia_de_fala.md` com pontos por slide e divisão do tempo entre quatro pessoas, dentro de dez minutos.
   - Verificar: teste que compara o número de slides do `.pptx` com o de páginas do `.pdf`; revisão visual de cada slide.
   - Arquivos: `src/redes/deck.py`, `tests/test_deck.py`
 

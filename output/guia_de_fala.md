@@ -7,9 +7,9 @@
 | Participante | Bloco | Slides | Tempo de fala |
 |---|---|---|---|
 | Voz 1 | Economia política e hipóteses | 1–3 | 2:10 |
-| Voz 2 | Desenho empírico e fontes | 4–5 | 2:10 |
-| Voz 3 | Estrutura da rede e resultados de H1, H3 e H4 | 6–7 | 2:10 |
-| Voz 4 | Resultados de H2 e conclusão | 8–9 | 2:10 |
+| Voz 2 | Desenho empírico e fontes | 4 | 2:10 |
+| Voz 3 | Estrutura da rede e resultados de H1, H3 e H4 | 5–6 | 2:10 |
+| Voz 4 | Resultados de H2 e conclusão | 7–8 | 2:10 |
 
 ## Cronograma por slide
 
@@ -18,12 +18,11 @@
 | 1 | Redes empresariais e persistência econômica sob alternância política | Voz 1 | 10 s | 0:10 |
 | 2 | Como o poder persiste após a alternância? | Voz 1 | 55 s | 1:05 |
 | 3 | Quatro hipóteses a partir dos vínculos de campanha | Voz 1 | 65 s | 2:10 |
-| 4 | O efeito da derrota perto do empate | Voz 2 | 80 s | 3:30 |
-| 5 | De onde vêm os vínculos e os empenhos | Voz 2 | 50 s | 4:20 |
-| 6 | Poucos vínculos por empresa, milhões de componentes | Voz 3 | 95 s | 5:55 |
-| 7 | Ligação direta, compensação e permanência | Voz 3 | 35 s | 6:30 |
-| 8 | A um passo, o contraste de 2025 é negativo | Voz 4 | 75 s | 7:45 |
-| 9 | O resultado a um passo depende da especificação | Voz 4 | 55 s | 8:40 |
+| 4 | O efeito da derrota perto do empate | Voz 2 | 130 s | 4:20 |
+| 5 | Poucos vínculos por empresa | Voz 3 | 95 s | 5:55 |
+| 6 | Ligação direta, compensação e permanência | Voz 3 | 35 s | 6:30 |
+| 7 | A um passo, o contraste de 2025 é negativo | Voz 4 | 75 s | 7:45 |
+| 8 | O resultado a um passo depende da especificação | Voz 4 | 55 s | 8:40 |
 
 ## Voz 1 · Economia política e hipóteses
 
@@ -56,11 +55,11 @@ No diagrama, as setas tracejadas são doações. Ana liga a empresa X ao grupo i
 
 ## Voz 2 · Desenho empírico e fontes
 
-### 4. O efeito da derrota perto do empate (80 s)
+### 4. O efeito da derrota perto do empate (130 s)
 
 **Na fala**
 
-Subtraímos a porcentagem de votos de B da de A. À esquerda do empate, A perde e B assume. À direita, A vence. Comparamos municípios dos dois lados, perto de zero. Para cada grupo de empresas, ajustamos uma reta de cada lado e medimos o salto na fatia dos empenhos de 2025. O salto estima o efeito local da derrota se os resultados potenciais variarem continuamente ao redor do empate. Para H2, definimos os grupos pela distância às candidaturas usando os vínculos e as doações anteriores à eleição. Também aplicamos a comparação a dados anteriores à eleição como teste placebo.
+Subtraímos a porcentagem de votos de B da de A. À esquerda do empate, A perde e B assume. À direita, A vence. Comparamos municípios dos dois lados, perto de zero. Para cada grupo de empresas, ajustamos uma reta de cada lado e medimos o salto na fatia dos empenhos de 2025. O salto estima o efeito local da derrota se os resultados potenciais variarem continuamente ao redor do empate. Para H2, definimos os grupos pela distância às candidaturas usando os vínculos e as doações anteriores à eleição. Também aplicamos a comparação a dados anteriores à eleição como teste placebo. A Receita Federal fornece o quadro societário. Cada aresta liga uma empresa a um sócio ou administrador, que pode ser pessoa física ou jurídica. Usamos os votos do TSE para calcular a margem eleitoral e cruzamos o cadastro com as doações individuais, incluindo recursos próprios dos candidatos, para identificar as empresas-semente. Por fim, cruzamos os CNPJs com os empenhos do Tribunal de Contas. Os empenhos anteriores à eleição identificam quem já fornecia e os de 2025 mostram a fatia de cada grupo.
 
 **Se perguntarem**
 
@@ -68,33 +67,24 @@ Subtraímos a porcentagem de votos de B da de A. À esquerda do empate, A perde 
 - A é o prefeito candidato ou, na ausência dele, representante de seu partido ou coligação. Excluímos a capital, os municípios com segundo turno e aqueles sem A identificável ou sem adversário. O suporte na banda varia por coorte.
 - Usamos núcleo triangular, banda escolhida pelo erro quadrático médio estimado e correção de viés. Os contrastes reamostram municípios de cada lado em conjunto, com bandas fixas.
 - O teste de densidade da margem deu p = 0,993. Também verificamos placebos e sensibilidade à metade e ao dobro da banda.
+- Fornecedora anterior tem saldo líquido positivo na janela pré-eleitoral. O desfecho de H1 e H2 inclui os saldos positivos das entrantes no denominador.
 
-### 5. De onde vêm os vínculos e os empenhos (50 s)
+## Voz 3 · Estrutura da rede e resultados de H1, H3 e H4
+
+### 5. Poucos vínculos por empresa (95 s)
 
 **Na fala**
 
-A Receita Federal fornece o quadro societário. Cada aresta liga uma empresa a um sócio ou administrador, que pode ser pessoa física ou jurídica. Cruzamos as doações individuais do TSE com o cadastro para encontrar as empresas-semente. O TSE também fornece os votos para calcular a margem eleitoral. Por fim, cruzamos os CNPJs com os empenhos do Tribunal de Contas. Os empenhos anteriores à eleição identificam quem já fornecia e os de 2025 mostram a fatia de cada grupo.
+A partir das fontes listadas na base do slide, construímos a rede principal com 14.069.286 empresas, 16.547.513 vértices de sócios/administradores PF/PJ e 24.689.604 vínculos. A maioria das empresas tem um ou dois vínculos. O grau médio é de 1,75 para empresas e 1,49 para sócios ou administradores. Um componente é um conjunto de empresas ligadas por caminhos societários. Muitas empresas estão sozinhas, mas o maior componente reúne 14,6% delas. No diagrama das hipóteses, retirar Bruno separaria X de Y e Z. Quando retiramos os sócios ou administradores que funcionam assim, o maior componente cai para 2,1%. Na conexão eleitoral, contamos os municípios com ao menos uma empresa-semente de A ou de B. A rede tem poucos vínculos em relação ao número de pares possíveis. A assortatividade próxima de zero indica pouca associação linear entre os graus nas pontas dos vínculos.
 
 **Se perguntarem**
 
 - O complemento de 12/10/2024 só usa vínculos iniciados até 13/09/2024 em empresas do cadastro de setembro sem quadro válido naquela fotografia. Vínculos encerrados até outubro podem faltar.
 - Ligamos a empresas 41,0% dos doadores de A e 43,4% dos de B.
-- Fornecedora anterior tem saldo líquido positivo na janela pré-eleitoral. O desfecho de H1 e H2 inclui os saldos positivos das entrantes no denominador.
-
-## Voz 3 · Estrutura da rede e resultados de H1, H3 e H4
-
-### 6. Poucos vínculos por empresa, milhões de componentes (95 s)
-
-**Na fala**
-
-A rede principal tem 14.069.286 empresas, 16.547.513 vértices de sócios/administradores PF/PJ e 24.689.604 vínculos. A maioria das empresas tem um ou dois vínculos. O grau médio é de 1,75 para empresas e 1,49 para sócios ou administradores. A densidade é baixa porque há muito mais pares possíveis do que vínculos observados. Na ligação eleitoral, contamos municípios em que encontramos ao menos uma empresa-semente de A ou de B. A assortatividade correlaciona os graus nas duas pontas de cada vínculo. O valor perto de zero indica pouca associação linear. Um componente é um conjunto de empresas ligadas por caminhos societários. Muitas empresas estão sozinhas, mas o maior componente reúne 14,6% delas. No diagrama anterior, retirar Bruno separaria X de Y e Z. Quando retiramos os sócios ou administradores que funcionam assim, o maior componente cai para 2,1%.
-
-**Se perguntarem**
-
 - A assortatividade é a correlação de Pearson entre os graus da empresa e do sócio ou administrador em cada aresta. A densidade divide o número de arestas pelo produto das duas contagens de vértices.
 - Na versão sem pontos de articulação, o universo de empresas é mantido e os caminhos societários mudam.
 
-### 7. Ligação direta, compensação e permanência (35 s)
+### 6. Ligação direta, compensação e permanência (35 s)
 
 **Na fala**
 
@@ -107,7 +97,7 @@ Em H1, comparamos a participação das empresas ligadas diretamente ao incumbent
 
 ## Voz 4 · Resultados de H2 e conclusão
 
-### 8. A um passo, o contraste de 2025 é negativo (75 s)
+### 7. A um passo, o contraste de 2025 é negativo (75 s)
 
 **Na fala**
 
@@ -119,7 +109,7 @@ A cada distância, calculamos o salto para as empresas ligadas ao adversário B 
 - A um passo, o salto de B em 2025 foi -8,07 p.p. (p de Holm = 0,077). O IC do contraste é nominal. A correção de Holm se aplica ao salto de B na família de testes secundários.
 - O placebo da coorte B mede a mudança de participação de 2021–2022 para 2023–setembro de 2024. Ele é distinto do placebo de nível pré do contraste.
 
-### 9. O resultado a um passo depende da especificação (55 s)
+### 8. O resultado a um passo depende da especificação (55 s)
 
 **Na fala**
 
