@@ -23,12 +23,16 @@ def _caminhos(tmp_path: Path) -> Caminhos:
     )
 
 
-def test_deck_tem_de_10_a_12_slides(tmp_path: Path) -> None:
+def test_deck_tem_nove_slides(tmp_path: Path) -> None:
     prs, notas = deck.construir(_caminhos(tmp_path), Numeros({}))
-    assert deck.MINIMO_SLIDES <= len(prs.slides) <= deck.MAXIMO_SLIDES
+    assert len(prs.slides) == 9
     assert len(notas) == len(prs.slides)
-    assert 540 <= sum(nota.segundos for nota in notas) < deck.LIMITE_SEGUNDOS
-    assert {nota.pessoa for nota in notas} == set(deck.VOZES)
+    assert sum(nota.segundos for nota in notas) == 520
+    assert [nota.pessoa for nota in notas] == [
+        voz
+        for voz, quantidade in zip(deck.VOZES, (3, 2, 2, 2), strict=True)
+        for _ in range(quantidade)
+    ]
     for slide, nota in zip(prs.slides, notas, strict=True):
         assert slide.notes_slide.notes_text_frame.text == nota.texto()
 
@@ -41,9 +45,11 @@ def test_guia_equilibra_os_blocos_e_nao_define_pessoas(tmp_path: Path) -> None:
     for nota in notas:
         por_bloco[nota.pessoa] = por_bloco.get(nota.pessoa, 0) + nota.segundos
     assert set(por_bloco) == set(deck.VOZES)
-    assert set(por_bloco.values()) == {135}
-    assert "2:15" in texto
-    assert "1:00" in texto
+    assert set(por_bloco.values()) == {130}
+    assert "2:10" in texto
+    assert "1:20" in texto
+    assert "| Voz 1 | Economia política e hipóteses | 1–3 | 2:10 |" in texto
+    assert "| Voz 4 | Resultados de H2 e conclusão | 8–9 | 2:10 |" in texto
     for autor in ("Felipe", "Andrei", "Rafael", "João Pedro"):
         assert autor not in texto
 
@@ -62,9 +68,9 @@ def test_deck_usa_os_numeros_das_tabelas(tmp_path: Path) -> None:
     (caminhos.resultados / "tables").mkdir(parents=True)
     pl.DataFrame(
         {
-            "variante": ["PRINCIPAL"] * 3,
-            "medida": ["empresas", "pessoas", "vinculos"],
-            "valor": [1234, 5678, 9999],
+            "variante": ["PRINCIPAL"] * 4,
+            "indicador": ["empresas", "pessoas", "vinculos", "assortatividade_grau"],
+            "valor": [1234.0, 5678.0, 9999.0, -0.12],
         }
     ).write_csv(caminhos.resultados / "tables" / "rede_resumo.csv")
     pl.DataFrame(
@@ -87,40 +93,34 @@ def test_deck_usa_os_numeros_das_tabelas(tmp_path: Path) -> None:
     notas_texto = " ".join(nota.texto() for nota in notas)
     assert "1.234 empresas" in notas_texto
     assert "5.678 vértices de sócios/administradores PF/PJ" in notas_texto
+    assert "1.427,072 vínculo por milhão" in textos
+    assert "r = -0,1200" in textos
     assert "-1,2 p.p." in textos
     assert "IC de 95% de -5,0 a 2,5 p.p." in textos
 
 
-def test_tabela_de_robustez_usa_as_quatro_variantes() -> None:
-    robustez = pl.DataFrame(
-        {
-            "hipotese": ["H1", "H1", "H1", "H1"],
-            "categoria": ["conectada_menos_sem_conexao"] * 4,
-            "tipo": ["contraste"] * 4,
-            "resultado": ["participacao_2025"] * 4,
-            "estimativa_principal": [0.1, 0.2, 0.3, 0.4],
-            "ic_inf_principal": [0.0, 0.1, 0.2, 0.3],
-            "ic_sup_principal": [0.2, 0.3, 0.4, 0.5],
-            "estimativa_sem_articulacao": [0.11, None, None, None],
-            "ic_inf_sem_articulacao": [0.01, None, None, None],
-            "ic_sup_sem_articulacao": [0.21, None, None, None],
-            "estimativa_sem_pj": [0.12, None, None, None],
-            "ic_inf_sem_pj": [0.02, None, None, None],
-            "ic_sup_sem_pj": [0.22, None, None, None],
-            "estimativa_sem_administrador": [0.13, None, None, None],
-            "ic_inf_sem_administrador": [0.03, None, None, None],
-            "ic_sup_sem_administrador": [0.23, None, None, None],
-        }
-    )
-    linhas = deck._linhas_robustez(robustez)
-    assert [linha[0] for linha in linhas] == ["H1", "H2", "H3"]
-    assert linhas[0][1:] == [
-        "10,0 (0,0 a 20,0)",
-        "11,0 (1,0 a 21,0)",
-        "12,0 (2,0 a 22,0)",
-        "13,0 (3,0 a 23,0)",
+def test_deck_ordena_os_cinco_blocos_e_destaca_h2(tmp_path: Path) -> None:
+    prs, _ = deck.construir(_caminhos(tmp_path), Numeros({}))
+    secoes = [slide.shapes[1].text_frame.text for slide in prs.slides]
+    assert prs.slides[0].shapes[0].text_frame.text == deck.TITULO
+    assert secoes[1:] == [
+        deck.CONTEXTO,
+        deck.HIPOTESES,
+        deck.DESENHO,
+        deck.REDE,
+        deck.REDE,
+        deck.RESULTADOS,
+        f"{deck.RESULTADOS}  /  H2",
+        f"{deck.RESULTADOS}  /  H2",
     ]
-    assert linhas[1][1] == "n.d."
+    teoria = " ".join(
+        forma.text_frame.text for forma in prs.slides[1].shapes if forma.has_text_frame
+    )
+    assert all(termo in teoria for termo in ("conflito social", "de jure", "de facto", "Acemoglu"))
+    assert "Instituições econômicas  →  Distribuição de recursos  →  Poder de fato futuro" in teoria
+    titulos = [slide.shapes[0].text_frame.text for slide in list(prs.slides)[-2:]]
+    assert "distância" in titulos[0]
+    assert "especificação" in titulos[1]
 
 
 def test_conversao_preserva_o_numero_de_slides(tmp_path: Path) -> None:

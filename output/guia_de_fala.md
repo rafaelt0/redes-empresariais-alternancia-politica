@@ -1,92 +1,117 @@
 # Guia de fala
 
-**Fala prevista de 9:00**, em 4 blocos iguais de 2:15. Reserve 1:00 para trocas de apresentador e variações de ritmo, dentro do limite de 10:00. Os tempos acumulados servem de referência no ensaio. A definição de quem apresenta cada bloco fica para a reunião.
+**Fala prevista de 8:40**, em 4 blocos iguais de 2:10. Reserve 1:20 para trocas de apresentador e variações de ritmo, dentro do limite de 10:00. Os tempos acumulados servem de referência no ensaio.
+
+## Divisão entre participantes
+
+| Participante | Bloco | Slides | Tempo de fala |
+|---|---|---|---|
+| Voz 1 | Economia política e hipóteses | 1–3 | 2:10 |
+| Voz 2 | Desenho empírico e fontes | 4–5 | 2:10 |
+| Voz 3 | Estrutura da rede e resultados de H1, H3 e H4 | 6–7 | 2:10 |
+| Voz 4 | Resultados de H2 e conclusão | 8–9 | 2:10 |
+
+## Cronograma por slide
 
 | Slide | Tema | Voz | Tempo | Até |
 |---|---|---|---|---|
-| 1 | Redes empresariais e persistência econômica sob alternância política | Voz 1 | 25 s | 0:25 |
-| 2 | A troca de governo e os fornecedores municipais | Voz 1 | 50 s | 1:15 |
-| 3 | Como uma empresa se liga a uma candidatura | Voz 1 | 60 s | 2:15 |
-| 4 | O maior componente da rede | Voz 2 | 35 s | 2:50 |
-| 5 | Comparação perto do empate | Voz 2 | 60 s | 3:50 |
-| 6 | A perda de espaço das ligadas ao incumbente é incerta | Voz 2 | 40 s | 4:30 |
-| 7 | A um passo, o contraste de 2025 é negativo | Voz 3 | 50 s | 5:20 |
-| 8 | O contraste sob outras especificações | Voz 3 | 40 s | 6:00 |
-| 9 | A compensação fica em aberto | Voz 3 | 45 s | 6:45 |
-| 10 | Permanência entre as principais redes | Voz 4 | 50 s | 7:35 |
-| 11 | O que muda com outras definições de rede | Voz 4 | 40 s | 8:15 |
-| 12 | A persistência dos empenhos após a alternância | Voz 4 | 45 s | 9:00 |
+| 1 | Redes empresariais e persistência econômica sob alternância política | Voz 1 | 10 s | 0:10 |
+| 2 | Como o poder persiste após a alternância? | Voz 1 | 55 s | 1:05 |
+| 3 | Quatro hipóteses a partir dos vínculos de campanha | Voz 1 | 65 s | 2:10 |
+| 4 | O efeito da derrota perto do empate | Voz 2 | 80 s | 3:30 |
+| 5 | De onde vêm os vínculos e os empenhos | Voz 2 | 50 s | 4:20 |
+| 6 | Poucos vínculos por empresa, milhões de componentes | Voz 3 | 95 s | 5:55 |
+| 7 | Ligação direta, compensação e permanência | Voz 3 | 35 s | 6:30 |
+| 8 | A um passo, o contraste de 2025 é negativo | Voz 4 | 75 s | 7:45 |
+| 9 | O resultado a um passo depende da especificação | Voz 4 | 55 s | 8:40 |
 
-## 1. Redes empresariais e persistência econômica sob alternância política — Voz 1 (25 s)
+## Voz 1 · Economia política e hipóteses
 
-**Na fala**
-
-Situar as eleições paulistas de 2024 e os empenhos de 2025. A prefeitura pode trocar de fornecedor e encontrar os mesmos sócios por trás do novo CNPJ.
-
-## 2. A troca de governo e os fornecedores municipais — Voz 1 (50 s)
+### 1. Redes empresariais e persistência econômica sob alternância política (10 s)
 
 **Na fala**
 
-Mesmo que uma fornecedora perca espaço após a eleição, parte da despesa pode continuar na mesma rede se outra empresa ligada a ela ganhar participação. Usamos os empenhos de 2025 para investigar isso nas prefeituras paulistas após as eleições de 2024. Começamos pelas empresas ligadas a quem doou às campanhas como pessoa física. A partir delas, seguimos os vínculos por sócios ou administradores em comum. O próximo slide mostra como fazemos essa ligação.
+Estudamos as eleições municipais paulistas de 2024 e os empenhos de 2025 para saber se a troca de governo muda quais redes empresariais recebem recursos.
+
+### 2. Como o poder persiste após a alternância? (55 s)
+
+**Na fala**
+
+Para Acemoglu e coautores, grupos disputam as regras que distribuem os recursos. As instituições políticas conferem autoridade formal. Os recursos econômicos dão poder de fato ao ampliar a capacidade de organização. As duas fontes de poder moldam as regras da economia. Os grupos que se beneficiam dessas regras ganham recursos para preservar sua influência no período seguinte. Uma eleição pode mudar quem comanda a prefeitura e preservar os recursos que sustentam essa influência. Nos empenhos, isso poderia aparecer se uma fornecedora perdesse espaço e outras empresas da mesma rede ganhassem participação.
 
 **Se perguntarem**
 
-- Duarte (2025) estudou disputas municipais de 2008 e 2012, encontrou estimativas imprecisas para doadoras diretas e explorou sócios em comum.
-- Guerra, Mattos e Nakaguma (2025) associam a proibição de doações empresariais ao aumento do número de empresas em mercados municipais mais expostos. Balán et al. (2026) observam doações individuais de famílias controladoras em companhias abertas que já doavam.
+- No esquema completo, o poder político também influencia as instituições políticas do período seguinte.
+- Empenhos são compromissos de despesa. Usamos vínculos societários e doações observáveis para investigar a persistência das redes fornecedoras.
 
-## 3. Como uma empresa se liga a uma candidatura — Voz 1 (60 s)
+### 3. Quatro hipóteses a partir dos vínculos de campanha (65 s)
 
 **Na fala**
 
-Apontar as doações de Ana a A, o incumbente, e de Daniel a B, o adversário. X e Z são as sementes. Y compartilha sócios com X e Z, por isso está a um passo de cada grupo.
+No diagrama, as setas tracejadas são doações. Ana liga a empresa X ao grupo incumbente A. Daniel liga Z ao adversário B. Essas empresas são as sementes. As linhas contínuas mostram os vínculos societários. Bruno conecta X a Y, e Carla conecta Y a Z. Se B vencer, H2 prevê a maior vantagem para Z, que está diretamente ligada a B. Y está a um passo e X a dois, então a vantagem deveria diminuir nessa ordem. H1 pergunta se X perde participação diante de empresas sem caminho aos dois grupos. Como a rede liga A e B, H3 pergunta se ganhos de Y e Z compensam a perda de X. H4 pergunta se redes ligadas ao vencedor permanecem entre as maiores fornecedoras.
 
 **Se perguntarem**
 
-- Um passo entre empresas tem duas arestas no grafo bipartido. Onde não há caminho, a distância é infinita.
-- TCESP: empenhos pela data do evento, de 2021 a 2025. TSE: doações de pessoas físicas até 5/10/2024, incluindo recursos próprios dos candidatos.
-- Receita Federal: fotografia de setembro de 2024, com complemento de 12/10 apenas para quadros ausentes e vínculos iniciados até 13/09. Vínculos encerrados até a extração podem faltar. A leitura eleitoral exige continuidade desse erro perto do empate.
+- No teste de H2, comparamos coortes à mesma distância de A e B em vários municípios. As empresas do desenho ilustram a contagem de passos.
 
-## 4. O maior componente da rede — Voz 2 (35 s)
+## Voz 2 · Desenho empírico e fontes
+
+### 4. O efeito da derrota perto do empate (80 s)
 
 **Na fala**
 
-Comparar a parcela de empresas no componente gigante com a parcela no maior componente depois de retirar as pessoas que ligam partes da rede.
+Subtraímos a porcentagem de votos de B da de A. À esquerda do empate, A perde e B assume. À direita, A vence. Comparamos municípios dos dois lados, perto de zero. Para cada grupo de empresas, ajustamos uma reta de cada lado e medimos o salto na fatia dos empenhos de 2025. O salto estima o efeito local da derrota se os resultados potenciais variarem continuamente ao redor do empate. Para H2, definimos os grupos pela distância às candidaturas usando os vínculos e as doações anteriores à eleição. Também aplicamos a comparação a dados anteriores à eleição como teste placebo.
 
 **Se perguntarem**
 
-- A rede principal tem 14.069.286 empresas, 16.547.513 vértices de sócios/administradores PF/PJ e 24.689.604 vínculos.
-- Explicar um ponto de articulação voltando ao exemplo: se Bruno sair, X perde o caminho para Y e Z. Removê-lo muda quais empresas podem ficar na mesma coorte.
-- Na reconstrução com a fotografia recente, 9,4% dos vínculos de setembro ficam de fora e 21,3% dos reconstruídos não constam em setembro.
+- A especificação é Y = α + βT + γM + θ(T × M) + u. β é o salto no empate e T indica derrota de A.
+- A é o prefeito candidato ou, na ausência dele, representante de seu partido ou coligação. Excluímos a capital, os municípios com segundo turno e aqueles sem A identificável ou sem adversário. O suporte na banda varia por coorte.
+- Usamos núcleo triangular, banda escolhida pelo erro quadrático médio estimado e correção de viés. Os contrastes reamostram municípios de cada lado em conjunto, com bandas fixas.
+- O teste de densidade da margem deu p = 0,993. Também verificamos placebos e sensibilidade à metade e ao dobro da banda.
 
-## 5. Comparação perto do empate — Voz 2 (60 s)
+### 5. De onde vêm os vínculos e os empenhos (50 s)
 
 **Na fala**
 
-Mostrar os dois lados do corte. Comparamos derrotas e vitórias por margem pequena. O salto estima o efeito local da derrota se os resultados potenciais forem contínuos no empate.
+A Receita Federal fornece o quadro societário. Cada aresta liga uma empresa a um sócio ou administrador, que pode ser pessoa física ou jurídica. Cruzamos as doações individuais do TSE com o cadastro para encontrar as empresas-semente. O TSE também fornece os votos para calcular a margem eleitoral. Por fim, cruzamos os CNPJs com os empenhos do Tribunal de Contas. Os empenhos anteriores à eleição identificam quem já fornecia e os de 2025 mostram a fatia de cada grupo.
 
 **Se perguntarem**
 
-- A margem é A menos B. O prefeito candidato representa A. Na ausência dele, buscamos o candidato do seu partido e depois de uma coligação que inclua o partido. Excluímos capital, segundo turno e disputas sem A identificável ou sem adversário.
-- Na regressão descontínua (RD), usamos ajuste linear local, núcleo triangular e banda escolhida pelo erro quadrático médio estimado. Antes do núcleo, o município tem peso um por coorte. Os ICs das coortes agrupam por município. Os contrastes reamostram os mesmos municípios por lado em todas as coortes e mantêm as bandas fixas.
-- O teste de densidade da margem deu p = 0,993. Também usamos placebos pré-eleitorais e verificamos sensibilidade à metade e ao dobro da banda.
+- O complemento de 12/10/2024 só usa vínculos iniciados até 13/09/2024 em empresas do cadastro de setembro sem quadro válido naquela fotografia. Vínculos encerrados até outubro podem faltar.
+- Ligamos a empresas 41,0% dos doadores de A e 43,4% dos de B.
+- Fornecedora anterior tem saldo líquido positivo na janela pré-eleitoral. O desfecho de H1 e H2 inclui os saldos positivos das entrantes no denominador.
 
-## 6. A perda de espaço das ligadas ao incumbente é incerta — Voz 2 (40 s)
+## Voz 3 · Estrutura da rede e resultados de H1, H3 e H4
+
+### 6. Poucos vínculos por empresa, milhões de componentes (95 s)
 
 **Na fala**
 
-Comparar as fornecedoras anteriores ligadas diretamente ao incumbente com as sem caminho a nenhuma candidatura. Ler o contraste e explicar o que o intervalo permite.
+A rede principal tem 14.069.286 empresas, 16.547.513 vértices de sócios/administradores PF/PJ e 24.689.604 vínculos. A maioria das empresas tem um ou dois vínculos. O grau médio é de 1,75 para empresas e 1,49 para sócios ou administradores. A densidade é baixa porque há muito mais pares possíveis do que vínculos observados. Na ligação eleitoral, contamos municípios em que encontramos ao menos uma empresa-semente de A ou de B. A assortatividade correlaciona os graus nas duas pontas de cada vínculo. O valor perto de zero indica pouca associação linear. Um componente é um conjunto de empresas ligadas por caminhos societários. Muitas empresas estão sozinhas, mas o maior componente reúne 14,6% delas. No diagrama anterior, retirar Bruno separaria X de Y e Z. Quando retiramos os sócios ou administradores que funcionam assim, o maior componente cai para 2,1%.
 
 **Se perguntarem**
 
-- A hipótese é que a derrota reduza a participação das sementes de A em relação às fornecedoras sem caminho aos dois grupos. O contraste é o salto da primeira coorte menos o da segunda.
-- Uma fornecedora anterior tem saldo líquido positivo de janeiro de 2021 a setembro de 2024. No denominador de 2025 entram todos os saldos positivos, inclusive de entrantes. A participação é zero quando o denominador é zero.
-- O contraste com metade da banda foi 2,9 p.p. e com o dobro, -0,7 p.p.
+- A assortatividade é a correlação de Pearson entre os graus da empresa e do sócio ou administrador em cada aresta. A densidade divide o número de arestas pelo produto das duas contagens de vértices.
+- Na versão sem pontos de articulação, o universo de empresas é mantido e os caminhos societários mudam.
 
-## 7. A um passo, o contraste de 2025 é negativo — Voz 3 (50 s)
+### 7. Ligação direta, compensação e permanência (35 s)
 
 **Na fala**
 
-Explicar a comparação dos saltos por distância. Ler o contraste a um passo de 2025 e o placebo da coorte B. Dar aos dois números o tempo necessário para explicar por que a diferença anterior à eleição importa para a leitura causal.
+Em H1, comparamos a participação das empresas ligadas diretamente ao incumbente com a das empresas sem caminho a A ou B. Em H3, olhamos a compensação. Os dois sinais contrariam a previsão de compensação na mesma rede. Em H4, olhamos a permanência das redes entre as maiores. Os intervalos mostram a precisão dessas estimativas. A seguir, H2 examina a participação dos fornecedores em cada distância.
+
+**Se perguntarem**
+
+- Em H3, as unidades estão em % do empenho anual médio pré-eleitoral do município. ICs de 95% de -0,03 a 0,10% para as anteriores ligadas diretamente a A e de -9,70 a 1,50% para as demais. O contraste do total, redes ligadas a ambos menos as demais, é -4,06 (-10,20 a 2,08)% do empenho prévio.
+- Em H4, o ranking inclui a rede que cruza o limiar de 50%. Na janela de cinco p.p., a permanência média descritiva é 82,6% entre as ligadas ao vencedor e 81,5% entre as demais. O contraste usa ligações exclusivas e tem p de Holm = 1,000.
+
+## Voz 4 · Resultados de H2 e conclusão
+
+### 8. A um passo, o contraste de 2025 é negativo (75 s)
+
+**Na fala**
+
+A cada distância, calculamos o salto para as empresas ligadas ao adversário B e para as ligadas ao incumbente A. Subtraímos o salto de A do de B e dividimos por dois para expressar a vantagem da ligação ao vencedor, sob simetria dos efeitos. A um passo, o contraste de 2025 é -4,06 p.p. (IC de 95% de -7,16 a -0,97 p.p.). O IC nominal exclui zero a um passo. O sinal é contrário ao previsto. O placebo examina a mudança de participação das empresas a um passo de B antes da eleição. O salto estimado foi de -7,68 p.p. (IC nominal de -13,50 a -1,86 p.p.). A diferença anterior à eleição enfraquece a leitura causal de 2025.
 
 **Se perguntarem**
 
@@ -94,76 +119,15 @@ Explicar a comparação dos saltos por distância. Ler o contraste a um passo de
 - A um passo, o salto de B em 2025 foi -8,07 p.p. (p de Holm = 0,077). O IC do contraste é nominal. A correção de Holm se aplica ao salto de B na família de testes secundários.
 - O placebo da coorte B mede a mudança de participação de 2021–2022 para 2023–setembro de 2024. Ele é distinto do placebo de nível pré do contraste.
 
-## 8. O contraste sob outras especificações — Voz 3 (40 s)
+### 9. O resultado a um passo depende da especificação (55 s)
 
 **Na fala**
 
-Mostrar o que acontece com o contraste a um passo quando mudam o desfecho e a amostra. À direita, explicar por que a concentração no componente gigante limita a leitura a três passos ou mais.
+Primeiro, medimos a mudança da participação pré-eleitoral para 2025. Depois, voltamos à participação de 2025 e excluímos as doações dos candidatos às próprias campanhas. Os dois intervalos das especificações alternativas incluem zero. Voltando à pergunta inicial, observamos como a participação varia com a distância ao vencedor. A persistência do acesso aos empenhos após a alternância continua em aberto nas eleições analisadas.
 
 **Se perguntarem**
 
-- Pós menos pré usa a diferença entre a participação de 2025 e a pré-eleitoral. O placebo anterior usa a mudança entre dois períodos anteriores à eleição.
-- A sobreposição por município, elemento de despesa e quintil de porte entre as coortes de ligação direta é de 6,3%.
+- Pós menos pré usa a diferença entre a participação de 2025 e a pré-eleitoral. O placebo do slide anterior usa a mudança entre dois períodos anteriores à eleição.
+- A três passos ou mais, o contraste é 0,06 p.p. (IC de 95% de -0,29 a 0,41 p.p.).
+- Ao menos 99% das observações nas bandas dessa faixa pertencem ao componente gigante. A mesma rede pode gerar dependência entre municípios.
 - No recorte comparável, a estimação ficou indefinida nas faixas 0, 1, 2. No recorte comparável da faixa 3+, o contraste foi de 0,055 p.p. (IC de 95% de 0,001 a 0,109).
-- O intervalo a três passos ou mais pressupõe inferência municipal. A mesma rede pode gerar dependência entre municípios.
-
-## 9. A compensação fica em aberto — Voz 3 (45 s)
-
-**Na fala**
-
-Explicar o que seria compensação. Nas redes ligadas a ambos, o primeiro grupo teria de perder espaço e o restante ganhar. Comparar os sinais previstos e os observados e apontar os intervalos.
-
-**Se perguntarem**
-
-- R1 são as fornecedoras anteriores diretamente ligadas a A. R2 são as demais fornecedoras anteriores. R3 são as novas. Os termos somam a mudança total da rede, normalizada pelo empenho anual médio pré-eleitoral do município.
-- O contraste do total, redes ligadas a ambos menos as demais, foi -4,06 (-10,20 a 2,08)% do empenho prévio (estimativa e IC de 95%). Na tela estão os saltos dentro de AMBOS.
-- Placebo de nível pré-eleitoral dentro de AMBOS: -11,09 p.p. (p nominal = 0,0501). Para o contraste do total: -11,11 p.p. (p nominal = 0,130).
-
-## 10. Permanência entre as principais redes — Voz 4 (50 s)
-
-**Na fala**
-
-Explicar como o ranking de 50% inclui a rede que cruza o limiar. As médias à esquerda descrevem as disputas próximas. O contraste à direita compara os saltos de coortes exclusivas e tem um intervalo amplo.
-
-**Se perguntarem**
-
-- O ranking pré exige saldo positivo em pelo menos três dos quatro anos pré-eleitorais. Se as elegíveis ficarem abaixo do limiar, todas entram. Em 2025 entram todas as redes de saldo positivo, inclusive estreantes. Usamos o mesmo percentual sobre o total de cada período.
-- As médias na janela incluem as quatro categorias de ligação. O contraste de RD é metade da diferença dos saltos de redes ligadas só a B e só a A. A leitura como vantagem do vencedor exige comparabilidade e simetria.
-- Estimativas e ICs de 95% em p.p. nos outros limiares: 25%, n.d. e 75%, 0,4 (-8,0 a 8,8). No limiar de 50%, o EMD é de 277,1 p.p. e o IC amplo indica instabilidade.
-- Em H4 (50%), 100,0% do peso das redes de ligação exclusiva na janela de cinco p.p. pertence ao gigante.
-- Em H4 (50%), o gigante também ocupa integralmente as duas coortes nas bandas do RD.
-
-## 11. O que muda com outras definições de rede — Voz 4 (40 s)
-
-**Na fala**
-
-Escolher a linha do total da rede para mostrar como a definição do grafo muda os intervalos e o próprio suporte da comparação.
-
-**Se perguntarem**
-
-- Mudar a rede também altera caminhos, sementes, composição das coortes e suporte. Na versão sem pontos de articulação, as sementes foram selecionadas de novo.
-- Quando o total fica sem estimativa, verificar quantos municípios restam de cada lado.
-- Sem o gigante, os contrastes de H3 e H4 (50%) ficam sem suporte.
-- Pessoal ou credores públicos somam 50,7% do empenho de 2025 com CNPJ válido na amostra.
-- Sem esses empenhos, H1 e H3 total mantêm ICs cruzando zero.
-
-## 12. A persistência dos empenhos após a alternância — Voz 4 (45 s)
-
-**Na fala**
-
-Responder à pergunta da abertura. Dizer o que as estimativas permitem concluir sobre a vantagem eleitoral e a compensação. Lembrar que a comparação vale para disputas apertadas de um único ciclo.
-
-**Se perguntarem**
-
-- Retomar a pergunta da abertura. A leitura do contraste a um passo depende da especificação. Os intervalos amplos em várias comparações admitem efeitos relevantes. A concentração em uma rede pode gerar dependência entre municípios.
-- Foi possível ligar a empresas 41,0% dos doadores de A e 43,4% dos de B. Vínculos informais ficam fora do cadastro.
-- A alternância também pode mudar a burocracia municipal, como estudado por Akhtari, Moreira e Trucco (2022). O possível efeito desse canal nos empenhos fica em aberto.
-
-## Divisão
-
-Blocos iguais de 2:15, sem nomes definidos.
-
-- Voz 1 (slides 1–3): 135 s
-- Voz 2 (slides 4–6): 135 s
-- Voz 3 (slides 7–9): 135 s
-- Voz 4 (slides 10–12): 135 s
