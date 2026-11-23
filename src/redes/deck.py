@@ -33,7 +33,7 @@ ETAPA = Etapa(
     artefatos=("saida/deck.pptx", "saida/deck.pdf", "saida/guia_de_fala.md"),
 )
 
-NUMERO_SLIDES = 8
+NUMERO_SLIDES = 9
 LIMITE_SEGUNDOS = 10 * 60
 LARGURA, ALTURA = 13.333, 7.5
 MARGEM = 0.75
@@ -385,14 +385,14 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
     # 2. Economia política
     slide = _pagina(
         prs,
-        "Como o poder persiste após a alternância?",
+        "De onde vem o poder político?",
         CONTEXTO,
-        "Acemoglu, Johnson e Robinson (2005) e Acemoglu e Robinson (2008).",
+        "Acemoglu e Robinson (2008), Persistence of Power, Elites, and Institutions.",
     )
     _texto(
         slide,
-        "Na abordagem do conflito social, grupos disputam as regras que definem "
-        "quem recebe os recursos.",
+        "Para Acemoglu, Johnson e Robinson (2005), as regras econômicas resultam do "
+        "conflito social pela distribuição de recursos.",
         MARGEM,
         1.66,
         11.4,
@@ -402,7 +402,7 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
     _bloco(
         slide,
         "Poder formal (de jure)",
-        "As instituições políticas definem quem tem autoridade para decidir.",
+        "Autoridade conferida pelas instituições políticas.",
         MARGEM,
         2.66,
         5.42,
@@ -411,18 +411,29 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
     _bloco(
         slide,
         "Poder de fato (de facto)",
-        "Recursos econômicos ampliam a capacidade de organização e influência.",
+        "Capacidade de influenciar decisões a partir de recursos econômicos.",
         MEIO,
         2.66,
         5.42,
     )
-    _traco(slide, MARGEM, 4.05, LARGURA - MARGEM, 4.05)
+    _traco(slide, MARGEM, 4.36, LARGURA - MARGEM, 4.36)
     _texto(
         slide,
-        "Poder político  →  Instituições econômicas  →  Distribuição de recursos"
+        "Por que o poder pode persistir",
+        MARGEM,
+        4.65,
+        CORPO,
+        0.34,
+        tamanho=17,
+        cor=ACCENT,
+        forte=True,
+    )
+    _texto(
+        slide,
+        "Poder político  →  Regras econômicas  →  Distribuição de recursos"
         "  →  Poder de fato futuro",
         MARGEM,
-        4.35,
+        5.08,
         CORPO,
         0.44,
         tamanho=18,
@@ -431,41 +442,87 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
     )
     _texto(
         slide,
-        "Os grupos beneficiados ganham meios para preservar as regras que os favorecem.",
+        "Quem ganha recursos hoje pode ampliar sua influência amanhã.",
         MARGEM,
-        4.87,
+        5.68,
         CORPO,
-        0.39,
-        tamanho=19,
-    )
-    _bloco(
-        slide,
-        "Aplicação aos empenhos municipais",
-        "Após uma troca de governo, os empenhos podem passar para outras fornecedoras "
-        "das mesmas redes societárias.",
-        MARGEM,
-        5.59,
-        11.45,
+        0.76,
+        tamanho=20,
     )
     _nota(
         notas,
         "Voz 1",
-        55,
-        "Para Acemoglu e coautores, grupos disputam as regras que distribuem os recursos. "
-        "As instituições políticas conferem autoridade formal. Os recursos econômicos "
-        "dão poder de fato ao ampliar a capacidade de organização. As duas fontes de "
-        "poder moldam as regras da economia. Os grupos que se beneficiam dessas regras "
-        "ganham recursos para preservar sua influência no período seguinte. Uma eleição "
-        "pode mudar quem comanda a prefeitura e preservar os recursos que sustentam "
-        "essa influência. Nos empenhos, isso poderia aparecer se uma fornecedora "
-        "perdesse espaço e outras empresas da mesma rede ganhassem participação.",
+        25,
+        "Para Acemoglu, Johnson e Robinson, grupos disputam as regras da economia. "
+        "O poder formal vem das instituições políticas; o poder de fato, dos recursos "
+        "que permitem aos grupos se organizar e influenciar decisões. As regras que "
+        "resultam dessa disputa distribuem recursos e podem reforçar a influência de "
+        "quem já se beneficia delas.",
         "No esquema completo, o poder político também influencia as instituições "
         "políticas do período seguinte.",
-        "Empenhos são compromissos de despesa. Usamos vínculos societários e doações "
-        "observáveis para investigar a persistência das redes fornecedoras.",
     )
 
-    # 3. Hipóteses com o diagrama de exemplo
+    slide = _pagina(prs, "Muda o governo. Mudam as redes fornecedoras?", CONTEXTO)
+    _bloco(
+        slide,
+        "Muda o comando da prefeitura",
+        "Se o incumbente perde, outro grupo passa a decidir sobre as despesas municipais.",
+        MARGEM,
+        1.94,
+        5.42,
+    )
+    _traco(slide, 6.55, 1.92, 6.55, 3.44)
+    _bloco(
+        slide,
+        "As redes podem persistir",
+        "Uma rede societária pode manter vínculos com os dois grupos políticos.",
+        MEIO,
+        1.94,
+        5.42,
+    )
+    _traco(slide, MARGEM, 3.68, LARGURA - MARGEM, 3.68)
+    _bloco(
+        slide,
+        "A perda fica na empresa ou chega à rede?",
+        "Se uma fornecedora ligada ao derrotado perde espaço, outra da mesma rede, "
+        "ligada ao vencedor, pode compensar.",
+        MARGEM,
+        3.94,
+        CORPO,
+    )
+    _bloco(
+        slide,
+        "Como testamos",
+        "Mapeamos conexões por doações de campanha e vínculos societários. "
+        "Medimos a fatia de empresas e redes nos empenhos de 2025.",
+        MARGEM,
+        5.15,
+        CORPO,
+    )
+    _texto(
+        slide,
+        "Os dados não provam influência nem favorecimento.",
+        MARGEM,
+        6.61,
+        CORPO,
+        0.40,
+        tamanho=16,
+        cor=CINZA,
+    )
+    _nota(
+        notas,
+        "Voz 1",
+        30,
+        "A eleição troca quem decide na prefeitura, mas não desfaz os vínculos entre "
+        "empresas. Uma rede pode estar ligada aos dois grupos. Se uma fornecedora ligada "
+        "ao derrotado perde espaço e outra da mesma rede, ligada ao vencedor, ganha, "
+        "a rede pode manter sua fatia. Mapeamos essas conexões com doações e vínculos "
+        "societários e olhamos os empenhos de 2025.",
+        "Empenhos são compromissos de despesa, não pagamentos. Os vínculos observados "
+        "não medem diretamente poder de fato nem demonstram favorecimento.",
+    )
+
+    # 4. Hipóteses com o diagrama de exemplo
     slide = _pagina(
         prs,
         "Quatro hipóteses a partir dos vínculos de campanha",
@@ -520,7 +577,7 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
         "municípios. As empresas do desenho ilustram a contagem de passos.",
     )
 
-    # 4. Desenho empírico
+    # 5. Desenho empírico
     slide = _pagina(
         prs,
         "O efeito da derrota perto do empate",
@@ -652,7 +709,7 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
         "O desfecho de H1 e H2 inclui os saldos positivos das entrantes no denominador.",
     )
 
-    # 5. Fontes e estrutura da rede
+    # 6. Fontes e estrutura da rede
     slide = _pagina(prs, "Poucos vínculos por empresa", REDE)
     faixa = slide.shapes.add_shape(
         MSO_SHAPE.RECTANGLE, Inches(MARGEM), Inches(1.68), Inches(CORPO), Inches(1.03)
@@ -851,7 +908,7 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
         "caminhos societários mudam.",
     )
 
-    # 6. Resultados de H1, H3 e H4
+    # 7. Resultados de H1, H3 e H4
     h1 = _celula(resumo, hipotese="H1", tipo="contraste")
     total_h3 = _celula(resumo, hipotese="H3", tipo="contraste", resultado="variacao_total")
     r1 = _celula(resumo, hipotese="H3", tipo="categoria", categoria="ambos", resultado="termo_r1")
@@ -927,7 +984,7 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
         f"O contraste usa ligações exclusivas e tem p de Holm = {_numero(h4.get('p_holm'))}.",
     )
 
-    # 7. Contrastes por distância
+    # 8. Contrastes por distância
     h2 = {
         faixa: _celula(resumo, hipotese="H2", tipo="contraste", categoria=f"vencedor_faixa_{faixa}")
         for faixa in ("0", "1", "2", "3+")
@@ -1040,7 +1097,7 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
         "2023–setembro de 2024. Ele é distinto do placebo de nível pré do contraste.",
     )
 
-    # 8. Sensibilidades e conclusão
+    # 9. Sensibilidades e conclusão
     pos_menos_pre = _celula(
         _ler_tabela(pasta, "sensibilidade_placebo"), tipo="contraste", categoria="vencedor_faixa_1"
     )
