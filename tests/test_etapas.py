@@ -79,7 +79,7 @@ def test_pipeline_percorre_a_amostra(caminhos_amostra):
     saida = caminhos_amostra.saida
     assert 0 < report.contar_paginas(saida / "relatorio.pdf") <= report.MAXIMO_PAGINAS
     slides = deck.contar_slides(saida / "deck.pptx")
-    assert deck.MINIMO_SLIDES <= slides <= deck.MAXIMO_SLIDES
+    assert slides == deck.NUMERO_SLIDES
     assert slides == deck.contar_paginas(saida / "deck.pdf")
     assert (saida / "guia_de_fala.md").stat().st_size > 0
     for arquivo in (

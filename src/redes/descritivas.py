@@ -1,4 +1,4 @@
-"""Descritivas de rede da seção 5 do projeto: componentes, graus, articulação e distâncias.
+"""Descritivas de rede: componentes, graus, assortatividade, articulação e distâncias.
 
 Só agregados, uma linha por variante e categoria; contagens entre 1 e `SUPRESSAO_MINIMA - 1`
 saem nulas. O erro de reconstrução é calculado na ingestão da Receita.
@@ -97,6 +97,31 @@ def graus(grau_empresa: np.ndarray, grau_pessoa: np.ndarray) -> pl.DataFrame:
     )
 
 
+def assortatividade_grau(
+    empresas: np.ndarray,
+    pessoas: np.ndarray,
+    grau_empresa: np.ndarray,
+    grau_pessoa: np.ndarray,
+) -> float | None:
+    """Pearson entre os graus nas pontas de cada vínculo, com empresa e pessoa em lados fixos."""
+    n = len(empresas)
+    if n < config.SUPRESSAO_MINIMA:
+        return None
+    # Cada vértice entra na média dos extremos uma vez por vínculo.
+    media_empresa = np.einsum("i,i->", grau_empresa, grau_empresa, dtype=float) / n
+    media_pessoa = np.einsum("i,i->", grau_pessoa, grau_pessoa, dtype=float) / n
+    produto = quadrados_empresa = quadrados_pessoa = 0.0
+    for inicio in range(0, n, 1_000_000):
+        bloco = slice(inicio, inicio + 1_000_000)
+        x = grau_empresa[empresas[bloco]] - media_empresa
+        y = grau_pessoa[pessoas[bloco]] - media_pessoa
+        produto += np.sum(x * y)
+        quadrados_empresa += np.sum(x * x)
+        quadrados_pessoa += np.sum(y * y)
+    denominador = np.sqrt(quadrados_empresa * quadrados_pessoa)
+    return float(produto / denominador) if denominador else None
+
+
 def faixas_de_distancia(distancias: pl.DataFrame, origens: pl.DataFrame) -> pl.DataFrame:
     """Pares (fornecedora, município) por grupo e faixa de δ, onde há conexão direta ao grupo."""
     busca = ["cod_municipio_tse", "grupo"]
@@ -117,6 +142,7 @@ def resumo(
     origens: pl.DataFrame,
     articulacao: int,
     componentes_de_um_socio: int,
+    assortatividade: float | None = None,
 ) -> pl.DataFrame:
     maior = rede["empresas_na_rede"].max() or 0
     linhas = {
@@ -143,7 +169,10 @@ def resumo(
         [
             contagens,
             pl.DataFrame(
-                {"indicador": ["fracao_no_maior_componente"], "valor": [fracao]},
+                {
+                    "indicador": ["fracao_no_maior_componente", "assortatividade_grau"],
+                    "valor": [fracao, assortatividade],
+                },
                 schema=contagens.schema,
             ),
         ]
@@ -158,6 +187,7 @@ def da_variante(
     origens: pl.DataFrame,
     articulacao: int,
     componentes_de_um_socio: int,
+    assortatividade: float | None = None,
 ) -> dict[str, pl.DataFrame]:
     """As quatro tabelas de uma variante, já com supressão, na ordem de `ARQUIVOS`.
 
@@ -165,7 +195,7 @@ def da_variante(
     vínculo na variante."""
     faixas = componentes(rede)
     tabelas = (
-        resumo(rede, grau_pessoa, origens, articulacao, componentes_de_um_socio),
+        resumo(rede, grau_pessoa, origens, articulacao, componentes_de_um_socio, assortatividade),
         faixas,
         suprimir_particao(graus(grau_empresa, grau_pessoa), ("vertices",), "vertice"),
         suprimir_particao(

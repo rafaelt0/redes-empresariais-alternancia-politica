@@ -9,6 +9,7 @@ PRINCIPAL,componentes_duas_empresas_um_socio,978427.0
 PRINCIPAL,municipios_com_conexao_a,376.0
 PRINCIPAL,municipios_com_conexao_b,356.0
 PRINCIPAL,fracao_no_maior_componente,0.14588082152854095
+PRINCIPAL,assortatividade_grau,0.0003007492259869337
 SEM_ARTICULACAO,empresas,14069286.0
 SEM_ARTICULACAO,pessoas,13292483.0
 SEM_ARTICULACAO,vinculos,15266906.0
@@ -19,6 +20,7 @@ SEM_ARTICULACAO,componentes_duas_empresas_um_socio,211632.0
 SEM_ARTICULACAO,municipios_com_conexao_a,311.0
 SEM_ARTICULACAO,municipios_com_conexao_b,279.0
 SEM_ARTICULACAO,fracao_no_maior_componente,0.021162481166421665
+SEM_ARTICULACAO,assortatividade_grau,0.0006616892562513867
 SEM_PJ,empresas,14069286.0
 SEM_PJ,pessoas,16295268.0
 SEM_PJ,vinculos,24109001.0
@@ -29,6 +31,7 @@ SEM_PJ,componentes_duas_empresas_um_socio,980721.0
 SEM_PJ,municipios_com_conexao_a,376.0
 SEM_PJ,municipios_com_conexao_b,356.0
 SEM_PJ,fracao_no_maior_componente,0.1403009363801404
+SEM_PJ,assortatividade_grau,-0.0002724993060013889
 SEM_ADMINISTRADOR,empresas,14069286.0
 SEM_ADMINISTRADOR,pessoas,15317081.0
 SEM_ADMINISTRADOR,vinculos,22221963.0
@@ -39,3 +42,4 @@ SEM_ADMINISTRADOR,componentes_duas_empresas_um_socio,876982.0
 SEM_ADMINISTRADOR,municipios_com_conexao_a,364.0
 SEM_ADMINISTRADOR,municipios_com_conexao_b,344.0
 SEM_ADMINISTRADOR,fracao_no_maior_componente,0.10550848138277948
+SEM_ADMINISTRADOR,assortatividade_grau,-0.0006629363860800547

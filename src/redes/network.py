@@ -394,18 +394,23 @@ def calcular_variante(
     delta = distancias(grafo, rede, origens, alvos)
     motivos = componentes_de_um_socio(grafo)
     del grafo
-    grau_pessoa = np.bincount(v.pessoa[mascara], minlength=v.n_pessoas)
+    empresas, pessoas = v.empresa[mascara], v.pessoa[mascara]
+    grau_empresa = np.bincount(empresas, minlength=len(v.cnpjs))
+    grau_pessoa = np.bincount(pessoas, minlength=v.n_pessoas)
+    assortatividade = descritivas.assortatividade_grau(empresas, pessoas, grau_empresa, grau_pessoa)
+    del empresas, pessoas
     resultado = Resultado(
         rede=rede,
         distancias=delta,
         descritivas=descritivas.da_variante(
             rede,
-            np.bincount(v.empresa[mascara], minlength=len(v.cnpjs)),
+            grau_empresa,
             grau_pessoa[grau_pessoa > 0],
             delta,
             origens,
             len(articulacao),
             motivos,
+            assortatividade=assortatividade,
         ),
     )
     return resultado, articulacao

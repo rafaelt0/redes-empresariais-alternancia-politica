@@ -28,7 +28,7 @@ def test_resultados_versionados_nao_divulgam_contagens_pequenas():
         )
         indicador = None
         if arquivo.stem in ("links_pc1", "rede_resumo"):
-            indicador = ~pl.col("indicador").str.contains(r"^(taxa_|fracao_)")
+            indicador = ~pl.col("indicador").str.contains(r"^(taxa_|fracao_|assortatividade_)")
         elif arquivo.stem == "reconstrucao":
             indicador = ~pl.col("medida").str.starts_with("fracao_")
         elif arquivo.stem == "validacao_panel":

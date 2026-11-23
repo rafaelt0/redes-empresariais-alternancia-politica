@@ -2,6 +2,7 @@ import math
 
 import numpy as np
 import polars as pl
+import pytest
 
 from redes import descritivas
 from redes.schemas import FAIXA, GRUPO
@@ -44,6 +45,24 @@ def test_graus_de_empresas_e_pessoas_em_faixas_separadas() -> None:
         "11+": 1,
     }
     assert pessoa["vertices"].sum() == 3
+
+
+def test_assortatividade_emprega_os_graus_das_duas_pontas_por_vinculo() -> None:
+    empresas = np.array([0, 0, 0, 1, 1, 2, 3])
+    pessoas = np.array([0, 1, 2, 0, 2, 0, 3])
+    grau_empresa, grau_pessoa = np.bincount(empresas), np.bincount(pessoas)
+    r = descritivas.assortatividade_grau(empresas, pessoas, grau_empresa, grau_pessoa)
+    esperado = np.corrcoef(grau_empresa[empresas], grau_pessoa[pessoas])[0, 1]
+    assert r == pytest.approx(esperado)
+
+    empresas = np.arange(7)
+    pessoas = np.array([0, 0, 0, 1, 1, 2, 3])
+    assert (
+        descritivas.assortatividade_grau(
+            empresas, pessoas, np.bincount(empresas), np.bincount(pessoas)
+        )
+        is None
+    )
 
 
 def test_graus_publicos_ocultam_diferencas_pequenas_de_cauda_entre_variantes():

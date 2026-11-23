@@ -197,7 +197,9 @@ def test_etapa_grava_tabelas_e_descritivas_sem_celulas_pequenas(caminhos_amostra
         )
         assert set(tabela["variante"]) == set(schemas.VARIANTE.categories), arquivo
         if arquivo == "rede_resumo":
-            tabela = tabela.filter(pl.col("indicador") != "fracao_no_maior_componente")
+            tabela = tabela.filter(
+                ~pl.col("indicador").is_in(("fracao_no_maior_componente", "assortatividade_grau"))
+            )
         contagens = tabela.select(*medidas).unpivot()["value"]
         assert not contagens.is_between(1, 4).any(), arquivo
 
