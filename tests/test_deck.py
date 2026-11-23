@@ -50,7 +50,7 @@ def test_guia_equilibra_os_blocos_e_nao_define_pessoas(tmp_path: Path) -> None:
     assert "1:20" in texto
     assert "| Voz 1 | Economia política e hipóteses | 1–4 | 2:10 |" in texto
     assert "| Voz 2 | Desenho empírico e fontes | 5 | 2:10 |" in texto
-    assert "| Voz 4 | Resultados de H2 e conclusão | 8–9 | 2:10 |" in texto
+    assert "| Voz 4 | Distância (H2) e conclusão | 8–9 | 2:10 |" in texto
     for autor in ("Felipe", "Andrei", "Rafael", "João Pedro"):
         assert autor not in texto
 
@@ -97,6 +97,17 @@ def test_deck_usa_os_numeros_das_tabelas(tmp_path: Path) -> None:
             "ic_sup": [0.025],
         }
     ).write_csv(tabelas / "resumo_estimacao.csv")
+    pl.DataFrame({"coorte": ["H3_ambos"], "fracao_empenho_gigante": [0.9987]}).write_csv(
+        tabelas / "sensibilidade_gigante.csv"
+    )
+    pl.DataFrame(
+        {
+            "hipotese": ["H3"],
+            "tipo": ["contraste"],
+            "resultado": ["variacao_total"],
+            "estimavel": [False],
+        }
+    ).write_csv(tabelas / "sensibilidade_sem_gigante.csv")
     numeros = Numeros.ler(tabelas)
     prs, notas = deck.construir(caminhos, numeros)
     textos = " ".join(
@@ -115,10 +126,12 @@ def test_deck_usa_os_numeros_das_tabelas(tmp_path: Path) -> None:
     assert "r = -0,1200" in textos
     assert "-1,2 p.p." in textos
     assert "IC de 95% de -5,0 a 2,5 p.p." in textos
+    assert "99,87%" in textos
+    assert "Sem esse componente, faltam municípios para estimar o contraste." in textos
 
 
-def test_deck_ordena_os_cinco_blocos_e_destaca_h2(tmp_path: Path) -> None:
-    prs, _ = deck.construir(_caminhos(tmp_path), Numeros({}))
+def test_deck_ordena_os_cinco_blocos_e_preserva_hierarquia(tmp_path: Path) -> None:
+    prs, notas = deck.construir(_caminhos(tmp_path), Numeros({}))
     secoes = [slide.shapes[1].text_frame.text for slide in prs.slides]
     assert prs.slides[0].shapes[0].text_frame.text == deck.TITULO
     assert secoes[1:] == [
@@ -146,13 +159,28 @@ def test_deck_ordena_os_cinco_blocos_e_destaca_h2(tmp_path: Path) -> None:
         for termo in (
             "incumbente",
             "mesma rede",
-            "ligada ao vencedor, pode compensar",
+            "podem compensar a perda",
             "doações de campanha",
-            "fatia de empresas e redes nos empenhos de 2025",
+            "fatia das empresas e a variação dos empenhos das redes",
         )
     )
     rede = " ".join(forma.text_frame.text for forma in prs.slides[5].shapes if forma.has_text_frame)
     assert all(termo in rede for termo in ("Receita Federal", "TSE", "TCESP", "maior componente"))
+    hipoteses, resultados, distancia, conclusao = (
+        " ".join(
+            forma.text_frame.text for forma in prs.slides[indice].shapes if forma.has_text_frame
+        )
+        for indice in (3, 6, 7, 8)
+    )
+    assert hipoteses.index("H1") < hipoteses.index("H3") < hipoteses.index("H2")
+    assert "teste principal" in resultados.lower()
+    assert "Decomposição" in resultados
+    assert "H4" not in " ".join((hipoteses, resultados, distancia, conclusao))
+    assert "H4" not in notas[6].fala
+    assert any("H4" in ponto for ponto in notas[6].apoio)
+    assert "análise exploratória" in distancia.lower()
+    assert "não testam se o efeito diminui" in distancia
+    assert "compensação na rede seguem em aberto" in conclusao
     titulos = [slide.shapes[0].text_frame.text for slide in list(prs.slides)[-2:]]
     assert "distância" in titulos[0]
     assert "especificação" in titulos[1]

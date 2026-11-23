@@ -8,8 +8,8 @@
 |---|---|---|---|
 | Voz 1 | Economia política e hipóteses | 1–4 | 2:10 |
 | Voz 2 | Desenho empírico e fontes | 5 | 2:10 |
-| Voz 3 | Estrutura da rede e resultados de H1, H3 e H4 | 6–7 | 2:10 |
-| Voz 4 | Resultados de H2 e conclusão | 8–9 | 2:10 |
+| Voz 3 | Estrutura da rede e resultados de H1 e H3 | 6–7 | 2:10 |
+| Voz 4 | Distância (H2) e conclusão | 8–9 | 2:10 |
 
 ## Cronograma por slide
 
@@ -18,11 +18,11 @@
 | 1 | Redes empresariais e persistência econômica sob alternância política | Voz 1 | 10 s | 0:10 |
 | 2 | De onde vem o poder político? | Voz 1 | 25 s | 0:35 |
 | 3 | Muda o governo. Mudam as redes fornecedoras? | Voz 1 | 30 s | 1:05 |
-| 4 | Quatro hipóteses a partir dos vínculos de campanha | Voz 1 | 65 s | 2:10 |
+| 4 | Ligação direta, compensação e distância | Voz 1 | 65 s | 2:10 |
 | 5 | O efeito da derrota perto do empate | Voz 2 | 130 s | 4:20 |
 | 6 | Poucos vínculos por empresa | Voz 3 | 95 s | 5:55 |
-| 7 | Ligação direta, compensação e permanência | Voz 3 | 35 s | 6:30 |
-| 8 | A um passo, o contraste de 2025 é negativo | Voz 4 | 75 s | 7:45 |
+| 7 | Ligação direta e compensação na rede | Voz 3 | 35 s | 6:30 |
+| 8 | A participação de 2025 por distância | Voz 4 | 75 s | 7:45 |
 | 9 | O resultado a um passo depende da especificação | Voz 4 | 55 s | 8:40 |
 
 ## Voz 1 · Economia política e hipóteses
@@ -47,21 +47,21 @@ Para Acemoglu, Johnson e Robinson, grupos disputam as regras da economia. O pode
 
 **Na fala**
 
-A eleição troca quem decide na prefeitura, mas não desfaz os vínculos entre empresas. Uma rede pode estar ligada aos dois grupos. Se uma fornecedora ligada ao derrotado perde espaço e outra da mesma rede, ligada ao vencedor, ganha, a rede pode manter sua fatia. Mapeamos essas conexões com doações e vínculos societários e olhamos os empenhos de 2025.
+A eleição troca quem decide na prefeitura, mas não desfaz os vínculos entre empresas. Uma rede pode estar ligada aos dois grupos. Se uma fornecedora ligada ao derrotado perde espaço, ganhos de outras empresas da mesma rede podem compensar essa perda. Mapeamos essas conexões com doações e vínculos societários e olhamos os empenhos de 2025.
 
 **Se perguntarem**
 
 - Empenhos são compromissos de despesa, não pagamentos. Os vínculos observados não medem diretamente poder de fato nem demonstram favorecimento.
 
-### 4. Quatro hipóteses a partir dos vínculos de campanha (65 s)
+### 4. Ligação direta, compensação e distância (65 s)
 
 **Na fala**
 
-No diagrama, as setas tracejadas são doações. Ana liga a empresa X ao grupo incumbente A. Daniel liga Z ao adversário B. Essas empresas são as sementes. As linhas contínuas mostram os vínculos societários. Bruno conecta X a Y, e Carla conecta Y a Z. Se B vencer, H2 prevê a maior vantagem para Z, que está diretamente ligada a B. Y está a um passo e X a dois, então a vantagem deveria diminuir nessa ordem. H1 pergunta se X perde participação diante de empresas sem caminho aos dois grupos. Como a rede liga A e B, H3 pergunta se ganhos de Y e Z compensam a perda de X. H4 pergunta se redes ligadas ao vencedor permanecem entre as maiores fornecedoras.
+No diagrama, as setas tracejadas são doações. Ana liga a empresa X ao grupo incumbente A. Daniel liga Z ao adversário B. Essas empresas são as sementes. As linhas contínuas mostram os vínculos societários. Bruno conecta X a Y, e Carla conecta Y a Z. A previsão principal, H1, é que, se A perder, X perca participação em relação às empresas sem caminho observado para A ou B. O exercício de H3 decompõe a variação na rede: a parte de X cai enquanto a de Y e Z sobe? Em H2, exploramos diferenças entre grupos de empresas por distância. A partir de B, Z está a zero passos, Y a um e X a dois. Essas distâncias descrevem os vínculos; a eleição não sorteia quem tem uma conexão.
 
 **Se perguntarem**
 
-- No teste de H2, comparamos coortes à mesma distância de A e B em vários municípios. As empresas do desenho ilustram a contagem de passos.
+- A hierarquia da apresentação foi definida após a análise. O relatório e as tabelas preservam os testes originais.
 
 ## Voz 2 · Desenho empírico e fontes
 
@@ -79,7 +79,7 @@ Subtraímos a porcentagem de votos de B da de A. À esquerda do empate, A perde 
 - O teste de densidade da margem deu p = 0,993. Também verificamos placebos e sensibilidade à metade e ao dobro da banda.
 - Fornecedora anterior tem saldo líquido positivo na janela pré-eleitoral. O desfecho de H1 e H2 inclui os saldos positivos das entrantes no denominador.
 
-## Voz 3 · Estrutura da rede e resultados de H1, H3 e H4
+## Voz 3 · Estrutura da rede e resultados de H1 e H3
 
 ### 6. Poucos vínculos por empresa (95 s)
 
@@ -94,28 +94,29 @@ A partir das fontes listadas na base do slide, construímos a rede principal com
 - A assortatividade é a correlação de Pearson entre os graus da empresa e do sócio ou administrador em cada aresta. A densidade divide o número de arestas pelo produto das duas contagens de vértices.
 - Na versão sem pontos de articulação, o universo de empresas é mantido e os caminhos societários mudam.
 
-### 7. Ligação direta, compensação e permanência (35 s)
+### 7. Ligação direta e compensação na rede (35 s)
 
 **Na fala**
 
-Em H1, comparamos a participação das empresas ligadas diretamente ao incumbente com a das empresas sem caminho a A ou B. Em H3, olhamos a compensação. Os dois sinais contrariam a previsão de compensação na mesma rede. Em H4, olhamos a permanência das redes entre as maiores. Os intervalos mostram a precisão dessas estimativas. A seguir, H2 examina a participação dos fornecedores em cada distância.
+H1 compara as fornecedoras ligadas diretamente ao incumbente com as sem caminho observado para A ou B. H3 separa as ligadas diretamente a A das demais nas redes dos dois grupos. Os sinais vão na direção oposta à prevista para compensação. Os intervalos incluem zero. Um só componente concentra 99,98% do empenho prévio da coorte. Sem esse componente, faltam municípios para estimar o contraste.
 
 **Se perguntarem**
 
 - Em H3, as unidades estão em % do empenho anual médio pré-eleitoral do município. ICs de 95% de -0,03 a 0,10% para as anteriores ligadas diretamente a A e de -9,70 a 1,50% para as demais. O contraste do total, redes ligadas a ambos menos as demais, é -4,06 (-10,20 a 2,08)% do empenho prévio.
-- Em H4, o ranking inclui a rede que cruza o limiar de 50%. Na janela de cinco p.p., a permanência média descritiva é 82,6% entre as ligadas ao vencedor e 81,5% entre as demais. O contraste usa ligações exclusivas e tem p de Holm = 1,000.
+- H3 é exploratória. A decomposição não identifica transferências de contratos entre empresas.
+- H4 (permanência no topo) ficou fora da apresentação principal por falta de uma comparação informativa. No limiar de 50%, o efeito mínimo detectável é 277,1 p.p. numa escala de 0 a 100%. O relatório preserva o teste.
 
-## Voz 4 · Resultados de H2 e conclusão
+## Voz 4 · Distância (H2) e conclusão
 
-### 8. A um passo, o contraste de 2025 é negativo (75 s)
+### 8. A participação de 2025 por distância (75 s)
 
 **Na fala**
 
-A cada distância, calculamos o salto para as empresas ligadas ao adversário B e para as ligadas ao incumbente A. Subtraímos o salto de A do de B e dividimos por dois para expressar a vantagem da ligação ao vencedor, sob simetria dos efeitos. A um passo, o contraste de 2025 é -4,06 p.p. (IC de 95% de -7,16 a -0,97 p.p.). O IC nominal exclui zero a um passo. O sinal é contrário ao previsto. O placebo examina a mudança de participação das empresas a um passo de B antes da eleição. O salto estimado foi de -7,68 p.p. (IC nominal de -13,50 a -1,86 p.p.). A diferença anterior à eleição enfraquece a leitura causal de 2025.
+A cada distância, calculamos o salto para as empresas ligadas ao adversário B e para as ligadas ao incumbente A. Subtraímos o salto de A do de B e dividimos por dois para resumir a diferença entre os efeitos da derrota nas duas coortes. A um passo, o contraste de 2025 é -4,06 p.p. (IC de 95% de -7,16 a -0,97 p.p.). Os contrastes por faixa não testam se o efeito diminui com a distância. O placebo examina a mudança de participação das empresas a um passo de B antes da eleição. O salto estimado foi de -7,68 p.p. (IC nominal de -13,50 a -1,86 p.p.). A diferença anterior à eleição enfraquece a leitura causal de 2025.
 
 **Se perguntarem**
 
-- A previsão era uma vantagem positiva da ligação ao vencedor que diminuísse com a distância. A interpretação exige coortes comparáveis e efeitos simétricos de ganhar e perder a ligação. A mesma firma pode entrar nas duas coortes.
+- Ler o contraste como vantagem da ligação ao vencedor exige coortes comparáveis e simetria entre os efeitos de ganhar e perder essa ligação. A mesma firma pode entrar nas duas coortes, e um passo societário não mede necessariamente proximidade política.
 - A um passo, o salto de B em 2025 foi -8,07 p.p. (p de Holm = 0,077). O IC do contraste é nominal. A correção de Holm se aplica ao salto de B na família de testes secundários.
 - O placebo da coorte B mede a mudança de participação de 2021–2022 para 2023–setembro de 2024. Ele é distinto do placebo de nível pré do contraste.
 
@@ -123,7 +124,7 @@ A cada distância, calculamos o salto para as empresas ligadas ao adversário B 
 
 **Na fala**
 
-Primeiro, medimos a mudança da participação pré-eleitoral para 2025. Depois, voltamos à participação de 2025 e excluímos as doações dos candidatos às próprias campanhas. Os dois intervalos das especificações alternativas incluem zero. Voltando à pergunta inicial, observamos como a participação varia com a distância ao vencedor. A persistência do acesso aos empenhos após a alternância continua em aberto nas eleições analisadas.
+Primeiro, medimos a mudança da participação pré-eleitoral para 2025. Depois, voltamos à participação de 2025 e excluímos as doações dos candidatos às próprias campanhas. Os dois intervalos das especificações alternativas incluem zero. As comparações por distância são exploratórias. Voltando à pergunta inicial, os dados não permitem concluir se uma derrota apertada reduziu a participação das fornecedoras ligadas ao incumbente em 2025, nem se outras empresas da mesma rede compensaram perdas.
 
 **Se perguntarem**
 
