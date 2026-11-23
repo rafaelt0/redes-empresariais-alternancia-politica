@@ -23,14 +23,14 @@ def _caminhos(tmp_path: Path) -> Caminhos:
     )
 
 
-def test_deck_tem_oito_slides(tmp_path: Path) -> None:
+def test_deck_tem_nove_slides(tmp_path: Path) -> None:
     prs, notas = deck.construir(_caminhos(tmp_path), Numeros({}))
-    assert len(prs.slides) == 8
+    assert len(prs.slides) == 9
     assert len(notas) == len(prs.slides)
     assert sum(nota.segundos for nota in notas) == 520
     assert [nota.pessoa for nota in notas] == [
         voz
-        for voz, quantidade in zip(deck.VOZES, (3, 1, 2, 2), strict=True)
+        for voz, quantidade in zip(deck.VOZES, (4, 1, 2, 2), strict=True)
         for _ in range(quantidade)
     ]
     for slide, nota in zip(prs.slides, notas, strict=True):
@@ -48,9 +48,9 @@ def test_guia_equilibra_os_blocos_e_nao_define_pessoas(tmp_path: Path) -> None:
     assert set(por_bloco.values()) == {130}
     assert "2:10" in texto
     assert "1:20" in texto
-    assert "| Voz 1 | Economia política e hipóteses | 1–3 | 2:10 |" in texto
-    assert "| Voz 2 | Desenho empírico e fontes | 4 | 2:10 |" in texto
-    assert "| Voz 4 | Resultados de H2 e conclusão | 7–8 | 2:10 |" in texto
+    assert "| Voz 1 | Economia política e hipóteses | 1–4 | 2:10 |" in texto
+    assert "| Voz 2 | Desenho empírico e fontes | 5 | 2:10 |" in texto
+    assert "| Voz 4 | Resultados de H2 e conclusão | 8–9 | 2:10 |" in texto
     for autor in ("Felipe", "Andrei", "Rafael", "João Pedro"):
         assert autor not in texto
 
@@ -108,7 +108,7 @@ def test_deck_usa_os_numeros_das_tabelas(tmp_path: Path) -> None:
     notas_texto = " ".join(nota.texto() for nota in notas)
     assert "1.234 empresas" in notas_texto
     assert "5.678 vértices de sócios/administradores PF/PJ" in notas_texto
-    metricas = {forma.text_frame.text for forma in prs.slides[4].shapes if forma.has_text_frame}
+    metricas = {forma.text_frame.text for forma in prs.slides[5].shapes if forma.has_text_frame}
     assert {"1.234", "5.678", "9.999", "250", "20,0%", "5,0%", "38", "32"} <= metricas
     assert "De 50 municípios analisáveis." in metricas
     assert "1.427,072 vínculo por milhão" in textos
@@ -123,6 +123,7 @@ def test_deck_ordena_os_cinco_blocos_e_destaca_h2(tmp_path: Path) -> None:
     assert prs.slides[0].shapes[0].text_frame.text == deck.TITULO
     assert secoes[1:] == [
         deck.CONTEXTO,
+        deck.CONTEXTO,
         deck.HIPOTESES,
         deck.DESENHO,
         deck.REDE,
@@ -134,8 +135,23 @@ def test_deck_ordena_os_cinco_blocos_e_destaca_h2(tmp_path: Path) -> None:
         forma.text_frame.text for forma in prs.slides[1].shapes if forma.has_text_frame
     )
     assert all(termo in teoria for termo in ("conflito social", "de jure", "de facto", "Acemoglu"))
-    assert "Instituições econômicas  →  Distribuição de recursos  →  Poder de fato futuro" in teoria
-    rede = " ".join(forma.text_frame.text for forma in prs.slides[4].shapes if forma.has_text_frame)
+    assert "Para Acemoglu, Johnson e Robinson (2005)" in teoria
+    assert "Regras econômicas  →  Distribuição de recursos  →  Poder de fato futuro" in teoria
+    assert "empenhos" not in teoria
+    aplicacao = " ".join(
+        forma.text_frame.text for forma in prs.slides[2].shapes if forma.has_text_frame
+    )
+    assert all(
+        termo in aplicacao
+        for termo in (
+            "incumbente",
+            "mesma rede",
+            "ligada ao vencedor, pode compensar",
+            "doações de campanha",
+            "fatia de empresas e redes nos empenhos de 2025",
+        )
+    )
+    rede = " ".join(forma.text_frame.text for forma in prs.slides[5].shapes if forma.has_text_frame)
     assert all(termo in rede for termo in ("Receita Federal", "TSE", "TCESP", "maior componente"))
     titulos = [slide.shapes[0].text_frame.text for slide in list(prs.slides)[-2:]]
     assert "distância" in titulos[0]

@@ -6,23 +6,24 @@
 
 | Participante | Bloco | Slides | Tempo de fala |
 |---|---|---|---|
-| Voz 1 | Economia política e hipóteses | 1–3 | 2:10 |
-| Voz 2 | Desenho empírico e fontes | 4 | 2:10 |
-| Voz 3 | Estrutura da rede e resultados de H1, H3 e H4 | 5–6 | 2:10 |
-| Voz 4 | Resultados de H2 e conclusão | 7–8 | 2:10 |
+| Voz 1 | Economia política e hipóteses | 1–4 | 2:10 |
+| Voz 2 | Desenho empírico e fontes | 5 | 2:10 |
+| Voz 3 | Estrutura da rede e resultados de H1, H3 e H4 | 6–7 | 2:10 |
+| Voz 4 | Resultados de H2 e conclusão | 8–9 | 2:10 |
 
 ## Cronograma por slide
 
 | Slide | Tema | Voz | Tempo | Até |
 |---|---|---|---|---|
 | 1 | Redes empresariais e persistência econômica sob alternância política | Voz 1 | 10 s | 0:10 |
-| 2 | Como o poder persiste após a alternância? | Voz 1 | 55 s | 1:05 |
-| 3 | Quatro hipóteses a partir dos vínculos de campanha | Voz 1 | 65 s | 2:10 |
-| 4 | O efeito da derrota perto do empate | Voz 2 | 130 s | 4:20 |
-| 5 | Poucos vínculos por empresa | Voz 3 | 95 s | 5:55 |
-| 6 | Ligação direta, compensação e permanência | Voz 3 | 35 s | 6:30 |
-| 7 | A um passo, o contraste de 2025 é negativo | Voz 4 | 75 s | 7:45 |
-| 8 | O resultado a um passo depende da especificação | Voz 4 | 55 s | 8:40 |
+| 2 | De onde vem o poder político? | Voz 1 | 25 s | 0:35 |
+| 3 | Muda o governo. Mudam as redes fornecedoras? | Voz 1 | 30 s | 1:05 |
+| 4 | Quatro hipóteses a partir dos vínculos de campanha | Voz 1 | 65 s | 2:10 |
+| 5 | O efeito da derrota perto do empate | Voz 2 | 130 s | 4:20 |
+| 6 | Poucos vínculos por empresa | Voz 3 | 95 s | 5:55 |
+| 7 | Ligação direta, compensação e permanência | Voz 3 | 35 s | 6:30 |
+| 8 | A um passo, o contraste de 2025 é negativo | Voz 4 | 75 s | 7:45 |
+| 9 | O resultado a um passo depende da especificação | Voz 4 | 55 s | 8:40 |
 
 ## Voz 1 · Economia política e hipóteses
 
@@ -32,18 +33,27 @@
 
 Estudamos as eleições municipais paulistas de 2024 e os empenhos de 2025 para saber se a troca de governo muda quais redes empresariais recebem recursos.
 
-### 2. Como o poder persiste após a alternância? (55 s)
+### 2. De onde vem o poder político? (25 s)
 
 **Na fala**
 
-Para Acemoglu e coautores, grupos disputam as regras que distribuem os recursos. As instituições políticas conferem autoridade formal. Os recursos econômicos dão poder de fato ao ampliar a capacidade de organização. As duas fontes de poder moldam as regras da economia. Os grupos que se beneficiam dessas regras ganham recursos para preservar sua influência no período seguinte. Uma eleição pode mudar quem comanda a prefeitura e preservar os recursos que sustentam essa influência. Nos empenhos, isso poderia aparecer se uma fornecedora perdesse espaço e outras empresas da mesma rede ganhassem participação.
+Para Acemoglu, Johnson e Robinson, grupos disputam as regras da economia. O poder formal vem das instituições políticas; o poder de fato, dos recursos que permitem aos grupos se organizar e influenciar decisões. As regras que resultam dessa disputa distribuem recursos e podem reforçar a influência de quem já se beneficia delas.
 
 **Se perguntarem**
 
 - No esquema completo, o poder político também influencia as instituições políticas do período seguinte.
-- Empenhos são compromissos de despesa. Usamos vínculos societários e doações observáveis para investigar a persistência das redes fornecedoras.
 
-### 3. Quatro hipóteses a partir dos vínculos de campanha (65 s)
+### 3. Muda o governo. Mudam as redes fornecedoras? (30 s)
+
+**Na fala**
+
+A eleição troca quem decide na prefeitura, mas não desfaz os vínculos entre empresas. Uma rede pode estar ligada aos dois grupos. Se uma fornecedora ligada ao derrotado perde espaço e outra da mesma rede, ligada ao vencedor, ganha, a rede pode manter sua fatia. Mapeamos essas conexões com doações e vínculos societários e olhamos os empenhos de 2025.
+
+**Se perguntarem**
+
+- Empenhos são compromissos de despesa, não pagamentos. Os vínculos observados não medem diretamente poder de fato nem demonstram favorecimento.
+
+### 4. Quatro hipóteses a partir dos vínculos de campanha (65 s)
 
 **Na fala**
 
@@ -55,7 +65,7 @@ No diagrama, as setas tracejadas são doações. Ana liga a empresa X ao grupo i
 
 ## Voz 2 · Desenho empírico e fontes
 
-### 4. O efeito da derrota perto do empate (130 s)
+### 5. O efeito da derrota perto do empate (130 s)
 
 **Na fala**
 
@@ -71,7 +81,7 @@ Subtraímos a porcentagem de votos de B da de A. À esquerda do empate, A perde 
 
 ## Voz 3 · Estrutura da rede e resultados de H1, H3 e H4
 
-### 5. Poucos vínculos por empresa (95 s)
+### 6. Poucos vínculos por empresa (95 s)
 
 **Na fala**
 
@@ -84,7 +94,7 @@ A partir das fontes listadas na base do slide, construímos a rede principal com
 - A assortatividade é a correlação de Pearson entre os graus da empresa e do sócio ou administrador em cada aresta. A densidade divide o número de arestas pelo produto das duas contagens de vértices.
 - Na versão sem pontos de articulação, o universo de empresas é mantido e os caminhos societários mudam.
 
-### 6. Ligação direta, compensação e permanência (35 s)
+### 7. Ligação direta, compensação e permanência (35 s)
 
 **Na fala**
 
@@ -97,7 +107,7 @@ Em H1, comparamos a participação das empresas ligadas diretamente ao incumbent
 
 ## Voz 4 · Resultados de H2 e conclusão
 
-### 7. A um passo, o contraste de 2025 é negativo (75 s)
+### 8. A um passo, o contraste de 2025 é negativo (75 s)
 
 **Na fala**
 
@@ -109,7 +119,7 @@ A cada distância, calculamos o salto para as empresas ligadas ao adversário B 
 - A um passo, o salto de B em 2025 foi -8,07 p.p. (p de Holm = 0,077). O IC do contraste é nominal. A correção de Holm se aplica ao salto de B na família de testes secundários.
 - O placebo da coorte B mede a mudança de participação de 2021–2022 para 2023–setembro de 2024. Ele é distinto do placebo de nível pré do contraste.
 
-### 8. O resultado a um passo depende da especificação (55 s)
+### 9. O resultado a um passo depende da especificação (55 s)
 
 **Na fala**
 
