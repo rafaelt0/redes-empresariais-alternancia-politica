@@ -576,12 +576,32 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
     )
     _texto(
         slide,
+        "Y = α + βT + γM + θ(T × M) + u,     |M| ≤ b",
+        MARGEM,
+        4.03,
+        CORPO,
+        0.51,
+        tamanho=28,
+        fonte=FONTE_TITULO,
+    )
+    _texto(
+        slide,
+        "T = 1 quando A perde. β é o salto no empate. b delimita a janela de estimação.",
+        MARGEM,
+        4.62,
+        CORPO,
+        0.38,
+        tamanho=18,
+        cor=CINZA,
+    )
+    _texto(
+        slide,
         "O desfecho é a fatia dos empenhos de 2025 no elemento de despesa do município. "
         "As coortes são definidas antes da eleição pela distância a A e B.",
         MARGEM,
-        4.20,
+        5.22,
         11.4,
-        1.13,
+        0.87,
         tamanho=22,
     )
     _texto(
@@ -589,9 +609,9 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
         f"{_destaque(numeros, 'munAnalisaveis')} municípios analisáveis. Estimação linear local "
         "e testes placebo com dados pré-eleitorais.",
         MARGEM,
-        5.91,
+        6.37,
         CORPO,
-        0.57,
+        0.42,
         tamanho=19,
         cor=CINZA,
     )
