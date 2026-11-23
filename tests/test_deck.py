@@ -23,14 +23,14 @@ def _caminhos(tmp_path: Path) -> Caminhos:
     )
 
 
-def test_deck_tem_nove_slides(tmp_path: Path) -> None:
+def test_deck_tem_oito_slides(tmp_path: Path) -> None:
     prs, notas = deck.construir(_caminhos(tmp_path), Numeros({}))
-    assert len(prs.slides) == 9
+    assert len(prs.slides) == 8
     assert len(notas) == len(prs.slides)
     assert sum(nota.segundos for nota in notas) == 520
     assert [nota.pessoa for nota in notas] == [
         voz
-        for voz, quantidade in zip(deck.VOZES, (3, 2, 2, 2), strict=True)
+        for voz, quantidade in zip(deck.VOZES, (3, 1, 2, 2), strict=True)
         for _ in range(quantidade)
     ]
     for slide, nota in zip(prs.slides, notas, strict=True):
@@ -49,7 +49,8 @@ def test_guia_equilibra_os_blocos_e_nao_define_pessoas(tmp_path: Path) -> None:
     assert "2:10" in texto
     assert "1:20" in texto
     assert "| Voz 1 | Economia política e hipóteses | 1–3 | 2:10 |" in texto
-    assert "| Voz 4 | Resultados de H2 e conclusão | 8–9 | 2:10 |" in texto
+    assert "| Voz 2 | Desenho empírico e fontes | 4 | 2:10 |" in texto
+    assert "| Voz 4 | Resultados de H2 e conclusão | 7–8 | 2:10 |" in texto
     for autor in ("Felipe", "Andrei", "Rafael", "João Pedro"):
         assert autor not in texto
 
@@ -65,14 +66,28 @@ def test_guia_recusa_blocos_com_tempos_desiguais() -> None:
 
 def test_deck_usa_os_numeros_das_tabelas(tmp_path: Path) -> None:
     caminhos = _caminhos(tmp_path)
-    (caminhos.resultados / "tables").mkdir(parents=True)
+    tabelas = caminhos.resultados / "tables"
+    tabelas.mkdir(parents=True)
     pl.DataFrame(
         {
-            "variante": ["PRINCIPAL"] * 4,
-            "indicador": ["empresas", "pessoas", "vinculos", "assortatividade_grau"],
-            "valor": [1234.0, 5678.0, 9999.0, -0.12],
+            "variante": ["PRINCIPAL"] * 8 + ["SEM_ARTICULACAO"],
+            "indicador": [
+                "empresas",
+                "pessoas",
+                "vinculos",
+                "assortatividade_grau",
+                "componentes",
+                "fracao_no_maior_componente",
+                "municipios_com_conexao_a",
+                "municipios_com_conexao_b",
+                "fracao_no_maior_componente",
+            ],
+            "valor": [1234.0, 5678.0, 9999.0, -0.12, 250.0, 0.2, 38.0, 32.0, 0.05],
         }
-    ).write_csv(caminhos.resultados / "tables" / "rede_resumo.csv")
+    ).write_csv(tabelas / "rede_resumo.csv")
+    pl.DataFrame(
+        {"indicador": ["municipios_analisaveis"], "grupo": [""], "valor": [50.0]}
+    ).write_csv(tabelas / "links_pc1.csv")
     pl.DataFrame(
         {
             "hipotese": ["H1"],
@@ -81,8 +96,8 @@ def test_deck_usa_os_numeros_das_tabelas(tmp_path: Path) -> None:
             "ic_inf": [-0.050],
             "ic_sup": [0.025],
         }
-    ).write_csv(caminhos.resultados / "tables" / "resumo_estimacao.csv")
-    numeros = Numeros.ler(caminhos.resultados / "tables")
+    ).write_csv(tabelas / "resumo_estimacao.csv")
+    numeros = Numeros.ler(tabelas)
     prs, notas = deck.construir(caminhos, numeros)
     textos = " ".join(
         forma.text_frame.text
@@ -93,6 +108,9 @@ def test_deck_usa_os_numeros_das_tabelas(tmp_path: Path) -> None:
     notas_texto = " ".join(nota.texto() for nota in notas)
     assert "1.234 empresas" in notas_texto
     assert "5.678 vértices de sócios/administradores PF/PJ" in notas_texto
+    metricas = {forma.text_frame.text for forma in prs.slides[4].shapes if forma.has_text_frame}
+    assert {"1.234", "5.678", "9.999", "250", "20,0%", "5,0%", "38", "32"} <= metricas
+    assert "De 50 municípios analisáveis." in metricas
     assert "1.427,072 vínculo por milhão" in textos
     assert "r = -0,1200" in textos
     assert "-1,2 p.p." in textos
@@ -108,7 +126,6 @@ def test_deck_ordena_os_cinco_blocos_e_destaca_h2(tmp_path: Path) -> None:
         deck.HIPOTESES,
         deck.DESENHO,
         deck.REDE,
-        deck.REDE,
         deck.RESULTADOS,
         f"{deck.RESULTADOS}  /  H2",
         f"{deck.RESULTADOS}  /  H2",
@@ -118,6 +135,8 @@ def test_deck_ordena_os_cinco_blocos_e_destaca_h2(tmp_path: Path) -> None:
     )
     assert all(termo in teoria for termo in ("conflito social", "de jure", "de facto", "Acemoglu"))
     assert "Instituições econômicas  →  Distribuição de recursos  →  Poder de fato futuro" in teoria
+    rede = " ".join(forma.text_frame.text for forma in prs.slides[4].shapes if forma.has_text_frame)
+    assert all(termo in rede for termo in ("Receita Federal", "TSE", "TCESP", "maior componente"))
     titulos = [slide.shapes[0].text_frame.text for slide in list(prs.slides)[-2:]]
     assert "distância" in titulos[0]
     assert "especificação" in titulos[1]
