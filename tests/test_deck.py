@@ -120,14 +120,18 @@ def test_deck_usa_os_numeros_das_tabelas(tmp_path: Path) -> None:
     assert "1.234 empresas" in notas_texto
     assert "5.678 vértices de sócios/administradores PF/PJ" in notas_texto
     metricas = {forma.text_frame.text for forma in prs.slides[5].shapes if forma.has_text_frame}
-    assert {"1.234", "5.678", "9.999", "250", "20,0%", "5,0%", "38", "32"} <= metricas
-    assert "De 50 municípios analisáveis." in metricas
+    rede_slide = " ".join(metricas)
+    assert {"20,0%", "5,0%", "38", "32"} <= metricas
+    assert all(termo in rede_slide for termo in ("1.234", "5.678", "9.999", "250"))
+    assert (
+        "De 50 municípios analisáveis. Semente: firma com sócio ou administrador doador."
+        in metricas
+    )
     assert "1.427,072 vínculo por milhão" in textos
     assert "r = -0,1200" in textos
     assert "-1,2 p.p." in textos
     assert "IC de 95% de -5,0 a 2,5 p.p." in textos
-    assert "99,87%" in textos
-    assert "Sem esse componente, faltam municípios para estimar o contraste." in textos
+    assert "H3" not in textos
 
 
 def test_deck_ordena_os_cinco_blocos_e_preserva_hierarquia(tmp_path: Path) -> None:
@@ -142,7 +146,7 @@ def test_deck_ordena_os_cinco_blocos_e_preserva_hierarquia(tmp_path: Path) -> No
         deck.REDE,
         deck.RESULTADOS,
         f"{deck.RESULTADOS}  /  H2",
-        f"{deck.RESULTADOS}  /  H2",
+        f"{deck.RESULTADOS}  /  CONCLUSÃO",
     ]
     teoria = " ".join(
         forma.text_frame.text for forma in prs.slides[1].shapes if forma.has_text_frame
@@ -160,8 +164,9 @@ def test_deck_ordena_os_cinco_blocos_e_preserva_hierarquia(tmp_path: Path) -> No
             "incumbente",
             "mesma rede",
             "podem compensar a perda",
+            "eleições municipais de 2024",
             "doações de campanha",
-            "fatia das empresas e a variação dos empenhos das redes",
+            "fatia dos empenhos de cada grupo de empresas",
         )
     )
     rede = " ".join(forma.text_frame.text for forma in prs.slides[5].shapes if forma.has_text_frame)
@@ -172,18 +177,27 @@ def test_deck_ordena_os_cinco_blocos_e_preserva_hierarquia(tmp_path: Path) -> No
         )
         for indice in (3, 6, 7, 8)
     )
-    assert hipoteses.index("H1") < hipoteses.index("H3") < hipoteses.index("H2")
+    assert all(
+        termo in hipoteses
+        for termo in ("prefeito na reeleição", "ruptura", "Adversário mais votado", "1º turno")
+    )
+    assert hipoteses.index("H1") < hipoteses.index("H2")
     assert "teste principal" in resultados.lower()
-    assert "Decomposição" in resultados
+    assert "contraste h1" in resultados.lower()
+    assert "pontos percentuais da fatia dos empenhos de 2025 no elemento de despesa" in resultados
+    assert "H3" not in " ".join((hipoteses, resultados, distancia, conclusao))
     assert "H4" not in " ".join((hipoteses, resultados, distancia, conclusao))
     assert "H4" not in notas[6].fala
     assert any("H4" in ponto for ponto in notas[6].apoio)
     assert "análise exploratória" in distancia.lower()
     assert "não testam se o efeito diminui" in distancia
-    assert "compensação na rede seguem em aberto" in conclusao
+    assert "pontos percentuais da fatia dos empenhos no elemento de despesa" in distancia
+    assert "pontos percentuais da fatia dos empenhos no elemento de despesa" in conclusao
+    assert "EM ABERTO" in conclusao
+    assert "NÃO SE SUSTENTA" in conclusao
     titulos = [slide.shapes[0].text_frame.text for slide in list(prs.slides)[-2:]]
     assert "distância" in titulos[0]
-    assert "especificação" in titulos[1]
+    assert "concluir" in titulos[1]
 
 
 def test_conversao_preserva_o_numero_de_slides(tmp_path: Path) -> None:
