@@ -128,8 +128,12 @@ def test_deck_usa_os_numeros_das_tabelas(tmp_path: Path) -> None:
             "estimativa": [-0.01234],
             "ic_inf": [-0.050],
             "ic_sup": [0.025],
+            "emd": [0.207],
         }
     ).write_csv(tabelas / "resumo_estimacao.csv")
+    pl.DataFrame(
+        {"categoria": ["faixa_a_0"], "media_participacao_2025": [0.017703287989352376]}
+    ).write_csv(tabelas / "descritivas_estimacao.csv")
     pl.DataFrame({"coorte": ["H3_ambos"], "fracao_empenho_gigante": [0.9987]}).write_csv(
         tabelas / "sensibilidade_gigante.csv"
     )
@@ -166,6 +170,8 @@ def test_deck_usa_os_numeros_das_tabelas(tmp_path: Path) -> None:
     assert "r = -0,1200" in textos
     assert "-1,2 p.p." in textos
     assert "IC de 95% de -5,0 a 2,5 p.p." in textos
+    assert "Efeito mínimo detectável: 20,7 p.p." in textos
+    assert "Média em 2025 (ligadas a A): 1,77%" in textos
     assert "H3" not in textos
 
 
@@ -226,12 +232,14 @@ def test_deck_ordena_os_cinco_blocos_e_preserva_hierarquia(tmp_path: Path) -> No
     assert "H4" not in " ".join((hipoteses, resultados, distancia, conclusao))
     assert "H4" not in notas[6].fala
     assert any("H4" in ponto for ponto in notas[6].apoio)
-    assert "análise exploratória" in distancia.lower()
+    assert "exploratóri" not in distancia.lower()
+    assert "sinal negativo" in distancia.lower()
+    assert "oposto à vantagem prevista por h2" in distancia.lower()
     assert "Testar se o efeito diminui exige comparar as faixas entre si." in distancia
     assert "pontos percentuais da fatia dos empenhos no elemento de despesa" in distancia
     assert "pontos percentuais da fatia dos empenhos no elemento de despesa" in conclusao
-    assert "EM ABERTO" in conclusao
-    assert "EXPLORATÓRIO" in conclusao
+    assert conclusao.count("EM ABERTO") == 2
+    assert "exploratóri" not in conclusao.lower()
     assert "Contraste entre coortes a 1 passo em 2025" in conclusao
     assert "PLACEBO PRÉ-ELEITORAL · SÓ A COORTE B" in conclusao
     titulos = [slide.shapes[0].text_frame.text for slide in list(prs.slides)[-2:]]

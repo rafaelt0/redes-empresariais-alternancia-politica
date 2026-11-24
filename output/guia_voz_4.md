@@ -10,4 +10,4 @@ Na H2, formamos grupos pela distância a A e a B na rede, com os vínculos que j
 
 ## Slide 9 · O que os dados permitem concluir (1:40–2:25)
 
-As duas hipóteses seguem em aberto. A estimativa para a ligação direta é imprecisa, e a comparação a um passo é exploratória. Para saber se a vantagem diminui com a distância, precisamos comparar os resultados entre as faixas. Obrigado.
+As duas hipóteses seguem em aberto. A estimativa para a ligação direta é imprecisa, e o salto a um passo já aparecia em B antes da eleição. Para saber se a vantagem diminui com a distância, precisamos comparar os resultados entre as faixas. Obrigado.
