@@ -14,4 +14,4 @@ A rede é esparsa, e muitas empresas ficam em grupos separados. Ainda assim, o m
 
 Para testar H1, estimamos o salto na fatia das fornecedoras ligadas diretamente a A quando ele perde perto do empate. Repetimos a estimativa para as empresas sem caminho a A ou B. Cada grupo tem sua própria janela de margens eleitorais. O contraste subtrai o salto das empresas sem caminho do salto das ligadas a A.
 
-A estimativa foi de -1,7 pontos percentuais. O intervalo de confiança de 95% vai de -16,2 a 12,8 pontos percentuais. O intervalo admite perdas e ganhos relevantes de participação.
+A estimativa foi de -1,7 pontos percentuais. O intervalo de confiança de 95% vai de -16,2 a 12,8 pontos percentuais. O intervalo admite perdas e ganhos relevantes de participação. O efeito mínimo detectável é de 20,7 p.p., que equivale a 11,7 vezes a fatia média (1,77%) das fornecedoras ligadas a A na banda. Na banda, a coorte ligada diretamente a A tem 25 municípios com A derrotado e 31 com A vitorioso, o que limita a precisão do contraste.

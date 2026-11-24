@@ -49,9 +49,9 @@ O esquema mostra como esse poder pode persistir. Quem tem mais poder político p
 
 **Na fala**
 
-Nas eleições municipais de 2024 em São Paulo, perguntamos se a derrota apertada de quem governava mudou a fatia das empresas que já forneciam para a prefeitura. Observamos as fornecedoras com ligação direta ao incumbente e as que chegam a uma candidatura por vínculos societários.
+Nas eleições municipais de 2024 em São Paulo, perguntamos se a derrota apertada de quem governava mudou a fatia das empresas que já forneciam aos órgãos municipais cobertos pelo TCESP, exceto a capital. Observamos as fornecedoras com ligação direta ao incumbente e as que chegam a uma candidatura por vínculos societários.
 
-Definimos essas ligações antes do voto, a partir das doações de sócios ou administradores e dos vínculos entre empresas. Depois da eleição, observamos os empenhos, que registram os compromissos de despesa da prefeitura. Para cada fornecedora anterior, calculamos sua fatia dos empenhos de 2025 na respectiva categoria de despesa.
+Definimos essas ligações antes do voto, a partir das doações de sócios ou administradores e dos vínculos entre empresas. Depois da eleição, observamos os empenhos dos órgãos municipais cobertos pelo TCESP, exceto a capital; o saldo líquido é emissão mais reforço menos anulação. Para cada fornecedora anterior, calculamos sua fatia no saldo líquido de 2025 do respectivo elemento de despesa, com entrantes no denominador. A medida usa todos os empenhos de 2025, não só contratos novos.
 
 **Se perguntarem**
 
@@ -110,7 +110,7 @@ A rede é esparsa, e muitas empresas ficam em grupos separados. Ainda assim, o m
 
 **Se perguntarem**
 
-- A Receita Federal liga 14.069.286 empresas a 16.547.513 vértices de sócios/administradores PF/PJ em 24.689.604 vínculos. O TSE registra as doações às candidaturas. Os empenhos do TCESP identificam as fornecedoras e mostram sua fatia em 2025.
+- A Receita Federal liga 14.069.286 empresas a 16.547.513 vértices de sócios/administradores PF/PJ em 24.689.604 vínculos. O TSE registra as doações às candidaturas. Os empenhos líquidos dos órgãos municipais cobertos pelo TCESP, exceto a capital, identificam as fornecedoras e mostram sua fatia em 2025; o denominador inclui entrantes. Usamos todos os empenhos de 2025, não só contratos novos.
 - A rede é fragmentada. Quase toda empresa tem um ou dois vínculos (grau médio de 1,75 para empresas e 1,49 para sócios) e quase metade não tem vizinha. Entre 8.003.121 grupos separados, um único componente gigante reúne 14,6% das empresas. Sem os sócios ou administradores que funcionam como ponte, o maior grupo cai para 2,1%.
 - Nos 506 municípios analisáveis, encontramos sementes de A em 376 e de B em 356.
 - O complemento de 12/10/2024 só usa vínculos iniciados até 13/09/2024 em empresas do cadastro de setembro sem quadro válido naquela fotografia. Vínculos encerrados até outubro podem faltar.
@@ -124,7 +124,7 @@ A rede é esparsa, e muitas empresas ficam em grupos separados. Ainda assim, o m
 
 Para testar H1, estimamos o salto na fatia das fornecedoras ligadas diretamente a A quando ele perde perto do empate. Repetimos a estimativa para as empresas sem caminho a A ou B. Cada grupo tem sua própria janela de margens eleitorais. O contraste subtrai o salto das empresas sem caminho do salto das ligadas a A.
 
-A estimativa foi de -1,7 pontos percentuais. O intervalo de confiança de 95% vai de -16,2 a 12,8 pontos percentuais. O intervalo admite perdas e ganhos relevantes de participação.
+A estimativa foi de -1,7 pontos percentuais. O intervalo de confiança de 95% vai de -16,2 a 12,8 pontos percentuais. O intervalo admite perdas e ganhos relevantes de participação. O efeito mínimo detectável é de 20,7 p.p., que equivale a 11,7 vezes a fatia média (1,77%) das fornecedoras ligadas a A na banda. Na banda, a coorte ligada diretamente a A tem 25 municípios com A derrotado e 31 com A vitorioso, o que limita a precisão do contraste.
 
 **Se perguntarem**
 
@@ -138,9 +138,9 @@ A estimativa foi de -1,7 pontos percentuais. O intervalo de confiança de 95% va
 
 **Na fala**
 
-Na H2, formamos grupos pela distância a A e a B na rede, com os vínculos que já existiam antes do voto. Para cada distância, pegamos o salto do grupo de B, subtraímos o salto do grupo de A e dividimos por dois. No quadro à esquerda, o contraste a um passo em 2025 foi de -4,06 pontos percentuais, com intervalo de confiança de 95% de -7,16 a -0,97. A leitura desse contraste depende de quão comparáveis são os dois grupos.
+Na H2, formamos grupos pela distância a A e a B na rede, com os vínculos que já existiam antes do voto. Para cada distância, pegamos o salto do grupo de B, subtraímos o salto do grupo de A e dividimos por dois. No quadro à esquerda, o contraste a um passo em 2025 foi de -4,06 pontos percentuais, com intervalo de confiança de 95% de -7,16 a -0,97. No recorte comparável por estratos, a estimação fica indefinida a um passo, então a leitura depende de quão comparáveis são os dois grupos.
 
-À direita, testamos se o salto já aparecia antes da eleição no grupo a um passo de B. No placebo, mantemos a margem eleitoral e usamos a mudança de fatia do biênio 2021–2022 para o período de janeiro de 2023 a setembro de 2024. O salto em B foi de -7,68 pontos percentuais no placebo e de -8,07 em 2025. O salto antes do voto enfraquece a leitura causal para B.
+À direita, o diagnóstico é só da coorte B: testamos se o salto já aparecia antes da eleição nesse grupo. No placebo, mantemos a margem eleitoral e usamos a mudança de fatia do biênio 2021–2022 para o período de janeiro de 2023 a setembro de 2024. O salto em B foi de -7,68 pontos percentuais no placebo e de -8,07 em 2025. O salto antes do voto enfraquece a leitura causal para B.
 
 **Se perguntarem**
 
@@ -152,10 +152,11 @@ Na H2, formamos grupos pela distância a A e a B na rede, com os vínculos que j
 
 **Na fala**
 
-As duas hipóteses seguem em aberto. A estimativa para a ligação direta é imprecisa, e a comparação a um passo é exploratória. Para saber se a vantagem diminui com a distância, precisamos comparar os resultados entre as faixas. Obrigado.
+As duas hipóteses seguem em aberto. A estimativa para a ligação direta é imprecisa. No H2, o contraste a um passo em 2025 foi de -4,06 p.p. O mesmo contraste antes do voto foi de -2,75 p.p. (-7,38 a 1,87 p.p.). Para saber se a vantagem diminui com a distância, precisamos comparar os resultados entre as faixas. Obrigado.
 
 **Se perguntarem**
 
+- Em 2025, o contraste a 1 passo foi de -4,06 p.p. (IC de 95% de -7,16 a -0,97 p.p.); antes do voto, o mesmo contraste foi de -2,75 p.p. (IC de 95% de -7,38 a 1,87 p.p.).
 - A três passos ou mais, o contraste é 0,06 p.p. (IC de 95% de -0,29 a 0,41 p.p.).
 - Ao menos 99% das observações nas bandas dessa faixa pertencem ao componente gigante. A mesma rede pode gerar dependência entre municípios.
 - No recorte comparável, a estimação ficou indefinida nas faixas 0, 1, 2. No recorte comparável da faixa 3+, o contraste foi de 0,055 p.p. (IC de 95% de 0,001 a 0,109).
