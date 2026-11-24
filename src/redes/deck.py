@@ -6,8 +6,10 @@ import shutil
 import subprocess
 import tempfile
 from dataclasses import dataclass
+from html import escape
 from itertools import accumulate
 from pathlib import Path
+from string import Template
 
 import polars as pl
 from pptx import Presentation
@@ -25,12 +27,22 @@ from redes.leitura_sensibilidades import piso_gigante_h2
 from redes.numeros import Numeros, decimal, leitura_h2_comparaveis, percentual
 from redes.portabilidade import ferramenta
 
+APRESENTADORES = {"Voz 1": "Andrei", "Voz 2": "Felipe", "Voz 3": "João Pedro", "Voz 4": "Rafael"}
+VOZES = tuple(APRESENTADORES)
+ARQUIVOS_GUIAS = {voz: f"guia_voz_{i}.md" for i, voz in enumerate(VOZES, start=1)}
+
 ETAPA = Etapa(
     nome="deck",
     depende=("estimate",),
     le=(),
     grava=(),
-    artefatos=("saida/deck.pptx", "saida/deck.pdf", "saida/guia_de_fala.md"),
+    artefatos=(
+        "saida/deck.pptx",
+        "saida/deck.pdf",
+        "saida/guia_de_fala.md",
+        "saida/guia_de_fala.html",
+        *(f"saida/{nome}" for nome in ARQUIVOS_GUIAS.values()),
+    ),
 )
 
 NUMERO_SLIDES = 9
@@ -55,11 +67,9 @@ AUTORES = (
     "João Pedro Ferreira",
 )
 NUSP = ("13963144", "14558482", "14604204", "14582312")
-# Blocos de fala de igual duração. A definição de quem apresenta cada bloco fica para a reunião.
-VOZES = ("Voz 1", "Voz 2", "Voz 3", "Voz 4")
 TEMAS_VOZES = (
-    "Economia política e hipóteses",
-    "Desenho empírico e fontes",
+    "Economia política e pergunta de pesquisa",
+    "Hipóteses e desenho empírico",
     "Estrutura da rede e ligação direta (H1)",
     "Distância (H2) e conclusão",
 )
@@ -78,7 +88,12 @@ class Nota:
     apoio: tuple[str, ...]
 
     def texto(self) -> str:
-        linhas = [f"{self.pessoa} · {self.segundos} s", "", "Na fala", self.fala]
+        linhas = [
+            f"{self.pessoa} · {APRESENTADORES[self.pessoa]} · {self.segundos} s",
+            "",
+            "Na fala",
+            self.fala,
+        ]
         if self.apoio:
             linhas.extend(("", "Se perguntarem", *self.apoio))
         return "\n".join(linhas)
@@ -489,9 +504,9 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
     _nota(
         notas,
         "Voz 1",
-        10,
-        "Estudamos se a derrota do grupo incumbente em eleições apertadas em 2024 mudou "
-        "a fatia dos empenhos de fornecedoras municipais em 2025.",
+        15,
+        "Vamos apresentar nosso estudo sobre redes empresariais e eleições municipais "
+        "em São Paulo.",
     )
 
     # 2. Economia política
@@ -564,12 +579,16 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
     _nota(
         notas,
         "Voz 1",
-        25,
-        "Para Acemoglu, Johnson e Robinson, grupos disputam as regras da economia. "
-        "O poder formal vem das instituições políticas; o poder de fato, dos recursos "
-        "que permitem aos grupos se organizar e influenciar decisões. As regras que "
-        "resultam dessa disputa distribuem recursos e podem reforçar a influência de "
-        "quem já se beneficia delas.",
+        60,
+        "Para Acemoglu, Johnson e Robinson, grupos com interesses diferentes disputam as "
+        "regras da economia. "
+        "O poder formal vem das instituições políticas. Numa prefeitura, por exemplo, "
+        "o mandato dá autoridade a quem assume o governo. O poder de fato vem dos recursos "
+        "que permitem a empresas e outros grupos se organizar e influenciar decisões.\n\n"
+        "O esquema mostra como esse poder pode persistir. Quem tem mais poder político "
+        "pode influenciar as regras econômicas, que ajudam a definir quem recebe recursos. "
+        "Quem se beneficia dessa distribuição hoje pode ter mais influência nas decisões "
+        "de amanhã.",
         "No esquema completo, o poder político também influencia as instituições "
         "políticas do período seguinte.",
     )
@@ -614,14 +633,18 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
     _nota(
         notas,
         "Voz 1",
-        30,
-        "Quando o grupo incumbente perde por pouco, muda a fatia dos empenhos das "
-        "fornecedoras que já vendiam para a prefeitura? Primeiro olhamos as ligações "
-        "diretas com o incumbente. Depois exploramos a distância a cada candidatura "
-        "na rede. Usamos os vínculos observados antes do voto e os empenhos do primeiro "
-        "ano após a eleição.",
-        "Empenhos registram compromissos de despesa. As doações e os vínculos societários "
-        "são medidas de conexão observada. A teoria motiva a hipótese de influência.",
+        70,
+        "Nas eleições municipais de 2024 em São Paulo, perguntamos se a derrota apertada "
+        "de quem governava mudou a fatia das empresas que já forneciam para a prefeitura. "
+        "Observamos as fornecedoras com ligação direta ao incumbente e as que chegam a uma "
+        "candidatura por vínculos societários.\n\n"
+        "Definimos essas ligações antes do voto, a partir das doações de sócios ou "
+        "administradores e dos vínculos entre empresas. Depois da eleição, observamos os "
+        "empenhos, que registram os compromissos de despesa da prefeitura. Para cada "
+        "fornecedora anterior, calculamos sua fatia dos empenhos de 2025 na respectiva "
+        "categoria de despesa.",
+        "As doações e os vínculos societários são medidas de conexão observada. "
+        "A teoria motiva a hipótese de influência.",
         "O relatório explora se, dentro de uma rede, ganhos de umas empresas compensam "
         "perdas de outras (H3). As estimativas deixam essa hipótese em aberto.",
     )
@@ -635,7 +658,7 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
         "Diagrama ilustrativo.",
     )
     faixa_ab = slide.shapes.add_shape(
-        MSO_SHAPE.RECTANGLE, Inches(MARGEM), Inches(1.60), Inches(CORPO), Inches(0.86)
+        MSO_SHAPE.RECTANGLE, Inches(MARGEM), Inches(1.60), Inches(CORPO), Inches(1.06)
     )
     estilo = faixa_ab._element.find(qn("p:style"))
     if estilo is not None:
@@ -645,9 +668,19 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
     faixa_ab.line.fill.background()
     _texto(
         slide,
-        "A  ·  Grupo incumbente",
+        "A e B são definidos em cada município",
         MARGEM + 0.16,
-        1.70,
+        1.68,
+        CORPO - 0.32,
+        0.26,
+        tamanho=14,
+        forte=True,
+    )
+    _texto(
+        slide,
+        "A  ·  Candidatura do grupo incumbente",
+        MARGEM + 0.16,
+        1.99,
         7.15,
         0.26,
         tamanho=13,
@@ -658,17 +691,17 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
         slide,
         "1º Prefeito candidato. 2º Candidato do partido. 3º Da coligação.",
         MARGEM + 0.16,
-        2.00,
+        2.27,
         7.15,
         0.34,
         tamanho=15,
     )
-    _traco(slide, 8.20, 1.72, 8.20, 2.34)
+    _traco(slide, 8.20, 1.97, 8.20, 2.55)
     _texto(
         slide,
         "B  ·  Adversário mais votado",
         8.40,
-        1.70,
+        1.99,
         4.05,
         0.26,
         tamanho=13,
@@ -679,7 +712,7 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
         slide,
         "Mais votado no 1º turno entre os demais.",
         8.40,
-        2.00,
+        2.27,
         4.05,
         0.34,
         tamanho=15,
@@ -734,22 +767,19 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
     )
     _nota(
         notas,
-        "Voz 1",
+        "Voz 2",
         65,
-        "No diagrama, definimos A e B no primeiro turno de 2024 em municípios sem segundo "
-        "turno e com prefeito anterior definido. A é o grupo incumbente, por ordem de "
-        "prioridade: o próprio prefeito concorrendo à reeleição, ou o candidato do seu "
-        "partido, ou de coligação com esse partido; sem candidato ou com ruptura, o "
-        "município sai da amostra. B é o adversário mais votado entre os demais. As setas "
-        "tracejadas são doações: Ana liga X a A e Daniel liga Z a B — essas são as sementes. "
-        "As linhas contínuas são vínculos societários: Bruno liga X a Y e Carla liga Y a Z. "
-        "Em H1, testamos se X perde espaço quando A perde ante firmas sem caminho a A ou B. "
-        "Em H2, a previsão é que uma vantagem para as ligadas ao vencedor diminua com "
-        "a distância. Medimos a distância até A e até B separadamente. Veja Y: está a um "
-        "passo de ambos e entra nas duas coortes.",
+        "Definimos A e B município por município. A é a candidatura do grupo que já "
+        "governava ali. Se o prefeito concorre, ele é A. Na ausência dele, buscamos "
+        "primeiro o candidato do seu partido e depois o da coligação que inclui o partido. "
+        "B é o adversário mais votado entre os demais candidatos daquele município.\n\n"
+        "No diagrama, as doações fazem de X a semente de A e de Z a semente de B. "
+        "Na primeira hipótese, perguntamos se X perde fatia quando A perde, em comparação "
+        "com empresas sem caminho a A ou B. Na segunda, perguntamos se a vantagem esperada "
+        "para quem está ligado ao vencedor diminui com a distância. Y está a um passo de "
+        "cada semente, então entra nos dois grupos.",
         "O prefeito anterior é o eleito na última eleição antes de 06/10/2024 (incluindo "
-        "suplementares). O prefeito concorrendo por outro partido continua no ramo do "
-        "prefeito. Municípios sem adversário também são excluídos.",
+        "suplementares). O prefeito concorrendo por outro partido continua no ramo do prefeito.",
         "A hierarquia da apresentação foi definida após a análise. O relatório e "
         "as tabelas preservam os testes originais.",
     )
@@ -857,27 +887,23 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
     _nota(
         notas,
         "Voz 2",
-        130,
-        "Subtraímos a porcentagem de votos de B da de A. À esquerda do empate, A perde "
-        "e B assume. À direita, A vence. Comparamos municípios dos dois lados, perto de "
-        "zero. Para cada grupo de empresas, ajustamos uma reta de cada lado e medimos o "
-        "salto na fatia dos empenhos de 2025. O salto estima o efeito local da derrota "
-        "se os resultados potenciais variarem continuamente ao redor do empate. Para H2, "
-        "definimos os grupos pela distância às candidaturas usando os vínculos e as doações "
-        "anteriores à eleição. Também aplicamos a comparação a dados anteriores à eleição "
-        "como teste placebo. A Receita Federal fornece o quadro societário. Cada aresta liga "
-        "uma empresa a um sócio ou administrador, que pode ser pessoa física ou jurídica. "
-        "Usamos os votos do TSE para calcular a margem eleitoral e cruzamos o cadastro com as "
-        "doações individuais, incluindo recursos próprios dos candidatos, para identificar "
-        "as empresas-semente. Por fim, cruzamos os CNPJs com os empenhos do Tribunal de Contas. "
-        "Os empenhos anteriores à eleição identificam quem já fornecia. Em 2025, se X teve "
-        "R$ 10 empenhados em material de consumo e o total dessa categoria foi R$ 100, "
-        "a fatia de X foi de 10%. O total inclui fornecedoras que entraram depois da eleição.",
+        80,
+        "A capital paulista fica fora porque tem tribunal de contas próprio, e nossa base "
+        "de empenhos vem do Tribunal de Contas do Estado. Usamos eleições decididas no "
+        "primeiro turno porque, se houver segundo turno, quem liderou no primeiro ainda "
+        "pode perder.\n\n"
+        "Com os votos válidos do TSE, calculamos a margem de A sobre B. À esquerda do "
+        "empate, A perde e B assume. À direita, A vence. Na regressão descontínua, "
+        "ajustamos uma reta de cada lado. O salto no empate estima o efeito local da "
+        "derrota se, para um mesmo resultado eleitoral, a fatia variar continuamente "
+        "perto do empate. Repetimos a comparação com dados anteriores ao voto para "
+        "verificar se já havia um salto.\n\n"
+        "Se a prefeitura empenhou dez reais para X de um total de cem em material de "
+        "consumo, X ficou com dez por cento. O total inclui novas fornecedoras.",
         "A especificação é Y = α + βT + γM + θ(T × M) + u. β é o salto no empate "
         "e T indica derrota de A.",
-        "A é o prefeito candidato ou, na ausência dele, representante de seu partido ou "
-        "coligação. Excluímos a capital, os municípios com segundo turno e aqueles sem A "
-        "identificável ou sem adversário. O suporte na banda varia por coorte.",
+        "Também excluímos os municípios sem A identificável ou sem adversário. "
+        "O suporte na banda varia por coorte.",
         "Usamos núcleo triangular, banda escolhida pelo erro quadrático médio estimado e "
         "correção de viés. Os contrastes reamostram municípios de cada lado em conjunto, "
         "com bandas fixas.",
@@ -937,7 +963,7 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
 
     _texto(
         slide,
-        "As doações mudam o ponto de partida",
+        "Calculamos as ligações com A e B em cada município",
         MARGEM,
         3.08,
         CORPO,
@@ -948,7 +974,7 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
     )
     _texto(
         slide,
-        "Z fornece nas duas cidades. A indica o candidato do grupo incumbente de cada uma.",
+        "Z fornece nas duas cidades. As doações a A definem uma semente diferente em cada uma.",
         MARGEM,
         3.42,
         CORPO,
@@ -1076,13 +1102,18 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
     _nota(
         notas,
         "Voz 3",
-        85,
-        "A Receita Federal registra os vínculos entre empresas no país inteiro. "
-        "Por isso podemos usar a mesma rede em todas as cidades. No exemplo, Z fornece "
-        "para duas prefeituras. A é o candidato do grupo incumbente de cada cidade. "
-        "Na primeira, uma sócia de X doou a A. Começamos em X e contamos dois passos "
-        "até Z, passando por Y. Na segunda, um sócio de Y doou a A. Começamos em Y "
-        "e contamos um passo até Z. Chamamos a empresa de onde partimos de semente.",
+        75,
+        "A rede societária é nacional. Calculamos as ligações com A e B para as "
+        "candidaturas de cada município. As doações a essas candidaturas definem as "
+        "empresas-semente de onde partimos.\n\n"
+        "No exemplo do slide, a empresa Z fornece para duas prefeituras. Na primeira, "
+        "uma sócia de X doou a A. X é a semente, então contamos dois passos até Z, passando "
+        "por Y. Na segunda, um sócio de Y doou a A. Agora a semente é Y, e Z está a um "
+        "passo.\n\n"
+        "A rede é esparsa, e muitas empresas ficam em grupos separados. Ainda assim, "
+        f"o maior grupo conectado reúne {_destaque(numeros, 'fracGigante')} das empresas. "
+        "Quando retiramos os sócios ou administradores que funcionam como pontes, "
+        "esse grupo encolhe.",
         "A Receita Federal liga "
         f"{_destaque(numeros, 'empresasRede')} empresas a "
         f"{_destaque(numeros, 'pessoasRede')} vértices de sócios/administradores PF/PJ em "
@@ -1206,14 +1237,13 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
     _nota(
         notas,
         "Voz 3",
-        45,
-        "Agora vamos ao teste principal, H1. Perguntamos se empresas ligadas diretamente ao "
-        "incumbente A perdem fatia dos empenhos de 2025 quando A perde perto do empate, "
-        "comparadas a firmas sem ligação a A ou B. O contraste mede o salto das ligadas a A "
-        "menos o salto das firmas sem ligação. Estimamos cada salto em sua própria banda "
-        "de margem eleitoral. A estimativa do contraste é de "
-        f"{_estimativa_pp(h1)}, com {_ic_pp(h1)}. O intervalo admite perdas e ganhos "
-        "relevantes de participação.",
+        70,
+        "Para testar H1, estimamos o salto na fatia das fornecedoras ligadas diretamente a "
+        "A quando ele perde perto do empate. Repetimos a estimativa para as empresas sem "
+        "caminho a A ou B. Cada grupo tem sua própria janela de margens eleitorais. "
+        "O contraste subtrai o salto das empresas sem caminho do salto das ligadas a A.\n\n"
+        f"A estimativa foi de {_pp(h1.get('estimativa'))} pontos percentuais. O intervalo "
+        f"de confiança de 95% vai de {_intervalo(h1)} pontos percentuais. {leitura_h1}",
         f"A estimativa das ligadas a A é {_estimativa_pp(h1_a)} "
         f"({_ic_pp(h1_a)}) e a das sem ligação é {_estimativa_pp(h1_sem)} ({_ic_pp(h1_sem)}).",
         f"Meia banda: {_pp(h1.get('estimativa_meia_banda'))} p.p.; dobro da banda: "
@@ -1349,14 +1379,18 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
     _nota(
         notas,
         "Voz 4",
-        75,
-        "Em H2, as coortes ficam fixas pela distância a A e a B antes do voto. "
-        "Para cada distância, subtraímos o salto de A do de B e dividimos por dois. "
-        f"Em 2025, o contraste entre as duas coortes a um passo foi de "
-        f"{_estimativa_pp(h2['1'], 2)} ({_ic_pp(h2['1'], 2)}). "
-        f"{destaque_h2} Para investigar se já havia diferenças antes da eleição, "
-        "repetimos a análise usando a mudança da fatia entre 2021–2022 e 2023 até setembro "
-        f"de 2024. À direita estão os dois saltos da coorte B. {comparacao_b}{leitura_b}",
+        100,
+        "Na H2, formamos grupos pela distância a A e a B na rede, com os vínculos que já "
+        "existiam antes do voto. Para cada distância, pegamos o salto do grupo de B, "
+        "subtraímos o salto do grupo de A e dividimos por dois. No quadro à esquerda, "
+        f"o contraste a um passo em 2025 foi de {_pp(h2['1'].get('estimativa'), 2)} pontos "
+        f"percentuais, com intervalo de confiança de 95% de {_intervalo(h2['1'], 2)}. "
+        "A leitura desse contraste depende de quão comparáveis são os dois grupos.\n\n"
+        "À direita, testamos se o salto já aparecia antes da eleição no grupo a um passo "
+        "de B. No placebo, mantemos a margem eleitoral e usamos a mudança de fatia do "
+        "biênio 2021–2022 para o período de janeiro de 2023 a setembro de 2024. "
+        f"O salto em B foi de {_pp(pre_b.get('estimativa'), 2)} pontos percentuais no "
+        f"placebo e de {_pp(b1.get('estimativa'), 2)} em 2025.{leitura_b}",
         "Ler o contraste como vantagem da ligação ao vencedor exige coortes comparáveis e "
         "simetria entre os efeitos de ganhar e perder essa ligação. A mesma firma pode entrar "
         "nas duas coortes, e um passo societário não mede necessariamente proximidade política.",
@@ -1580,12 +1614,10 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
     _nota(
         notas,
         "Voz 4",
-        55,
-        "Em H1, a estimativa é imprecisa: o intervalo admite perdas e ganhos de fatia "
-        "para as empresas diretamente ligadas a A. Em H2, o primeiro número é a diferença "
-        "entre as duas coortes a um passo em 2025, dividida por dois. O segundo é o salto "
-        f"da coorte B no placebo pré-eleitoral.{leitura_b} "
-        "A hipótese de que o efeito diminui com a distância segue em aberto.",
+        45,
+        "As duas hipóteses seguem em aberto. A estimativa para a ligação direta é "
+        "imprecisa, e a comparação a um passo é exploratória. Para saber se a vantagem "
+        "diminui com a distância, precisamos comparar os resultados entre as faixas. Obrigado.",
         f"A três passos ou mais, o contraste é {_estimativa_pp(h2['3+'], 2)} "
         f"({_ic_pp(h2['3+'], 2)}).",
         *(
@@ -1650,11 +1682,7 @@ def _cronometro(segundos: int) -> str:
 
 
 def guia(notas: list[Nota], titulos: list[str]) -> str:
-    """`output/guia_de_fala.md`: pontos por slide, tempo e blocos de fala equilibrados.
-
-    Cada bloco soma o mesmo tempo, e os blocos ainda não têm dono: a distribuição entre as
-    pessoas fica para a reunião.
-    """
+    """Reúne os roteiros, o cronograma da apresentação e o apoio para perguntas."""
     total = sum(nota.segundos for nota in notas)
     margem = LIMITE_SEGUNDOS - total
     if margem < 0:
@@ -1664,7 +1692,7 @@ def guia(notas: list[Nota], titulos: list[str]) -> str:
     for i, nota in enumerate(notas, start=1):
         por_voz[nota.pessoa] = por_voz.get(nota.pessoa, 0) + nota.segundos
         slides.setdefault(nota.pessoa, []).append(i)
-    if len(por_voz) != len(VOZES) or len(set(por_voz.values())) != 1:
+    if set(por_voz) != set(VOZES) or len(set(por_voz.values())) != 1:
         detalhe = ", ".join(f"{voz}: {segundos} s" for voz, segundos in por_voz.items())
         raise ValueError(f"os {len(VOZES)} blocos de fala precisam ter o mesmo tempo ({detalhe})")
     faixa_por_voz = {
@@ -1686,7 +1714,8 @@ def guia(notas: list[Nota], titulos: list[str]) -> str:
         "| Participante | Bloco | Slides | Tempo de fala |",
         "|---|---|---|---|",
         *[
-            f"| {voz} | {tema} | {faixa_por_voz[voz]} | {_cronometro(bloco)} |"
+            f"| [{voz} · {APRESENTADORES[voz]}]({ARQUIVOS_GUIAS[voz]}) | {tema} | "
+            f"{faixa_por_voz[voz]} | {_cronometro(bloco)} |"
             for voz, tema in zip(VOZES, TEMAS_VOZES, strict=True)
         ],
         "",
@@ -1705,8 +1734,8 @@ def guia(notas: list[Nota], titulos: list[str]) -> str:
     voz_anterior = None
     for i, (titulo, nota) in enumerate(zip(titulos, notas, strict=True), start=1):
         if nota.pessoa != voz_anterior:
-            linhas.extend((f"## {nota.pessoa} · {TEMAS_VOZES[VOZES.index(nota.pessoa)]}", ""))
             voz_anterior = nota.pessoa
+            linhas.extend((f"## {voz_anterior} · {APRESENTADORES[voz_anterior]}", ""))
         linhas += [
             f"### {i}. {titulo} ({nota.segundos} s)",
             "",
@@ -1718,6 +1747,90 @@ def guia(notas: list[Nota], titulos: list[str]) -> str:
         if nota.apoio:
             linhas += ["**Se perguntarem**", "", *(f"- {ponto}" for ponto in nota.apoio), ""]
     return "\n".join(linhas)
+
+
+def _slides_por_voz(
+    notas: list[Nota], titulos: list[str]
+) -> dict[str, list[tuple[int, str, Nota]]]:
+    slides_por_voz: dict[str, list[tuple[int, str, Nota]]] = {voz: [] for voz in VOZES}
+    for i, (titulo, nota) in enumerate(zip(titulos, notas, strict=True), start=1):
+        slides_por_voz[nota.pessoa].append((i, titulo, nota))
+    return slides_por_voz
+
+
+def guias_individuais(notas: list[Nota], titulos: list[str]) -> dict[str, str]:
+    slides_por_voz = _slides_por_voz(notas, titulos)
+    roteiros = {}
+    for voz, tema in zip(VOZES, TEMAS_VOZES, strict=True):
+        slides = slides_por_voz[voz]
+        total = sum(nota.segundos for _, _, nota in slides)
+        linhas = [f"# {voz} · {APRESENTADORES[voz]}", "", f"**{tema} · {_cronometro(total)}**", ""]
+        inicio = 0
+        for i, titulo, nota in slides:
+            fim = inicio + nota.segundos
+            linhas.extend(
+                (
+                    f"## Slide {i} · {titulo} ({_cronometro(inicio)}–{_cronometro(fim)})",
+                    "",
+                    nota.fala,
+                    "",
+                )
+            )
+            inicio = fim
+        roteiros[ARQUIVOS_GUIAS[voz]] = "\n".join(linhas)
+    return roteiros
+
+
+def guia_html(notas: list[Nota], titulos: list[str], *, amostra: bool = False) -> str:
+    """Reúne os roteiros individuais em um documento autônomo para compartilhar."""
+    slides_por_voz = _slides_por_voz(notas, titulos)
+    atalhos = []
+    secoes = []
+    for i, (voz, tema) in enumerate(zip(VOZES, TEMAS_VOZES, strict=True), start=1):
+        nome = escape(APRESENTADORES[voz])
+        slides = slides_por_voz[voz]
+        faixa = f"{slides[0][0]}–{slides[-1][0]}"
+        atalhos.append(f'<li><a href="#voz-{i}">{nome}<span>Slides {faixa}</span></a></li>')
+        inicio = 0
+        roteiro = []
+        apoio = []
+        for numero, titulo, nota in slides:
+            fim = inicio + nota.segundos
+            paragrafos = "\n".join(f"<p>{escape(p)}</p>" for p in nota.fala.split("\n\n"))
+            roteiro.append(
+                f'<div class="slide">\n<p class="marcacao">Slide {numero} · '
+                f"{_cronometro(inicio)}–{_cronometro(fim)}</p>\n"
+                f"<h3>{escape(titulo)}</h3>\n{paragrafos}\n</div>"
+            )
+            if nota.apoio:
+                itens = "\n".join(f"<li>{escape(ponto)}</li>" for ponto in nota.apoio)
+                apoio.append(f"<h3>Slide {numero}</h3>\n<ul>\n{itens}\n</ul>")
+            inicio = fim
+        if apoio:
+            roteiro.extend(("<details><summary>Se perguntarem</summary>", *apoio, "</details>"))
+        secoes.append(
+            "\n".join(
+                (
+                    f'<section class="voz" id="voz-{i}" aria-labelledby="nome-{i}">',
+                    '<header class="voz-cabecalho">',
+                    f'<div><h2 id="nome-{i}">{nome}</h2><p>{escape(tema)}</p></div>',
+                    f'<p class="duracao">{_cronometro(inicio)} de fala</p>',
+                    "</header>",
+                    *roteiro,
+                    "</section>",
+                )
+            )
+        )
+    total = sum(nota.segundos for nota in notas)
+    modelo = Path(__file__).with_name("guia_de_fala.html").read_text(encoding="utf-8")
+    return Template(modelo).substitute(
+        titulo=escape(TITULO),
+        total=_cronometro(total),
+        margem=_cronometro(LIMITE_SEGUNDOS - total),
+        amostra='<p class="amostra">Amostra sintética para teste.</p>' if amostra else "",
+        atalhos="\n".join(atalhos),
+        roteiros="\n".join(secoes),
+    )
 
 
 def executar(ctx: Contexto) -> None:
@@ -1740,9 +1853,11 @@ def executar(ctx: Contexto) -> None:
         raise RuntimeError(f"deck com {len(prs.slides)} slides, eram esperados {NUMERO_SLIDES}")
     ctx.caminhos.saida.mkdir(parents=True, exist_ok=True)
     titulos = [slide.shapes[0].text_frame.text for slide in prs.slides]
-    texto = guia(notas, titulos)
-    if (ctx.caminhos.dados / MARCADOR).is_file():
-        texto = "> Amostra sintética para teste.\n\n" + texto
+    roteiros = {"guia_de_fala.md": guia(notas, titulos), **guias_individuais(notas, titulos)}
+    amostra = (ctx.caminhos.dados / MARCADOR).is_file()
+    prefixo = "> Amostra sintética para teste.\n\n" if amostra else ""
+    roteiros = {nome: prefixo + texto for nome, texto in roteiros.items()}
+    roteiros["guia_de_fala.html"] = guia_html(notas, titulos, amostra=amostra)
     with tempfile.TemporaryDirectory(dir=ctx.caminhos.saida) as pasta:
         diretorio = Path(pasta)
         pptx = diretorio / "deck.pptx"
@@ -1752,7 +1867,7 @@ def executar(ctx: Contexto) -> None:
         paginas = contar_paginas(pdf)
         if slides != paginas:
             raise RuntimeError(f"deck.pdf tem {paginas} páginas e deck.pptx tem {slides} slides")
-        roteiro = diretorio / "guia_de_fala.md"
-        roteiro.write_text(texto, encoding="utf-8")
-        for arquivo in (pptx, pdf, roteiro):
+        for nome, texto in roteiros.items():
+            (diretorio / nome).write_text(texto, encoding="utf-8")
+        for arquivo in (pptx, pdf, *(diretorio / nome for nome in roteiros)):
             arquivo.replace(ctx.caminhos.saida / arquivo.name)

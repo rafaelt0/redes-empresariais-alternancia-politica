@@ -75,7 +75,8 @@ Os testes dependentes de ferramentas ausentes mostram o motivo com `pytest -rs`.
 
 `make sample` gera os artefatos em `data/amostra/output/`. `make all` baixa as
 fontes necessárias, constrói os painéis e gera em `output/` o relatório PDF, o
-deck em PowerPoint e PDF e o guia de fala. As tabelas e figuras agregadas ficam
+deck em PowerPoint e PDF, o guia de fala geral em Markdown e HTML e quatro roteiros individuais
+(`guia_voz_1.md` a `guia_voz_4.md`). As tabelas e figuras agregadas ficam
 em `results/`. A lista de municípios excluídos e seus motivos fica em
 `data/exclusoes.csv`. `make panel` e os outros alvos por etapa executam os
 pré-requisitos necessários.

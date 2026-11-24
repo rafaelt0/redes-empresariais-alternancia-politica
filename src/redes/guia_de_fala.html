@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Guia de fala · $titulo</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --papel: #f7f3ee;
+      --texto: #221f20;
+      --secundario: #625752;
+      --destaque: #862f3d;
+      --linha: #e2d8d2;
+      font-family: system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      border-top: 0.35rem solid var(--destaque);
+      background: var(--papel);
+      color: var(--texto);
+      line-height: 1.55;
+    }
+    .pagina { width: min(100% - 2rem, 54rem); margin: 0 auto; }
+    .abertura { padding: clamp(1.6rem, 5vw, 3.2rem) 0 1.5rem; }
+    h1, h2, h3, p { margin: 0; }
+    h1, h2 { font-family: Georgia, serif; font-weight: normal; line-height: 1.1; }
+    h1 { font-size: clamp(2.65rem, 7vw, 4.5rem); }
+    h2 { font-size: clamp(1.85rem, 5vw, 2.5rem); }
+    h3 { font-size: 1.125rem; line-height: 1.35; }
+    .subtitulo { margin-top: 0.45rem; font-size: 1.2rem; }
+    .tempos { margin-top: 1rem; color: var(--secundario); }
+    .tempos strong { color: var(--destaque); }
+    .amostra { margin-top: 1rem; color: var(--destaque); font-weight: 700; }
+    nav ul {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0.6rem;
+      list-style: none;
+      padding: 0;
+      margin: 0 0 1.4rem;
+    }
+    nav a {
+      display: block;
+      padding: 0.7rem 0.9rem;
+      border: 1px solid var(--linha);
+      border-radius: 0.35rem;
+      background: white;
+      color: var(--destaque);
+      font-weight: 700;
+      text-decoration: none;
+    }
+    nav a:hover { border-color: var(--destaque); }
+    nav a:focus-visible, summary:focus-visible { outline: 2px solid var(--destaque); }
+    nav span { display: block; color: var(--secundario); font-size: 0.87rem; font-weight: 400; }
+    main { padding-bottom: 2rem; }
+    .voz {
+      margin-bottom: 1rem;
+      padding: clamp(1.1rem, 4vw, 2rem);
+      scroll-margin-top: 1rem;
+      border: 1px solid var(--linha);
+      border-radius: 0.45rem;
+      background: white;
+    }
+    .voz:target { border-color: var(--destaque); }
+    .voz-cabecalho { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.65rem 1rem; }
+    .voz-cabecalho p { color: var(--secundario); margin-top: 0.25rem; }
+    .voz-cabecalho .duracao { color: var(--destaque); font-size: 0.95rem; font-weight: 700; }
+    .slide, details { border-top: 1px solid var(--linha); padding-top: 1rem; margin-top: 1rem; }
+    .slide p { margin-top: 0.65rem; }
+    .slide .marcacao {
+      color: var(--destaque);
+      font-size: 0.85rem;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      margin: 0 0 0.25rem;
+    }
+    details { color: var(--secundario); }
+    details h3 { margin-top: 0.9rem; }
+    details ul { margin: 0.4rem 0; padding-left: 1.3rem; }
+    details li + li { margin-top: 0.4rem; }
+    summary { cursor: pointer; color: var(--destaque); font-weight: 700; }
+    @media (max-width: 36rem) {
+      nav ul { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media print {
+      @page { margin: 15mm; }
+      body { border: 0; background: white; font-size: 11pt; }
+      .pagina { width: auto; }
+      .abertura { padding: 0 0 1rem; }
+      nav, details { display: none; }
+      .voz { border: 0; margin: 0; padding: 0; }
+      .voz + .voz { break-before: page; }
+      .slide { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <div class="pagina">
+    <header class="abertura">
+      <h1>Guia de fala</h1>
+      <p class="subtitulo">$titulo</p>
+      <p class="tempos"><strong>$total de fala</strong> com $margem reservados para as trocas.</p>
+      $amostra
+    </header>
+    <nav aria-label="Ir ao roteiro">
+      <ul>
+$atalhos
+      </ul>
+    </nav>
+    <main>
+$roteiros
+    </main>
+  </div>
+</body>
+</html>

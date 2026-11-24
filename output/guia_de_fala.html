@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Guia de fala · Redes empresariais, eleições e empenhos municipais</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --papel: #f7f3ee;
+      --texto: #221f20;
+      --secundario: #625752;
+      --destaque: #862f3d;
+      --linha: #e2d8d2;
+      font-family: system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      border-top: 0.35rem solid var(--destaque);
+      background: var(--papel);
+      color: var(--texto);
+      line-height: 1.55;
+    }
+    .pagina { width: min(100% - 2rem, 54rem); margin: 0 auto; }
+    .abertura { padding: clamp(1.6rem, 5vw, 3.2rem) 0 1.5rem; }
+    h1, h2, h3, p { margin: 0; }
+    h1, h2 { font-family: Georgia, serif; font-weight: normal; line-height: 1.1; }
+    h1 { font-size: clamp(2.65rem, 7vw, 4.5rem); }
+    h2 { font-size: clamp(1.85rem, 5vw, 2.5rem); }
+    h3 { font-size: 1.125rem; line-height: 1.35; }
+    .subtitulo { margin-top: 0.45rem; font-size: 1.2rem; }
+    .tempos { margin-top: 1rem; color: var(--secundario); }
+    .tempos strong { color: var(--destaque); }
+    .amostra { margin-top: 1rem; color: var(--destaque); font-weight: 700; }
+    nav ul {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0.6rem;
+      list-style: none;
+      padding: 0;
+      margin: 0 0 1.4rem;
+    }
+    nav a {
+      display: block;
+      padding: 0.7rem 0.9rem;
+      border: 1px solid var(--linha);
+      border-radius: 0.35rem;
+      background: white;
+      color: var(--destaque);
+      font-weight: 700;
+      text-decoration: none;
+    }
+    nav a:hover { border-color: var(--destaque); }
+    nav a:focus-visible, summary:focus-visible { outline: 2px solid var(--destaque); }
+    nav span { display: block; color: var(--secundario); font-size: 0.87rem; font-weight: 400; }
+    main { padding-bottom: 2rem; }
+    .voz {
+      margin-bottom: 1rem;
+      padding: clamp(1.1rem, 4vw, 2rem);
+      scroll-margin-top: 1rem;
+      border: 1px solid var(--linha);
+      border-radius: 0.45rem;
+      background: white;
+    }
+    .voz:target { border-color: var(--destaque); }
+    .voz-cabecalho { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.65rem 1rem; }
+    .voz-cabecalho p { color: var(--secundario); margin-top: 0.25rem; }
+    .voz-cabecalho .duracao { color: var(--destaque); font-size: 0.95rem; font-weight: 700; }
+    .slide, details { border-top: 1px solid var(--linha); padding-top: 1rem; margin-top: 1rem; }
+    .slide p { margin-top: 0.65rem; }
+    .slide .marcacao {
+      color: var(--destaque);
+      font-size: 0.85rem;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      margin: 0 0 0.25rem;
+    }
+    details { color: var(--secundario); }
+    details h3 { margin-top: 0.9rem; }
+    details ul { margin: 0.4rem 0; padding-left: 1.3rem; }
+    details li + li { margin-top: 0.4rem; }
+    summary { cursor: pointer; color: var(--destaque); font-weight: 700; }
+    @media (max-width: 36rem) {
+      nav ul { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media print {
+      @page { margin: 15mm; }
+      body { border: 0; background: white; font-size: 11pt; }
+      .pagina { width: auto; }
+      .abertura { padding: 0 0 1rem; }
+      nav, details { display: none; }
+      .voz { border: 0; margin: 0; padding: 0; }
+      .voz + .voz { break-before: page; }
+      .slide { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <div class="pagina">
+    <header class="abertura">
+      <h1>Guia de fala</h1>
+      <p class="subtitulo">Redes empresariais, eleições e empenhos municipais</p>
+      <p class="tempos"><strong>9:40 de fala</strong> com 0:20 reservados para as trocas.</p>
+      
+    </header>
+    <nav aria-label="Ir ao roteiro">
+      <ul>
+<li><a href="#voz-1">Andrei<span>Slides 1–3</span></a></li>
+<li><a href="#voz-2">Felipe<span>Slides 4–5</span></a></li>
+<li><a href="#voz-3">João Pedro<span>Slides 6–7</span></a></li>
+<li><a href="#voz-4">Rafael<span>Slides 8–9</span></a></li>
+      </ul>
+    </nav>
+    <main>
+<section class="voz" id="voz-1" aria-labelledby="nome-1">
+<header class="voz-cabecalho">
+<div><h2 id="nome-1">Andrei</h2><p>Economia política e pergunta de pesquisa</p></div>
+<p class="duracao">2:25 de fala</p>
+</header>
+<div class="slide">
+<p class="marcacao">Slide 1 · 0:00–0:15</p>
+<h3>Redes empresariais, eleições e empenhos municipais</h3>
+<p>Vamos apresentar nosso estudo sobre redes empresariais e eleições municipais em São Paulo.</p>
+</div>
+<div class="slide">
+<p class="marcacao">Slide 2 · 0:15–1:15</p>
+<h3>De onde vem o poder político?</h3>
+<p>Para Acemoglu, Johnson e Robinson, grupos com interesses diferentes disputam as regras da economia. O poder formal vem das instituições políticas. Numa prefeitura, por exemplo, o mandato dá autoridade a quem assume o governo. O poder de fato vem dos recursos que permitem a empresas e outros grupos se organizar e influenciar decisões.</p>
+<p>O esquema mostra como esse poder pode persistir. Quem tem mais poder político pode influenciar as regras econômicas, que ajudam a definir quem recebe recursos. Quem se beneficia dessa distribuição hoje pode ter mais influência nas decisões de amanhã.</p>
+</div>
+<div class="slide">
+<p class="marcacao">Slide 3 · 1:15–2:25</p>
+<h3>A troca de governo muda a fatia das fornecedoras?</h3>
+<p>Nas eleições municipais de 2024 em São Paulo, perguntamos se a derrota apertada de quem governava mudou a fatia das empresas que já forneciam para a prefeitura. Observamos as fornecedoras com ligação direta ao incumbente e as que chegam a uma candidatura por vínculos societários.</p>
+<p>Definimos essas ligações antes do voto, a partir das doações de sócios ou administradores e dos vínculos entre empresas. Depois da eleição, observamos os empenhos, que registram os compromissos de despesa da prefeitura. Para cada fornecedora anterior, calculamos sua fatia dos empenhos de 2025 na respectiva categoria de despesa.</p>
+</div>
+<details><summary>Se perguntarem</summary>
+<h3>Slide 2</h3>
+<ul>
+<li>No esquema completo, o poder político também influencia as instituições políticas do período seguinte.</li>
+</ul>
+<h3>Slide 3</h3>
+<ul>
+<li>As doações e os vínculos societários são medidas de conexão observada. A teoria motiva a hipótese de influência.</li>
+<li>O relatório explora se, dentro de uma rede, ganhos de umas empresas compensam perdas de outras (H3). As estimativas deixam essa hipótese em aberto.</li>
+</ul>
+</details>
+</section>
+<section class="voz" id="voz-2" aria-labelledby="nome-2">
+<header class="voz-cabecalho">
+<div><h2 id="nome-2">Felipe</h2><p>Hipóteses e desenho empírico</p></div>
+<p class="duracao">2:25 de fala</p>
+</header>
+<div class="slide">
+<p class="marcacao">Slide 4 · 0:00–1:05</p>
+<h3>Ligação direta e distância ao vencedor</h3>
+<p>Definimos A e B município por município. A é a candidatura do grupo que já governava ali. Se o prefeito concorre, ele é A. Na ausência dele, buscamos primeiro o candidato do seu partido e depois o da coligação que inclui o partido. B é o adversário mais votado entre os demais candidatos daquele município.</p>
+<p>No diagrama, as doações fazem de X a semente de A e de Z a semente de B. Na primeira hipótese, perguntamos se X perde fatia quando A perde, em comparação com empresas sem caminho a A ou B. Na segunda, perguntamos se a vantagem esperada para quem está ligado ao vencedor diminui com a distância. Y está a um passo de cada semente, então entra nos dois grupos.</p>
+</div>
+<div class="slide">
+<p class="marcacao">Slide 5 · 1:05–2:25</p>
+<h3>O efeito da derrota perto do empate</h3>
+<p>A capital paulista fica fora porque tem tribunal de contas próprio, e nossa base de empenhos vem do Tribunal de Contas do Estado. Usamos eleições decididas no primeiro turno porque, se houver segundo turno, quem liderou no primeiro ainda pode perder.</p>
+<p>Com os votos válidos do TSE, calculamos a margem de A sobre B. À esquerda do empate, A perde e B assume. À direita, A vence. Na regressão descontínua, ajustamos uma reta de cada lado. O salto no empate estima o efeito local da derrota se, para um mesmo resultado eleitoral, a fatia variar continuamente perto do empate. Repetimos a comparação com dados anteriores ao voto para verificar se já havia um salto.</p>
+<p>Se a prefeitura empenhou dez reais para X de um total de cem em material de consumo, X ficou com dez por cento. O total inclui novas fornecedoras.</p>
+</div>
+<details><summary>Se perguntarem</summary>
+<h3>Slide 4</h3>
+<ul>
+<li>O prefeito anterior é o eleito na última eleição antes de 06/10/2024 (incluindo suplementares). O prefeito concorrendo por outro partido continua no ramo do prefeito.</li>
+<li>A hierarquia da apresentação foi definida após a análise. O relatório e as tabelas preservam os testes originais.</li>
+</ul>
+<h3>Slide 5</h3>
+<ul>
+<li>A especificação é Y = α + βT + γM + θ(T × M) + u. β é o salto no empate e T indica derrota de A.</li>
+<li>Também excluímos os municípios sem A identificável ou sem adversário. O suporte na banda varia por coorte.</li>
+<li>Usamos núcleo triangular, banda escolhida pelo erro quadrático médio estimado e correção de viés. Os contrastes reamostram municípios de cada lado em conjunto, com bandas fixas.</li>
+<li>O teste de densidade da margem deu p = 0,993. Também verificamos placebos e sensibilidade à metade e ao dobro da banda.</li>
+<li>Fornecedora anterior tem saldo líquido positivo na janela pré-eleitoral. O desfecho de H1 e H2 inclui os saldos positivos das entrantes no denominador.</li>
+</ul>
+</details>
+</section>
+<section class="voz" id="voz-3" aria-labelledby="nome-3">
+<header class="voz-cabecalho">
+<div><h2 id="nome-3">João Pedro</h2><p>Estrutura da rede e ligação direta (H1)</p></div>
+<p class="duracao">2:25 de fala</p>
+</header>
+<div class="slide">
+<p class="marcacao">Slide 6 · 0:00–1:15</p>
+<h3>Uma rede societária para todos os municípios</h3>
+<p>A rede societária é nacional. Calculamos as ligações com A e B para as candidaturas de cada município. As doações a essas candidaturas definem as empresas-semente de onde partimos.</p>
+<p>No exemplo do slide, a empresa Z fornece para duas prefeituras. Na primeira, uma sócia de X doou a A. X é a semente, então contamos dois passos até Z, passando por Y. Na segunda, um sócio de Y doou a A. Agora a semente é Y, e Z está a um passo.</p>
+<p>A rede é esparsa, e muitas empresas ficam em grupos separados. Ainda assim, o maior grupo conectado reúne 14,6% das empresas. Quando retiramos os sócios ou administradores que funcionam como pontes, esse grupo encolhe.</p>
+</div>
+<div class="slide">
+<p class="marcacao">Slide 7 · 1:15–2:25</p>
+<h3>As fornecedoras ligadas a A perdem fatia (H1)?</h3>
+<p>Para testar H1, estimamos o salto na fatia das fornecedoras ligadas diretamente a A quando ele perde perto do empate. Repetimos a estimativa para as empresas sem caminho a A ou B. Cada grupo tem sua própria janela de margens eleitorais. O contraste subtrai o salto das empresas sem caminho do salto das ligadas a A.</p>
+<p>A estimativa foi de -1,7 pontos percentuais. O intervalo de confiança de 95% vai de -16,2 a 12,8 pontos percentuais. O intervalo admite perdas e ganhos relevantes de participação.</p>
+</div>
+<details><summary>Se perguntarem</summary>
+<h3>Slide 6</h3>
+<ul>
+<li>A Receita Federal liga 14.069.286 empresas a 16.547.513 vértices de sócios/administradores PF/PJ em 24.689.604 vínculos. O TSE registra as doações às candidaturas. Os empenhos do TCESP identificam as fornecedoras e mostram sua fatia em 2025.</li>
+<li>A rede é fragmentada. Quase toda empresa tem um ou dois vínculos (grau médio de 1,75 para empresas e 1,49 para sócios) e quase metade não tem vizinha. Entre 8.003.121 grupos separados, um único componente gigante reúne 14,6% das empresas. Sem os sócios ou administradores que funcionam como ponte, o maior grupo cai para 2,1%.</li>
+<li>Nos 506 municípios analisáveis, encontramos sementes de A em 376 e de B em 356.</li>
+<li>O complemento de 12/10/2024 só usa vínculos iniciados até 13/09/2024 em empresas do cadastro de setembro sem quadro válido naquela fotografia. Vínculos encerrados até outubro podem faltar.</li>
+<li>Ligamos a empresas 41,0% dos doadores de A e 43,4% dos de B.</li>
+<li>A assortatividade é a correlação de Pearson entre os graus da empresa e do sócio ou administrador em cada aresta. A densidade divide o número de arestas pelo produto das duas contagens de vértices.</li>
+<li>Na versão sem pontos de articulação, o universo de empresas é mantido e os caminhos societários mudam.</li>
+</ul>
+<h3>Slide 7</h3>
+<ul>
+<li>A estimativa das ligadas a A é -1,6 p.p. (IC de 95% de -12,4 a 9,2 p.p.) e a das sem ligação é 0,1 p.p. (IC de 95% de -0,1 a 0,4 p.p.).</li>
+<li>Meia banda: 2,9 p.p.; dobro da banda: -0,7 p.p.; placebo pré-eleitoral: 2,0 p.p. (p = 0,82); EMD: 20,7 p.p.</li>
+<li>H4 (permanência no topo) ficou fora da apresentação principal por falta de uma comparação informativa. No limiar de 50%, o efeito mínimo detectável é 277,1 p.p. numa escala de 0 a 100%. O relatório preserva o teste.</li>
+</ul>
+</details>
+</section>
+<section class="voz" id="voz-4" aria-labelledby="nome-4">
+<header class="voz-cabecalho">
+<div><h2 id="nome-4">Rafael</h2><p>Distância (H2) e conclusão</p></div>
+<p class="duracao">2:25 de fala</p>
+</header>
+<div class="slide">
+<p class="marcacao">Slide 8 · 0:00–1:40</p>
+<h3>Fatia em 2025 por distância a A e B</h3>
+<p>Na H2, formamos grupos pela distância a A e a B na rede, com os vínculos que já existiam antes do voto. Para cada distância, pegamos o salto do grupo de B, subtraímos o salto do grupo de A e dividimos por dois. No quadro à esquerda, o contraste a um passo em 2025 foi de -4,06 pontos percentuais, com intervalo de confiança de 95% de -7,16 a -0,97. A leitura desse contraste depende de quão comparáveis são os dois grupos.</p>
+<p>À direita, testamos se o salto já aparecia antes da eleição no grupo a um passo de B. No placebo, mantemos a margem eleitoral e usamos a mudança de fatia do biênio 2021–2022 para o período de janeiro de 2023 a setembro de 2024. O salto em B foi de -7,68 pontos percentuais no placebo e de -8,07 em 2025. O salto antes do voto enfraquece a leitura causal para B.</p>
+</div>
+<div class="slide">
+<p class="marcacao">Slide 9 · 1:40–2:25</p>
+<h3>O que os dados permitem concluir</h3>
+<p>As duas hipóteses seguem em aberto. A estimativa para a ligação direta é imprecisa, e a comparação a um passo é exploratória. Para saber se a vantagem diminui com a distância, precisamos comparar os resultados entre as faixas. Obrigado.</p>
+</div>
+<details><summary>Se perguntarem</summary>
+<h3>Slide 8</h3>
+<ul>
+<li>Ler o contraste como vantagem da ligação ao vencedor exige coortes comparáveis e simetria entre os efeitos de ganhar e perder essa ligação. A mesma firma pode entrar nas duas coortes, e um passo societário não mede necessariamente proximidade política.</li>
+<li>O placebo para B a um passo tem IC de 95% de -13,50 a -1,86 p.p. (nominal). Em 2025, o salto de B tem p de Holm = 0,077 na família secundária.</li>
+<li>O contraste entre A e B a um passo, no placebo de mudança pré-eleitoral, foi de -2,75 p.p. (IC de 95% de -7,38 a 1,87 p.p., nominal).</li>
+</ul>
+<h3>Slide 9</h3>
+<ul>
+<li>A três passos ou mais, o contraste é 0,06 p.p. (IC de 95% de -0,29 a 0,41 p.p.).</li>
+<li>Ao menos 99% das observações nas bandas dessa faixa pertencem ao componente gigante. A mesma rede pode gerar dependência entre municípios.</li>
+<li>No recorte comparável, a estimação ficou indefinida nas faixas 0, 1, 2. No recorte comparável da faixa 3+, o contraste foi de 0,055 p.p. (IC de 95% de 0,001 a 0,109).</li>
+</ul>
+</details>
+</section>
+    </main>
+  </div>
+</body>
+</html>

@@ -2,6 +2,7 @@ from pathlib import Path
 
 import polars as pl
 import pytest
+from lxml import html
 
 from redes import deck
 from redes.config import Caminhos
@@ -27,17 +28,17 @@ def test_deck_tem_nove_slides(tmp_path: Path) -> None:
     prs, notas = deck.construir(_caminhos(tmp_path), Numeros({}))
     assert len(prs.slides) == 9
     assert len(notas) == len(prs.slides)
-    assert sum(nota.segundos for nota in notas) == 520
+    assert sum(nota.segundos for nota in notas) == 580
     assert [nota.pessoa for nota in notas] == [
         voz
-        for voz, quantidade in zip(deck.VOZES, (4, 1, 2, 2), strict=True)
+        for voz, quantidade in zip(deck.VOZES, (3, 2, 2, 2), strict=True)
         for _ in range(quantidade)
     ]
     for slide, nota in zip(prs.slides, notas, strict=True):
         assert slide.notes_slide.notes_text_frame.text == nota.texto()
 
 
-def test_guia_equilibra_os_blocos_e_nao_define_pessoas(tmp_path: Path) -> None:
+def test_guias_atribuem_os_slides_e_equilibram_os_blocos(tmp_path: Path) -> None:
     prs, notas = deck.construir(_caminhos(tmp_path), Numeros({}))
     titulos = [slide.shapes[0].text_frame.text for slide in prs.slides]
     texto = deck.guia(notas, titulos)
@@ -45,14 +46,28 @@ def test_guia_equilibra_os_blocos_e_nao_define_pessoas(tmp_path: Path) -> None:
     for nota in notas:
         por_bloco[nota.pessoa] = por_bloco.get(nota.pessoa, 0) + nota.segundos
     assert set(por_bloco) == set(deck.VOZES)
-    assert set(por_bloco.values()) == {130}
-    assert "2:10" in texto
-    assert "1:20" in texto
-    assert "| Voz 1 | Economia política e hipóteses | 1–4 | 2:10 |" in texto
-    assert "| Voz 2 | Desenho empírico e fontes | 5 | 2:10 |" in texto
-    assert "| Voz 4 | Distância (H2) e conclusão | 8–9 | 2:10 |" in texto
-    for autor in ("Felipe", "Andrei", "Rafael", "João Pedro"):
-        assert autor not in texto
+    assert set(por_bloco.values()) == {145}
+    assert "9:40" in texto
+    assert "0:20" in texto
+
+    roteiros = deck.guias_individuais(notas, titulos)
+    for i, (nome, slides) in enumerate(
+        (("Andrei", "1–3"), ("Felipe", "4–5"), ("João Pedro", "6–7"), ("Rafael", "8–9")),
+        start=1,
+    ):
+        arquivo = f"guia_voz_{i}.md"
+        assert f"[Voz {i} · {nome}]({arquivo})" in texto
+        assert f"| {slides} | 2:25 |" in texto
+        roteiro = roteiros[arquivo]
+        assert roteiro.startswith(f"# Voz {i} · {nome}\n")
+        assert "2:25)" in roteiro
+        for j, nota in enumerate(notas, start=1):
+            if nota.pessoa == f"Voz {i}":
+                assert f"## Slide {j} · {titulos[j - 1]}" in roteiro
+                assert nota.fala in roteiro
+            else:
+                assert f"## Slide {j} ·" not in roteiro
+        assert "Se perguntarem" not in roteiro
 
 
 def test_guia_recusa_blocos_com_tempos_desiguais() -> None:
@@ -62,6 +77,24 @@ def test_guia_recusa_blocos_com_tempos_desiguais() -> None:
     ]
     with pytest.raises(ValueError, match="mesmo tempo"):
         deck.guia(notas, ["a", "b"])
+
+
+def test_guia_html_reune_as_falas_e_os_links_de_cada_voz(tmp_path: Path) -> None:
+    prs, notas = deck.construir(_caminhos(tmp_path), Numeros({}))
+    titulos = [slide.shapes[0].text_frame.text for slide in prs.slides]
+    titulos[0] = "<título> & texto"
+    documento = html.fromstring(deck.guia_html(notas, titulos, amostra=True))
+    assert documento.get("lang") == "pt-BR"
+    assert documento.xpath("//p[@class='amostra']/text()") == ["Amostra sintética para teste."]
+    assert documento.xpath("//nav//a/@href") == ["#voz-1", "#voz-2", "#voz-3", "#voz-4"]
+    assert documento.xpath("//main/section/@id") == ["voz-1", "voz-2", "voz-3", "voz-4"]
+    assert documento.xpath("//main/section/header//h2/text()") == list(deck.APRESENTADORES.values())
+    assert documento.xpath("//p[@class='duracao']/text()") == ["2:25 de fala"] * 4
+    assert documento.xpath("//div[@class='slide']/h3/text()", smart_strings=False) == titulos
+    for bloco, nota in zip(documento.xpath("//div[@class='slide']"), notas, strict=True):
+        paragrafos = bloco.xpath("./p[not(@class)]/text()", smart_strings=False)
+        assert paragrafos == nota.fala.split("\n\n")
+    assert not documento.xpath("//link[@href] | //script | //img[@src]")
 
 
 def test_deck_usa_os_numeros_das_tabelas(tmp_path: Path) -> None:
@@ -173,6 +206,7 @@ def test_deck_ordena_os_cinco_blocos_e_preserva_hierarquia(tmp_path: Path) -> No
     )
     rede = " ".join(forma.text_frame.text for forma in prs.slides[5].shapes if forma.has_text_frame)
     assert all(termo in rede for termo in ("Receita Federal", "TSE", "TCESP", "maior componente"))
+    assert "Calculamos as ligações com A e B em cada município" in rede
     hipoteses, resultados, distancia, conclusao = (
         " ".join(
             forma.text_frame.text for forma in prs.slides[indice].shapes if forma.has_text_frame
@@ -183,6 +217,7 @@ def test_deck_ordena_os_cinco_blocos_e_preserva_hierarquia(tmp_path: Path) -> No
         termo in hipoteses
         for termo in ("Prefeito candidato", "ruptura", "Adversário mais votado", "1º turno")
     )
+    assert "A e B são definidos em cada município" in hipoteses
     assert hipoteses.index("H1") < hipoteses.index("H2")
     assert "teste principal" in resultados.lower()
     assert "contraste h1" in resultados.lower()
