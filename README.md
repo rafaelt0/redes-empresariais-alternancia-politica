@@ -2,8 +2,8 @@
 
 Projeto de EAE1429 (FEA-USP) sobre como a derrota do grupo incumbente em eleições
 municipais apertadas se relaciona com a distribuição das compras públicas entre
-empresas e redes societárias paulistas. O [relatório](report/relatorio.tex) define
-H1 a H4 e o desenho; o [dicionário de dados](docs/dicionario.md) descreve as tabelas
+empresas e redes societárias paulistas. O [relatório](report/relatorio.tex) apresenta
+H1 e H2 e o desenho empírico. O [dicionário de dados](docs/dicionario.md) descreve as tabelas
 que o pipeline grava.
 
 Felipe Ferreira Alexandre, Andrei Schoschlakow Bonifácio, Rafael Eiki Teruya e

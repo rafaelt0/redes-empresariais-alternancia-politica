@@ -31,57 +31,15 @@ def limite_h2(pasta: Path) -> str:
     if piso is None:
         return ""
     return (
-        f"Em H2, ao menos {decimal(100 * piso, 0)}% das observações 3+ nas bandas "
-        "principais e comparáveis pertencem ao gigante. O IC é condicional à inferência "
-        "municipal, que trata os municípios como independentes. A concentração limita a "
-        "generalização para outros componentes."
+        f"Como ao menos {decimal(100 * piso, 0)}% das observações de H2 na faixa 3+ pertencem "
+        "ao gigante, tanto nas bandas principais como nas comparáveis, a generalização a outros "
+        "componentes é limitada. O IC é condicional à inferência municipal, que trata os "
+        "municípios como independentes."
     )
 
 
 def leitura(pasta: Path) -> dict[str, list[str]]:
     verificacoes = {}
-    frases = []
-    gigante = _linha(pasta, "sensibilidade_gigante", coorte="H3_ambos")
-    if (peso := gigante.get("fracao_peso_gigante")) is not None:
-        frases.append(
-            f"O gigante concentra {decimal(100 * peso, 1)}% do peso municipal de AMBOS na banda "
-            "de H3. A comparação depende desse componente."
-        )
-    elif (valor := gigante.get("fracao_empenho_gigante")) is not None:
-        frases.append(
-            f"O gigante concentra {decimal(100 * valor, 2)}% do empenho prévio de AMBOS na banda "
-            "de H3. A comparação depende desse componente."
-        )
-    sem_gigante = _linha(
-        pasta,
-        "sensibilidade_sem_gigante",
-        hipotese="H3",
-        categoria="ambos_menos_demais",
-        resultado="variacao_total",
-    )
-    if sem_gigante and not sem_gigante.get("estimavel"):
-        frases.append("Em H3, retirar o gigante deixa municípios insuficientes para o contraste.")
-    verificacoes["H3"] = frases
-
-    frases = []
-    h4 = _linha(pasta, "sensibilidade_gigante", coorte="H4_exclusivas_50")
-    if (peso := h4.get("fracao_peso_gigante")) is not None:
-        frases.append(
-            f"Em H4 (50%), {decimal(100 * peso, 1)}% do peso das redes de ligação exclusiva "
-            "na janela de cinco p.p. pertence ao gigante."
-        )
-    h4_a = _linha(pasta, "sensibilidade_gigante", coorte="H4_rdd_A_50")
-    h4_b = _linha(pasta, "sensibilidade_gigante", coorte="H4_rdd_B_50")
-    if h4_a.get("fracao_peso_gigante") == h4_b.get("fracao_peso_gigante") == 1:
-        frases.append(
-            "Em H4 (50%), o gigante também ocupa integralmente as duas coortes nas bandas do RD."
-        )
-    sem_gigante_h4 = _linha(
-        pasta, "sensibilidade_sem_gigante", hipotese="H4", categoria="ligada_ao_vencedor_50"
-    )
-    if sem_gigante_h4 and not sem_gigante_h4.get("estimavel"):
-        frases.append("Em H4 (50%), retirar o gigante deixa o contraste sem suporte.")
-    verificacoes["H4"] = frases
 
     frases = []
     variacao = _linha(
@@ -90,7 +48,8 @@ def leitura(pasta: Path) -> dict[str, list[str]]:
     if variacao.get("estimavel"):
         est, inf, sup = (decimal(100 * variacao[c], 2) for c in ("estimativa", "ic_inf", "ic_sup"))
         frases.append(
-            f"Em H2 (δ = 1), o RD da diferença de participação pós menos pré é {est} p.p. "
+            f"Em H2 (δ = 1), usar a mudança de participação do pré para o pós-eleitoral dá "
+            f"um contraste de {est} p.p. "
             f"(IC de 95% de {inf} a {sup} p.p.)."
         )
     auto = _linha(
@@ -99,7 +58,8 @@ def leitura(pasta: Path) -> dict[str, list[str]]:
     if auto.get("estimavel"):
         est, inf, sup = (decimal(100 * auto[c], 2) for c in ("estimativa", "ic_inf", "ic_sup"))
         frases.append(
-            f"Sem autofinanciamento, H2 (δ = 1) dá {est} p.p. (IC de 95% de {inf} a {sup} p.p.)."
+            f"Ao excluir o autofinanciamento, o contraste a um passo é de {est} p.p. "
+            f"(IC de 95% de {inf} a {sup} p.p.)."
         )
     if all(
         linha.get("estimavel") and linha["ic_inf"] <= 0 <= linha["ic_sup"]
@@ -110,7 +70,7 @@ def leitura(pasta: Path) -> dict[str, list[str]]:
         pasta, "sensibilidade_apenas_setembro", tipo="contraste", categoria="vencedor_faixa_1"
     )
     if setembro and not setembro.get("estimavel"):
-        frases.append("Só com setembro, H2 em δ = 1 fica sem suporte para o contraste.")
+        frases.append("Com apenas o cadastro de setembro, H2 a um passo fica sem suporte.")
     verificacoes["sensibilidade H2"] = frases
 
     frases = []
@@ -132,30 +92,29 @@ def leitura(pasta: Path) -> dict[str, list[str]]:
             f"Pessoal ou credores públicos somam {decimal(100 * fracao, 1)}% do empenho de 2025 "
             "com CNPJ válido na amostra."
         )
-    recortes = [
-        _linha(
+    efeitos_escopo = []
+    for hipotese, categoria in (
+        ("H1", "conectada_menos_sem_conexao"),
+        ("H2", "vencedor_faixa_1"),
+    ):
+        recorte = _linha(
             pasta,
             "sensibilidade_sem_pessoal_ou_credor_publico",
             tipo="contraste",
-            hipotese=h,
-            categoria=c,
-            resultado=r,
+            hipotese=hipotese,
+            categoria=categoria,
+            resultado="participacao_2025",
         )
-        for h, c, r in (
-            ("H1", "conectada_menos_sem_conexao", "participacao_2025"),
-            ("H2", "vencedor_faixa_1", "participacao_2025"),
-            ("H3", "ambos_menos_demais", "variacao_total"),
-        )
-    ]
-    if all(
-        r.get("estimavel") and r.get("ic_inf") is not None and r.get("ic_sup") is not None
-        for r in recortes
-    ):
-        h1, h2, h3 = recortes
-        if h1["ic_inf"] <= 0 <= h1["ic_sup"] and h3["ic_inf"] <= 0 <= h3["ic_sup"]:
-            frases.append("Sem esses empenhos, H1 e H3 total mantêm ICs cruzando zero.")
-        if h2["ic_sup"] < 0:
-            frases.append("H2 a um passo permanece negativa com IC nominal fora de zero.")
+        inferior, superior = recorte.get("ic_inf"), recorte.get("ic_sup")
+        if not recorte.get("estimavel") or inferior is None or superior is None:
+            continue
+        if hipotese == "H1" and inferior <= 0 <= superior:
+            efeitos_escopo.append("o IC de H1 continua a incluir zero")
+        if hipotese == "H2" and superior < 0:
+            efeitos_escopo.append("o contraste a um passo de H2 mantém o IC nominal negativo")
+    if efeitos_escopo:
+        efeitos = " e ".join(efeitos_escopo)
+        frases.append(f"Ao excluir empenhos de pessoal e de credores públicos, {efeitos}.")
     media = _linha(pasta, "descritivas_estimacao", categoria="faixa_a_0")
     if (valor := media.get("media_participacao_2025")) is not None:
         h1 = _linha(
