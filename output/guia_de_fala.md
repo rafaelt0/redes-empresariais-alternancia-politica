@@ -1,29 +1,29 @@
 # Guia de fala
 
-**Fala prevista de 9:40**, em 4 blocos iguais de 2:25. Reserve 0:20 para trocas de apresentador e variações de ritmo, dentro do limite de 10:00. Os tempos acumulados servem de referência no ensaio.
+**Fala prevista de 9:00**, em 4 blocos iguais de 2:15. Reserve 1:00 para trocas de apresentador e variações de ritmo, dentro do limite de 10:00. Os tempos acumulados servem de referência no ensaio.
 
 ## Divisão entre participantes
 
 | Participante | Bloco | Slides | Tempo de fala |
 |---|---|---|---|
-| [Voz 1 · Andrei](guia_voz_1.md) | Economia política e pergunta de pesquisa | 1–3 | 2:25 |
-| [Voz 2 · Felipe](guia_voz_2.md) | Hipóteses e desenho empírico | 4–5 | 2:25 |
-| [Voz 3 · João Pedro](guia_voz_3.md) | Estrutura da rede e ligação direta (H1) | 6–7 | 2:25 |
-| [Voz 4 · Rafael](guia_voz_4.md) | Distância (H2) e conclusão | 8–9 | 2:25 |
+| [Voz 1 · Andrei](guia_voz_1.md) | Economia política e pergunta de pesquisa | 1–3 | 2:15 |
+| [Voz 2 · Felipe](guia_voz_2.md) | Hipóteses e desenho empírico | 4–5 | 2:15 |
+| [Voz 3 · João Pedro](guia_voz_3.md) | Estrutura da rede e ligação direta (H1) | 6–7 | 2:15 |
+| [Voz 4 · Rafael](guia_voz_4.md) | Distância (H2) e conclusão | 8–9 | 2:15 |
 
 ## Cronograma por slide
 
 | Slide | Tema | Voz | Tempo | Até |
 |---|---|---|---|---|
 | 1 | Redes empresariais, eleições e empenhos municipais | Voz 1 | 15 s | 0:15 |
-| 2 | De onde vem o poder político? | Voz 1 | 60 s | 1:15 |
-| 3 | A troca de governo muda a fatia das fornecedoras? | Voz 1 | 70 s | 2:25 |
-| 4 | Ligação direta e distância ao vencedor | Voz 2 | 65 s | 3:30 |
-| 5 | O efeito da derrota perto do empate | Voz 2 | 80 s | 4:50 |
-| 6 | Uma rede societária para todos os municípios | Voz 3 | 75 s | 6:05 |
-| 7 | As fornecedoras ligadas a A perdem fatia (H1)? | Voz 3 | 70 s | 7:15 |
-| 8 | Fatia em 2025 por distância a A e B | Voz 4 | 100 s | 8:55 |
-| 9 | O que os dados permitem concluir | Voz 4 | 45 s | 9:40 |
+| 2 | De onde vem o poder político? | Voz 1 | 55 s | 1:10 |
+| 3 | A troca de governo muda a fatia das fornecedoras? | Voz 1 | 65 s | 2:15 |
+| 4 | Ligação direta e distância ao vencedor | Voz 2 | 60 s | 3:15 |
+| 5 | O efeito da derrota perto do empate | Voz 2 | 75 s | 4:30 |
+| 6 | Uma rede societária para todos os municípios | Voz 3 | 65 s | 5:35 |
+| 7 | As fornecedoras ligadas a A perdem fatia (H1)? | Voz 3 | 70 s | 6:45 |
+| 8 | Fatia em 2025 por distância a A e B | Voz 4 | 85 s | 8:10 |
+| 9 | O que os dados permitem concluir | Voz 4 | 50 s | 9:00 |
 
 ## Voz 1 · Andrei
 
@@ -31,132 +31,139 @@
 
 **Na fala**
 
-Vamos apresentar nosso estudo sobre redes empresariais e eleições municipais em São Paulo.
+Vamos apresentar nosso estudo sobre redes empresariais, eleições municipais de 2024 em São Paulo e empenhos de 2025, cobrindo teoria, método, rede e resultados.
 
-### 2. De onde vem o poder político? (60 s)
-
-**Na fala**
-
-Para Acemoglu, Johnson e Robinson, grupos com interesses diferentes disputam as regras da economia. O poder formal vem das instituições políticas. Numa prefeitura, por exemplo, o mandato dá autoridade a quem assume o governo. O poder de fato vem dos recursos que permitem a empresas e outros grupos se organizar e influenciar decisões.
-
-O esquema mostra como esse poder pode persistir. Quem tem mais poder político pode influenciar as regras econômicas, que ajudam a definir quem recebe recursos. Quem se beneficia dessa distribuição hoje pode ter mais influência nas decisões de amanhã.
-
-**Se perguntarem**
-
-- No esquema completo, o poder político também influencia as instituições políticas do período seguinte.
-
-### 3. A troca de governo muda a fatia das fornecedoras? (70 s)
+### 2. De onde vem o poder político? (55 s)
 
 **Na fala**
 
-Nas eleições municipais de 2024 em São Paulo, perguntamos se a derrota apertada de quem governava mudou a fatia das empresas que já forneciam aos órgãos municipais cobertos pelo TCESP, exceto a capital. Observamos as fornecedoras com ligação direta ao incumbente e as que chegam a uma candidatura por vínculos societários.
+Para Acemoglu, Johnson e Robinson (2005) e Acemoglu e Robinson (2008), grupos com interesses distintos disputam as regras econômicas. O poder formal, ou de jure, vem das instituições políticas, como o mandato de quem assume a prefeitura. O poder de fato vem dos recursos econômicos que permitem organizar e influenciar decisões.
 
-Definimos essas ligações antes do voto, a partir das doações de sócios ou administradores e dos vínculos entre empresas. Depois da eleição, observamos os empenhos dos órgãos municipais cobertos pelo TCESP, exceto a capital; o saldo líquido é emissão mais reforço menos anulação. Para cada fornecedora anterior, calculamos sua fatia no saldo líquido de 2025 do respectivo elemento de despesa, com entrantes no denominador. A medida usa todos os empenhos de 2025, não só contratos novos.
+O diagrama resume por que esse poder pode persistir: quem detém poder político hoje influencia as regras econômicas, que moldam a distribuição de recursos, e quem acumula recursos hoje pode ampliar sua influência amanhã.
 
 **Se perguntarem**
 
-- As doações e os vínculos societários são medidas de conexão observada. A teoria motiva a hipótese de influência.
-- O relatório explora se, dentro de uma rede, ganhos de umas empresas compensam perdas de outras (H3). As estimativas deixam essa hipótese em aberto.
+- No esquema completo de Acemoglu e Robinson (2008), o poder político também molda as instituições políticas futuras; em equilíbrio, elites capturam ou mantêm instituições favoráveis.
+- Na literatura empírica no Brasil, Boas et al. (2014) encontram ganhos em contratos federais para doadoras do PT, enquanto Duarte (2025) obtém estimativas imprecisas para doadoras diretas em municípios; Guerra et al. (2025) analisam empresas após o fim das doações empresariais, e Balán et al. (2026) examinam laços familiares como poder corporativo.
+- Sobre redes e burocracia: Jackson e Wolinsky (1996) formalizam a formação estratégica de redes e efeitos indiretos; Akhtari et al. (2022) mostram que a troca de governo gera rotatividade burocrática capaz de afetar contratos públicos.
+
+### 3. A troca de governo muda a fatia das fornecedoras? (65 s)
+
+**Na fala**
+
+Aplicamos essa lógica às eleições para prefeito de 2024 em São Paulo. Primeiro (H1), perguntamos se a derrota apertada do grupo incumbente — que chamaremos de A — reduz a fatia de mercado de suas fornecedoras diretas. Segundo (H2), investigamos se essa vantagem prevista varia conforme a distância societária até A e até o principal adversário, B.
+
+Como o STF proibiu doações empresariais na ADI 4650, construímos os vínculos antes do voto cruzando doações de sócios ou administradores pessoas físicas com o quadro societário das empresas.
+
+Depois da eleição, medimos em 2025 a fatia de cada fornecedora anterior no saldo líquido dos empenhos do respectivo elemento de despesa no TCESP, com novas fornecedoras no denominador.
+
+**Se perguntarem**
+
+- A ADI 4650 (2015) proibiu doações de pessoas jurídicas; no TSE, usamos doações de pessoas físicas (inclusive autofinanciamento dos candidatos) e ligamos ao QSA da Receita Federal.
+- Doações e vínculos societários medem conexão observada antes do pleito, e não influência política direta; a teoria motiva a hipótese.
+- Nos dados do TCESP (excluída a capital), pessoal ou credores públicos somam 50,7% do valor com CNPJ válido na amostra de 2025, órgãos fora das prefeituras respondem por 13,9% do saldo líquido de 2025 e 3,7% do valor está ligado a ajustes; sem pessoal/credor público, as estimativas seguem próximas (H1 -1,3 p.p. e H2 a 1 passo -4,16 p.p.).
+- Testes adicionais de compensação dentro da rede e permanência no topo (H3 e H4) foram preservados apenas nas tabelas em results/tables/, fora do relatório e da apresentação.
 
 ## Voz 2 · Felipe
 
-### 4. Ligação direta e distância ao vencedor (65 s)
+### 4. Ligação direta e distância ao vencedor (60 s)
 
 **Na fala**
 
-Definimos A e B município por município. A é a candidatura do grupo que já governava ali. Se o prefeito concorre, ele é A. Na ausência dele, buscamos primeiro o candidato do seu partido e depois o da coligação que inclui o partido. B é o adversário mais votado entre os demais candidatos daquele município.
+Definimos A e B em cada município de primeiro turno no interior paulista, sem a capital e sem ruptura — casos com mais de um candidato no ramo do prefeito. A é o candidato do grupo incumbente: primeiro o próprio prefeito, depois alguém do partido ou da coligação. B é o adversário mais votado entre os demais.
 
-No diagrama, as doações fazem de X a semente de A e de Z a semente de B. Na primeira hipótese, perguntamos se X perde fatia quando A perde, em comparação com empresas sem caminho a A ou B. Na segunda, perguntamos se a vantagem esperada para quem está ligado ao vencedor diminui com a distância. Y está a um passo de cada semente, então entra nos dois grupos.
+No diagrama, doações de sócios tornam X semente de A e Z semente de B. Na H1, comparamos X a firmas sem caminho a A nem a B quando A perde por pouco. Na H2, examinamos se a vantagem ao vencedor cai com a distância societária; Y, por exemplo, está a um passo de cada candidatura.
 
 **Se perguntarem**
 
-- O prefeito anterior é o eleito na última eleição antes de 06/10/2024 (incluindo suplementares). O prefeito concorrendo por outro partido continua no ramo do prefeito.
-- A hierarquia da apresentação foi definida após a análise. O relatório e as tabelas preservam os testes originais.
+- De 645 municípios paulistas (644 fora a capital), excluímos 17 com 2º turno, 39 sem eleito único anterior, além de rupturas (>1 candidato no ramo) e cidades sem A ou B identificáveis, restando 506 municípios analisáveis; a validade externa restringe-se a cidades menores decididas em 1º turno.
+- O prefeito anterior é o eleito na última eleição antes de 06/10/2024 (incluindo suplementares); se concorre por outro partido, segue no ramo do prefeito. Nos degraus 2 e 3 (partido ou coligação), trocas partidárias entre 2020 e 2024 podem gerar ruído.
+- A hierarquia entre hipóteses na apresentação foi definida após a análise; H3 e H4 permanecem preservadas apenas nas tabelas em results/tables/, fora do relatório.
 
-### 5. O efeito da derrota perto do empate (80 s)
+### 5. O efeito da derrota perto do empate (75 s)
 
 **Na fala**
 
-A amostra exclui a capital, que tem tribunal de contas próprio, e usa eleições decididas no primeiro turno.
+Usamos uma regressão descontínua na margem de votos M: percentual de A menos percentual de B. À esquerda do zero, A perde e T vale um; à direita, A vence e T vale zero.
 
-Em H1 e H2, Y é a fatia da fornecedora nos empenhos municipais de 2025 por tipo de despesa. Se X tem dez reais de um total de cem, sua fatia é de dez por cento. O total inclui novas fornecedoras.
+A unidade é empresa, município e elemento de despesa, com peso igual por município por coorte. Se X recebeu dez reais de cem naquele elemento, sua fatia Y é de dez por cento, com entrantes no total.
 
-M é o percentual de votos válidos de A menos o de B, em pontos percentuais. T vale um na derrota de A e zero na vitória. A banda b é a distância máxima ao empate para entrar no ajuste.
-
-Cada lado tem sua reta. Alfa é a fatia prevista no empate pela reta do lado da vitória. Gama é a inclinação dessa reta. Teta multiplica T vezes M e mede a mudança de inclinação na derrota. O termo u é a diferença entre a fatia observada e a prevista.
-
-Beta é o salto no empate, a previsão do lado da derrota menos a do lado da vitória. Esse salto estima o efeito local da derrota se a fatia variar continuamente em cada cenário perto do empate. Com dados pré-eleitorais, checamos se já havia um salto.
+Ajustamos retas locais dentro da banda b: alfa é a fatia prevista na vitória, beta é o salto na derrota e gama e teta dão as inclinações, com erro u. Sob continuidade perto do corte, beta estima o efeito causal local. Checamos placebos pré-eleitorais e o teste de densidade da margem, sem evidência de manipulação.
 
 **Se perguntarem**
 
-- Na equação, T = 1 se M < 0 e T = 0 se M ≥ 0. A reta do lado da derrota tem inclinação γ + θ e intercepto α + β.
-- Nossa base de empenhos vem do Tribunal de Contas do Estado. Em disputas com segundo turno, o líder do primeiro ainda pode perder.
-- Também excluímos os municípios sem A identificável ou sem adversário. O suporte na banda varia por coorte.
-- Usamos núcleo triangular, banda escolhida pelo erro quadrático médio estimado e correção de viés. Os contrastes reamostram municípios de cada lado em conjunto, com bandas fixas.
-- O teste de densidade da margem deu p = 0,993. Também verificamos placebos e sensibilidade à metade e ao dobro da banda.
-- Fornecedora anterior tem saldo líquido positivo na janela pré-eleitoral. O desfecho de H1 e H2 inclui os saldos positivos das entrantes no denominador.
+- Na equação, T = 1 se M < 0 e T = 0 se M ≥ 0; usamos núcleo triangular, banda ótima pelo EQM e correção robusta de viés (CCT), com bandas de 13,1 a 28,8 p.p. em H1 e H2 e checagens em b/2 e 2b.
+- Cada município tem peso unitário por coorte (1/n_m para cada observação no município m), evitando que cidades maiores dominem a média.
+- Em primeiras diferenças (Y_2025 − Y_pré) na coorte direta a A, o erro-padrão cai 27% (5,51 para 4,01 p.p.), mantendo estimativa nula (-2,57 p.p.).
+- O teste de densidade de Cattaneo, Jansson e Ma (2020) deu p = 0,993; contrastes entre coortes usam reamostragem municipal em bloco (999 réplicas) com bandas fixas.
+- Fornecedora anterior é quem teve saldo líquido positivo na janela pré-eleitoral (2021–set/2024); o denominador de 2025 inclui todas as empresas com saldo positivo no elemento, inclusive entrantes.
 
 ## Voz 3 · João Pedro
 
-### 6. Uma rede societária para todos os municípios (75 s)
+### 6. Uma rede societária para todos os municípios (65 s)
 
 **Na fala**
 
-A rede societária é nacional. Calculamos as ligações com A e B para as candidaturas de cada município. As doações a essas candidaturas definem as empresas-semente de onde partimos.
+Cruzamos três bases: o cadastro nacional da Receita Federal, as doações ao TSE até 5 de outubro de 2024 e os empenhos do TCESP no interior paulista.
 
-No exemplo do slide, a empresa Z fornece para duas prefeituras. Na primeira, uma sócia de X doou a A. X é a semente, então contamos dois passos até Z, passando por Y. Na segunda, um sócio de Y doou a A. Agora a semente é Y, e Z está a um passo.
+No centro, mostramos como as distâncias são municipais: se uma sócia de X doou a A na cidade 1, Z fica a dois passos; se um sócio de Y doou a A na cidade 2, Z fica a um passo.
 
-A rede é esparsa, e muitas empresas ficam em grupos separados. Ainda assim, o maior grupo conectado reúne 14,6% das empresas. Quando retiramos os sócios ou administradores que funcionam como pontes, esse grupo encolhe.
+A rede é muito esparsa e fragmentada, mas o maior componente conecta 14,6% das empresas — percentual que cai para 2,1% sem sócios-ponte. Por fim, nem todos os 376 municípios com semente de A fornecem ao próprio município; só os com fornecedoras anteriores entram na estimação.
 
 **Se perguntarem**
 
-- A Receita Federal liga 14.069.286 empresas a 16.547.513 vértices de sócios/administradores PF/PJ em 24.689.604 vínculos. O TSE registra as doações às candidaturas. Os empenhos líquidos dos órgãos municipais cobertos pelo TCESP, exceto a capital, identificam as fornecedoras e mostram sua fatia em 2025; o denominador inclui entrantes. Usamos todos os empenhos de 2025, não só contratos novos.
-- A rede é fragmentada. Quase toda empresa tem um ou dois vínculos (grau médio de 1,75 para empresas e 1,49 para sócios) e quase metade não tem vizinha. Entre 8.003.121 grupos separados, um único componente gigante reúne 14,6% das empresas. Sem os sócios ou administradores que funcionam como ponte, o maior grupo cai para 2,1%.
-- Nos 506 municípios analisáveis, encontramos sementes de A em 376 e de B em 356.
-- O complemento de 12/10/2024 só usa vínculos iniciados até 13/09/2024 em empresas do cadastro de setembro sem quadro válido naquela fotografia. Vínculos encerrados até outubro podem faltar.
-- Ligamos a empresas 41,0% dos doadores de A e 43,4% dos de B.
-- A assortatividade é a correlação de Pearson entre os graus da empresa e do sócio ou administrador em cada aresta. A densidade divide o número de arestas pelo produto das duas contagens de vértices.
-- Na versão sem pontos de articulação, o universo de empresas é mantido e os caminhos societários mudam.
+- A Receita Federal liga 14.069.286 empresas a 16.547.513 vértices de sócios/administradores PF/PJ em 24.689.604 vínculos e 8.003.121 componentes (grau médio 1,75 para empresas e 1,49 para sócios; densidade bipartida de 0,106 por milhão; assortatividade r = 0,0003).
+- Dos 376 municípios com semente de A (356 para B), chegamos a 272 pares empresa–município fornecedores ligados diretamente a A, dos quais 56 municípios (25 derrotas e 31 vitórias) entram na banda principal de H1.
+- Na ambiguidade de nomes da RFB, há 26 pseudônimos PF em 501+ empresas (máximo de 2.847 firmas); retirar pontes de articulação (2,1%) ou administradores (10,6%) testa essa sensibilidade.
+- No painel, 129.975 fornecedoras anteriores sem QSA (45,5% do valor pré-eleitoral) permanecem no grupo "Sem ligação".
+- Ligamos a empresas 41,0% dos doadores de A e 43,4% dos de B; no autofinanciamento, 290 candidatos A (287 B) conectam 388 firmas A (486 B) só por recursos próprios.
+- A recomposição de outubro supre 19,4% dos vínculos (2.756.163 empresas) porque Socios0.zip da pasta de setembro veio da extração de 10/08/2024.
 
 ### 7. As fornecedoras ligadas a A perdem fatia (H1)? (70 s)
 
 **Na fala**
 
-Para testar H1, estimamos o salto na fatia das fornecedoras ligadas diretamente a A quando ele perde perto do empate. Repetimos a estimativa para as empresas sem caminho a A ou B. Cada grupo tem sua própria janela de margens eleitorais. O contraste subtrai o salto das empresas sem caminho do salto das ligadas a A.
+Na H1, comparamos o salto na fatia de 2025 das fornecedoras ligadas diretamente a A com o salto das empresas sem caminho a A nem a B, cada grupo em sua banda.
 
-A estimativa foi de -1,7 pontos percentuais. O intervalo de confiança de 95% vai de -16,2 a 12,8 pontos percentuais. O intervalo admite perdas e ganhos relevantes de participação. O efeito mínimo detectável é de 20,7 p.p., que equivale a 11,7 vezes a fatia média (1,77%) das fornecedoras ligadas a A na banda. Na banda, a coorte ligada diretamente a A tem 25 municípios com A derrotado e 31 com A vitorioso, o que limita a precisão do contraste.
+A estimativa do contraste foi de -1,7 pontos percentuais, com intervalo de 95% de -16,2 a 12,8 pontos percentuais. O intervalo admite perdas e ganhos relevantes de participação. O efeito mínimo detectável é de 20,7 p.p., que equivale a 11,7 vezes a fatia média (1,77%) das fornecedoras ligadas a A na banda. Na banda, a coorte ligada diretamente a A tem 25 municípios com A derrotado e 31 com A vitorioso, o que limita a precisão do contraste.
 
 **Se perguntarem**
 
-- A estimativa das ligadas a A é -1,6 p.p. (IC de 95% de -12,4 a 9,2 p.p.) e a das sem ligação é 0,1 p.p. (IC de 95% de -0,1 a 0,4 p.p.).
-- Meia banda: 2,9 p.p.; dobro da banda: -0,7 p.p.; placebo pré-eleitoral: 2,0 p.p. (p = 0,82); EMD: 20,7 p.p.
-- H4 (permanência no topo) ficou fora da apresentação principal por falta de uma comparação informativa. No limiar de 50%, o efeito mínimo detectável é 277,1 p.p. numa escala de 0 a 100%. O relatório preserva o teste.
+- Ligadas a A: -1,6 p.p. (IC de 95% de -12,4 a 9,2 p.p., EP robusto CCT de 5,51 p.p.); Sem ligação: 0,1 p.p. (IC de 95% de -0,1 a 0,4 p.p.). O contraste tem EP de 7,39 p.p. por reamostragem municipal (999 réplicas) — cerca de 34% mais largo que o de Ligadas a A por combinar incerteza amostral entre coortes com suporte assimétrico (25/31 municípios).
+- Os dois placebos de H1 incluem zero: nível pré-eleitoral de +2,0 p.p. (p = 0,82) e tendência pré-eleitoral (2023–24 vs. 2021–22) de -2,85 p.p. (p = 0,56).
+- Sensibilidades de H1: meia banda +2,9 p.p., dobro da banda -0,7 p.p., sem autofinanciamento -1,2 p.p., apenas setembro -1,8 p.p., sem pontes -1,5 p.p. e sem pessoal/credor público -1,3 p.p.
+- H3 e H4 ficaram fora da apresentação principal e do relatório, preservadas apenas em results/tables/: na H3, a coorte AMBOS concentra 99,98% do empenho no gigante; na H4 a 50%, o EMD é 277,1 p.p. numa escala de 0 a 100% e 100%/100% do peso/empenho nas bandas está no gigante.
 
 ## Voz 4 · Rafael
 
-### 8. Fatia em 2025 por distância a A e B (100 s)
+### 8. Fatia em 2025 por distância a A e B (85 s)
 
 **Na fala**
 
-Na H2, formamos grupos pela distância a A e a B na rede, com os vínculos que já existiam antes do voto. Para cada distância, pegamos o salto do grupo de B, subtraímos o salto do grupo de A e dividimos por dois. No quadro à esquerda, o contraste a um passo em 2025 foi de -4,06 pontos percentuais, com intervalo de confiança de 95% de -7,16 a -0,97. No recorte comparável por estratos, a estimação fica indefinida a um passo, então a leitura depende de quão comparáveis são os dois grupos.
+Na H2, olhamos a distância societária a A e a B antes da eleição e calculamos, em cada faixa, o salto de B menos o de A dividido por dois, em que valores positivos indicam vantagem ao vencedor.
 
-À direita, o diagnóstico é só da coorte B: testamos se o salto já aparecia antes da eleição nesse grupo. No placebo, mantemos a margem eleitoral e usamos a mudança de fatia do biênio 2021–2022 para o período de janeiro de 2023 a setembro de 2024. O salto em B foi de -7,68 pontos percentuais no placebo e de -8,07 em 2025. O salto antes do voto enfraquece a leitura causal para B.
+A um passo, o contraste em 2025 foi de -4,06 p.p., com intervalo de -7,16 a -0,97 — ou seja, sinal oposto ao previsto, puxado pela queda em B (-8,07 p.p.), enquanto A fica perto de zero (+0,06 p.p.).
+
+Além disso, o recorte comparável por estratos fica sem suporte a um passo, e o diagnóstico pré-eleitoral mostra que B já apresentava salto negativo antes da eleição: -11,00 p.p. em nível e -7,68 p.p. na tendência. Quando fazemos pós menos pré no contraste, o efeito vira +1,25 p.p., e sem autofinanciamento cai para -2,85 p.p., ambos cruzando o zero.
 
 **Se perguntarem**
 
-- Ler o contraste como vantagem da ligação ao vencedor exige coortes comparáveis e simetria entre os efeitos de ganhar e perder essa ligação. A mesma firma pode entrar nas duas coortes, e um passo societário não mede necessariamente proximidade política.
-- O placebo para B a um passo tem IC de 95% de -13,50 a -1,86 p.p. (nominal). Em 2025, o salto de B tem p de Holm = 0,077 na família secundária.
-- O contraste entre A e B a um passo, no placebo de mudança pré-eleitoral, foi de -2,75 p.p. (IC de 95% de -7,38 a 1,87 p.p., nominal).
+- Decomposição a 1 passo: B tem -8,07 p.p. (p de Holm = 0,077, média na banda 2,18%) e A tem +0,06 p.p. (p de Holm = 1,000, média 0,28%); os grupos diferem em porte.
+- Três diagnósticos de 1 passo: nível pré-eleitoral de -5,05 p.p. no contraste (-11,00 p.p. em B); tendência pré-eleitoral de -2,75 p.p. (-7,68 p.p. em B); e pós − pré de +1,25 p.p. (IC de 95% de -4,08 a 6,58 p.p.).
+- Fragilidade a 1 passo: sem autofinanciamento dá -2,85 p.p. (IC de 95% de -6,25 a 0,55 p.p.); fica sem estimação válida em apenas setembro, sem pontos de articulação, sem administradores e meia banda.
+- Nos estratos (município × elemento × quintil prévio), a sobreposição de mercado e porte é de 6,3% na faixa direta e 15,1% a 1 passo; no recorte comparável a 1 passo restam 6/5 municípios, abaixo do mínimo de 10.
+- Na banda principal a 1 passo, o suporte é pequeno (6/7 redes em B; 8/6 em A; p de rede = n.d.), com 66,7% do peso de B e 60,5% do peso de A no componente gigante.
 
-### 9. O que os dados permitem concluir (45 s)
+### 9. O que os dados permitem concluir (50 s)
 
 **Na fala**
 
-As duas hipóteses seguem em aberto. A estimativa para a ligação direta é imprecisa. No H2, o contraste a um passo em 2025 foi de -4,06 p.p. O mesmo contraste antes do voto foi de -2,75 p.p. (-7,38 a 1,87 p.p.). Para saber se a vantagem diminui com a distância, precisamos comparar os resultados entre as faixas. Obrigado.
+Para concluir, nenhuma das duas hipóteses se confirma de forma robusta. Em H1, a estimativa de -1,7 p.p. é imprecisa e admite efeitos grandes nos dois sentidos. Em H2 a um passo, o contraste de -4,06 p.p. tem sinal oposto ao esperado, já aparecia antes da eleição e vira +1,25 p.p. na variação pós menos pré.
+
+Três limitações explicam essa cautela: um único ano de empenhos com contratos herdados e folha, cruzamento parcial de doadores e empresas sem QSA, e a concentração no componente gigante somada à troca burocrática. Obrigado.
 
 **Se perguntarem**
 
-- Em 2025, o contraste a 1 passo foi de -4,06 p.p. (IC de 95% de -7,16 a -0,97 p.p.); antes do voto, o mesmo contraste foi de -2,75 p.p. (IC de 95% de -7,38 a 1,87 p.p.).
-- A três passos ou mais, o contraste é 0,06 p.p. (IC de 95% de -0,29 a 0,41 p.p.).
-- Ao menos 99% das observações nas bandas dessa faixa pertencem ao componente gigante. A mesma rede pode gerar dependência entre municípios.
-- No recorte comparável, a estimação ficou indefinida nas faixas 0, 1, 2. No recorte comparável da faixa 3+, o contraste foi de 0,055 p.p. (IC de 95% de 0,001 a 0,109).
+- Resumo H2 a 1 passo: -4,06 p.p. em 2025, +1,25 p.p. em pós − pré (IC de 95% de -4,08 a 6,58 p.p.) e -2,75 p.p. na tendência pré-eleitoral (IC de 95% de -7,38 a 1,87 p.p.).
+- A 3+ passos no painel principal, o contraste é +0,06 p.p. (IC de 95% de -0,29 a 0,41 p.p.), mas ao menos 99% das observações (99,99% do peso de A e 94,82% do de B) pertencem ao componente gigante.
+- Na auditoria do recorte comparável a 3+ passos, o contraste de 0,055 p.p. (IC de 95% de 0,001 a 0,109 p.p.) decorre de sobreposição de 97,4% (Jaccard) entre A e B nos 2.674 estratos (85,0% nas bandas), gerando correlação de 0,971 no bootstrap que reduz o EP de 0,159 para 0,028 p.p.

@@ -13,6 +13,10 @@ from redes.numeros import Numeros
 def test_efeito_preserva_sinal_de_intervalos_pequenos() -> None:
     linha = {"estimativa": 0.0004, "ic_inf": -0.0002, "ic_sup": 0.0011}
     assert deck._efeito(linha, casas=2) == "0,04 (-0,02 a 0,11)"
+    assert deck._pp_sinal(None) == "n.d."
+    assert deck._pp_sinal(0.01251, 2) == "+1,25 p.p."
+    assert deck._pp_sinal(0.00001, 2) == "0,00 p.p."
+    assert deck._pp_sinal(-0.0406, 2) == "-4,06 p.p."
 
 
 def _caminhos(tmp_path: Path) -> Caminhos:
@@ -28,7 +32,7 @@ def test_deck_tem_nove_slides(tmp_path: Path) -> None:
     prs, notas = deck.construir(_caminhos(tmp_path), Numeros({}))
     assert len(prs.slides) == 9
     assert len(notas) == len(prs.slides)
-    assert sum(nota.segundos for nota in notas) == 580
+    assert sum(nota.segundos for nota in notas) == 540
     assert [nota.pessoa for nota in notas] == [
         voz
         for voz, quantidade in zip(deck.VOZES, (3, 2, 2, 2), strict=True)
@@ -46,9 +50,9 @@ def test_guias_atribuem_os_slides_e_equilibram_os_blocos(tmp_path: Path) -> None
     for nota in notas:
         por_bloco[nota.pessoa] = por_bloco.get(nota.pessoa, 0) + nota.segundos
     assert set(por_bloco) == set(deck.VOZES)
-    assert set(por_bloco.values()) == {145}
-    assert "9:40" in texto
-    assert "0:20" in texto
+    assert set(por_bloco.values()) == {135}
+    assert "9:00" in texto
+    assert "1:00" in texto
 
     roteiros = deck.guias_individuais(notas, titulos)
     for i, (nome, slides) in enumerate(
@@ -57,17 +61,20 @@ def test_guias_atribuem_os_slides_e_equilibram_os_blocos(tmp_path: Path) -> None
     ):
         arquivo = f"guia_voz_{i}.md"
         assert f"[Voz {i} · {nome}]({arquivo})" in texto
-        assert f"| {slides} | 2:25 |" in texto
+        assert f"| {slides} | 2:15 |" in texto
         roteiro = roteiros[arquivo]
         assert roteiro.startswith(f"# Voz {i} · {nome}\n")
-        assert "2:25)" in roteiro
+        assert "2:15)" in roteiro
+        assert "**Na fala**" in roteiro
+        assert "**Se perguntarem**" in roteiro
         for j, nota in enumerate(notas, start=1):
             if nota.pessoa == f"Voz {i}":
                 assert f"## Slide {j} · {titulos[j - 1]}" in roteiro
                 assert nota.fala in roteiro
+                for ponto in nota.apoio:
+                    assert f"- {ponto}" in roteiro
             else:
                 assert f"## Slide {j} ·" not in roteiro
-        assert "Se perguntarem" not in roteiro
 
 
 def test_guia_recusa_blocos_com_tempos_desiguais() -> None:
@@ -89,7 +96,7 @@ def test_guia_html_reune_as_falas_e_os_links_de_cada_voz(tmp_path: Path) -> None
     assert documento.xpath("//nav//a/@href") == ["#voz-1", "#voz-2", "#voz-3", "#voz-4"]
     assert documento.xpath("//main/section/@id") == ["voz-1", "voz-2", "voz-3", "voz-4"]
     assert documento.xpath("//main/section/header//h2/text()") == list(deck.APRESENTADORES.values())
-    assert documento.xpath("//p[@class='duracao']/text()") == ["2:25 de fala"] * 4
+    assert documento.xpath("//p[@class='duracao']/text()") == ["2:15 de fala"] * 4
     assert documento.xpath("//div[@class='slide']/h3/text()", smart_strings=False) == titulos
     for bloco, nota in zip(documento.xpath("//div[@class='slide']"), notas, strict=True):
         paragrafos = bloco.xpath("./p[not(@class)]/text()", smart_strings=False)
@@ -169,6 +176,29 @@ def test_deck_usa_os_numeros_das_tabelas(tmp_path: Path) -> None:
     assert "H3" not in textos
 
 
+def test_tema_hyperlink_e_marcadores_sem_estilo(tmp_path: Path) -> None:
+    from lxml import etree
+    from pptx.enum.shapes import MSO_SHAPE
+    from pptx.oxml.ns import qn
+
+    prs, _ = deck.construir(_caminhos(tmp_path), Numeros({}))
+    ns = {"a": "http://schemas.openxmlformats.org/drawingml/2006/main"}
+    cores = []
+    for rel in prs.slide_masters[0].part.rels.values():
+        if "theme" in rel.reltype:
+            raiz = etree.fromstring(rel.target_part.blob)
+            for tag in ("hlink", "folHlink"):
+                no = raiz.find(f".//a:clrScheme/a:{tag}/a:srgbClr", ns)
+                assert no is not None
+                cores.append(no.get("val"))
+    assert cores == ["862F3D", "862F3D"]
+
+    for idx in (6, 7, 8):
+        ovais = [forma for forma in prs.slides[idx].shapes if forma.shape_type == MSO_SHAPE.OVAL]
+        for oval in ovais:
+            assert oval._element.find(qn("p:style")) is None
+
+
 def test_deck_contextualiza_o_emd_de_h1_com_a_coorte_direta(tmp_path: Path) -> None:
     caminhos = _caminhos(tmp_path)
     tabelas = caminhos.resultados / "tables"
@@ -225,14 +255,17 @@ def test_slide_conclusao_emparelha_o_contraste_pre_eleitoral(tmp_path: Path) -> 
     tabelas.mkdir(parents=True)
     pl.DataFrame(
         {
-            "hipotese": ["H2", "H2", "H2"],
-            "categoria": ["vencedor_faixa_1", "faixa_b_1", "vencedor_faixa_3+"],
-            "tipo": ["contraste", "categoria", "contraste"],
-            "resultado": ["participacao_2025"] * 3,
-            "estimavel": [True, True, True],
-            "estimativa": [-0.0406, -0.0807, 0.0005],
-            "ic_inf": [-0.0716, -0.1355, 0.0000],
-            "ic_sup": [-0.0097, -0.0260, 0.0011],
+            "hipotese": ["H2", "H2", "H2", "H2"],
+            "categoria": ["vencedor_faixa_1", "faixa_b_1", "faixa_a_1", "vencedor_faixa_3+"],
+            "tipo": ["contraste", "categoria", "categoria", "contraste"],
+            "resultado": ["participacao_2025"] * 4,
+            "estimavel": [True, True, True, True],
+            "estimativa": [-0.0406, -0.0807, 0.0006, 0.0005],
+            "ic_inf": [-0.0716, -0.1355, -0.0076, 0.0000],
+            "ic_sup": [-0.0097, -0.0260, 0.0087, 0.0011],
+            "municipios_tratados": [None, 11, 12, None],
+            "municipios_controle": [None, 17, 13, None],
+            "placebo_estimativa": [-0.0505, -0.1100, -0.0090, None],
         }
     ).write_csv(tabelas / "resumo_estimacao.csv")
     pl.DataFrame(
@@ -253,6 +286,41 @@ def test_slide_conclusao_emparelha_o_contraste_pre_eleitoral(tmp_path: Path) -> 
             "hipotese": ["H2"],
             "categoria": ["vencedor_faixa_1"],
             "tipo": ["contraste"],
+            "resultado": ["variacao_participacao"],
+            "placebo": [False],
+            "estimavel": [True],
+            "estimativa": [0.0125],
+            "ic_inf": [-0.0408],
+            "ic_sup": [0.0658],
+        }
+    ).write_csv(tabelas / "sensibilidade_placebo.csv")
+    pl.DataFrame(
+        {
+            "hipotese": ["H2"],
+            "categoria": ["vencedor_faixa_1"],
+            "tipo": ["contraste"],
+            "resultado": ["participacao_2025"],
+            "estimavel": [True],
+            "estimativa": [-0.0285],
+            "ic_inf": [-0.0625],
+            "ic_sup": [0.0055],
+        }
+    ).write_csv(tabelas / "sensibilidade_sem_autofinanciamento.csv")
+    pl.DataFrame(
+        {
+            "recorte": ["principal", "principal", "principal"],
+            "faixa": ["1", "1", "3+"],
+            "grupo": ["B", "A", "A"],
+            "janela": ["h", "h", "h"],
+            "fracao_peso_gigante": [0.6668, 0.6046, 0.9999],
+            "piso_fracao_observacoes": [None, None, 0.99],
+        }
+    ).write_csv(tabelas / "concentracao_gigante_h2.csv")
+    pl.DataFrame(
+        {
+            "hipotese": ["H2"],
+            "categoria": ["vencedor_faixa_1"],
+            "tipo": ["contraste"],
             "resultado": ["participacao_2025"],
             "placebo": [False],
             "estimavel": [False],
@@ -266,14 +334,28 @@ def test_slide_conclusao_emparelha_o_contraste_pre_eleitoral(tmp_path: Path) -> 
     conclusao = " ".join(
         forma.text_frame.text for forma in prs.slides[8].shapes if forma.has_text_frame
     )
-    assert "PLACEBO PRÉ-ELEITORAL · COORTE B A 1 PASSO" in distancia
-    assert "Recorte comparável por estratos: sem estimativa a 1 passo." in distancia
-    assert "PRÉ-ELEITORAL · MESMO CONTRASTE" in conclusao
-    assert "-3,12 p.p." in conclusao
-    assert "IC de 95% de -8,00 a 2,00 p.p." in conclusao
-    assert "PLACEBO PRÉ-ELEITORAL" not in conclusao
-    assert "No recorte comparável por estratos, a estimação fica indefinida" in notas[7].fala
-    assert "O mesmo contraste antes do voto foi de -3,12 p.p." in notas[8].fala
+    assert "CONTRASTE A 1 PASSO EM 2025" in distancia
+    assert "Sinal oposto ao previsto" in distancia
+    assert "B: -8,07 p.p. (11/17 mun., 67% no gigante)" in distancia
+    assert "A: +0,06 p.p. (12/13 mun., 60% no gigante)" in distancia
+    assert "DIAGNÓSTICO E SENSIBILIDADE (1 PASSO)" in distancia
+    assert "Estratos (município × elemento × quintil prévio): 1 passo sem suporte." in distancia
+    assert "VARIAÇÃO PÓS − PRÉ (2025 − 2021–24)" in conclusao
+    assert "+1,25 p.p." in conclusao
+    assert "IC de 95% de -4,08 a 6,58 p.p." in conclusao
+    assert "Antes do voto: -3,12 p.p. na tendência e -5,05 p.p. no nível." in conclusao
+    assert "LIMITAÇÕES" in conclusao
+    assert "o recorte comparável por estratos fica sem suporte a um passo" in notas[7].fala
+    assert "vira +1,25 p.p. na variação pós menos pré" in notas[8].fala
+
+    (tabelas / "sensibilidade_placebo.csv").unlink()
+    prs_fallback, _ = deck.construir(caminhos, Numeros({}))
+    conclusao_fallback = " ".join(
+        forma.text_frame.text for forma in prs_fallback.slides[8].shapes if forma.has_text_frame
+    )
+    assert "VARIAÇÃO PRÉ-ELEITORAL (2023–24 VS. 2021–22)" in conclusao_fallback
+    assert "-3,12 p.p." in conclusao_fallback
+    assert "IC de 95% de -8,00 a 2,00 p.p." in conclusao_fallback
 
 
 def test_deck_ordena_os_cinco_blocos_e_preserva_hierarquia(tmp_path: Path) -> None:
@@ -304,9 +386,10 @@ def test_deck_ordena_os_cinco_blocos_e_preserva_hierarquia(tmp_path: Path) -> No
         termo in aplicacao
         for termo in (
             "incumbente",
-            "Distância a A e B",
+            "Distância ao incumbente e ao adversário (H2)",
             "Vínculos antes da eleição de 2024",
-            "doações de seus sócios ou administradores",
+            "ADI 4650",
+            "doações de sócios ou administradores (PF)",
             "Para cada fornecedora anterior",
             "fatia no saldo líquido dos empenhos de 2025",
             "entrantes no denominador",
@@ -332,7 +415,10 @@ def test_deck_ordena_os_cinco_blocos_e_preserva_hierarquia(tmp_path: Path) -> No
     assert hipoteses.index("H1") < hipoteses.index("H2")
     assert "teste principal" in resultados.lower()
     assert "contraste h1" in resultados.lower()
-    assert "pontos percentuais da fatia dos empenhos de 2025 no elemento de despesa" in resultados
+    assert (
+        "Categorias: IC robusto analítico (CCT); contraste: reamostragem municipal (999 réplicas)."
+        in resultados
+    )
     assert "H3" not in " ".join((hipoteses, resultados, distancia, conclusao))
     assert "H4" not in " ".join((hipoteses, resultados, distancia, conclusao))
     assert "H4" not in notas[6].fala
@@ -340,12 +426,13 @@ def test_deck_ordena_os_cinco_blocos_e_preserva_hierarquia(tmp_path: Path) -> No
     assert "análise exploratória" in distancia.lower()
     assert "Testar se o efeito diminui exige comparar as faixas entre si." in distancia
     assert "pontos percentuais da fatia dos empenhos no elemento de despesa" in distancia
-    assert "PLACEBO PRÉ-ELEITORAL · COORTE B A 1 PASSO" in distancia
+    assert "DIAGNÓSTICO E SENSIBILIDADE (1 PASSO)" in distancia
     assert "pontos percentuais da fatia dos empenhos no elemento de despesa" in conclusao
     assert "EM ABERTO" in conclusao
     assert "EXPLORATÓRIO" in conclusao
-    assert "Contraste (B − A)/2 a 1 passo em 2025" in conclusao
-    assert "PRÉ-ELEITORAL · MESMO CONTRASTE" in conclusao
+    assert "Contraste (B − A)/2 a 1 passo" in conclusao
+    assert "VARIAÇÃO PRÉ-ELEITORAL (2023–24 VS. 2021–22)" in conclusao
+    assert "LIMITAÇÕES" in conclusao
     assert "SÓ A COORTE B" not in conclusao
     titulos = [slide.shapes[0].text_frame.text for slide in list(prs.slides)[-2:]]
     assert "distância" in titulos[0]
