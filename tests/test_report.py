@@ -9,24 +9,28 @@ from redes.report import (
 )
 
 
-def test_h3_discute_placebo_de_nivel_mesmo_sem_rejeicao():
+def test_relatorio_omite_hipoteses_fora_do_texto(tmp_path):
     resumo = pl.DataFrame(
         {
-            "hipotese": ["H3"],
-            "categoria": ["ambos_menos_demais"],
-            "tipo": ["contraste"],
-            "resultado": ["variacao_total"],
-            "estimativa": [-0.04],
-            "ic_inf": [-0.10],
-            "ic_sup": [0.02],
-            "placebo_estimativa": [-0.11],
-            "placebo_p_valor": [0.13],
+            "hipotese": ["H1", "H3", "H4"],
+            "categoria": [
+                "conectada_menos_sem_conexao",
+                "ambos_menos_demais",
+                "ligada_ao_vencedor_50",
+            ],
+            "tipo": ["contraste"] * 3,
+            "resultado": ["participacao_2025", "variacao_total", "mantem_posicao_50"],
+            "estimativa": [-0.01, -0.04, 0.05],
+            "ic_inf": [-0.05, -0.10, -0.01],
+            "ic_sup": [0.02, 0.02, 0.15],
         }
     )
-    texto = leitura_resultados(resumo)["leituraHUmHTres"]
-    assert "O placebo de H3 usa o nível da participação pré-eleitoral" in texto
-    assert "O salto é de -11,0 p.p." in texto
-    assert "O sinal coincide com o do contraste pós-eleitoral" in texto
+    resumo.write_csv(tmp_path / "resumo_estimacao.csv")
+    texto = numeros_tex(tmp_path)
+    assert "Em H1, o contraste" in texto
+    assert "H3" not in texto
+    assert "H4" not in texto
+    assert "compensam essas perdas" not in texto
 
 
 def test_relatorio_le_o_resumo_real_e_distingue_o_intervalo_do_contraste():
@@ -73,32 +77,25 @@ def test_relatorio_mostra_o_suporte_e_o_contraste_do_recorte_comparavel(tmp_path
 def test_leituras_por_hipotese_usam_formato_ptbr_e_emd():
     resumo = pl.DataFrame(
         {
-            "hipotese": ["H1", "H2", "H2", "H3"],
+            "hipotese": ["H1", "H2", "H2"],
             "categoria": [
                 "conectada_menos_sem_conexao",
                 "vencedor_faixa_0",
                 "vencedor_faixa_3+",
-                "ambos_menos_demais",
             ],
-            "tipo": ["contraste"] * 4,
-            "resultado": [
-                "participacao_2025",
-                "participacao_2025",
-                "participacao_2025",
-                "variacao_total",
-            ],
-            "estimativa": [-0.011, -0.016, 0.001, -0.039],
-            "ic_inf": [-0.114, -0.062, -0.002, -0.090],
-            "ic_sup": [0.093, 0.029, 0.004, 0.011],
-            "emd": [0.148, 0.065, 0.004, 0.072],
-            "densidade_p_valor": [0.993] * 4,
-            "placebo_p_valor": [0.936, 0.240, 0.465, 0.060],
+            "tipo": ["contraste"] * 3,
+            "resultado": ["participacao_2025"] * 3,
+            "estimativa": [-0.011, -0.016, 0.001],
+            "ic_inf": [-0.114, -0.062, -0.002],
+            "ic_sup": [0.093, 0.029, 0.004],
+            "emd": [0.148, 0.065, 0.004],
+            "densidade_p_valor": [0.993] * 3,
+            "placebo_p_valor": [0.936, 0.240, 0.465],
         }
     )
     leitura = leitura_resultados(resumo)
     assert "$p = 0{,}993$" in leitura["leituraDensidade"]
-    assert "efeito mínimo detectável é de 14,8 pontos percentuais." in leitura["leituraHUmHTres"]
-    assert r"do gasto prévio, com EMD de 7,2\%" in leitura["leituraHUmHTres"]
+    assert "EMD é de 14,8 p.p." in leitura["leituraHUm"]
     assert "O IC da faixa de ligação direta inclui zero." in leitura["leituraHDois"]
     assert (
         "o contraste é de 0,1 p.p. e o EMD é de 0,4 p.p. sob inferência municipal"
@@ -109,10 +106,10 @@ def test_leituras_por_hipotese_usam_formato_ptbr_e_emd():
 def test_leitura_robustez_destaca_estabilidade_e_suporte_nd():
     robustez = pl.DataFrame(
         {
-            "hipotese": ["H1", "H3"],
-            "categoria": ["conectada_menos_sem_conexao", "ambos_menos_demais"],
+            "hipotese": ["H1", "H2"],
+            "categoria": ["conectada_menos_sem_conexao", "vencedor_faixa_1"],
             "tipo": ["contraste", "contraste"],
-            "resultado": ["participacao_2025", "variacao_total"],
+            "resultado": ["participacao_2025", "participacao_2025"],
             "estimativa_principal": [-0.011, -0.039],
             "ic_inf_principal": [-0.114, -0.090],
             "ic_sup_principal": [0.093, 0.011],
@@ -129,5 +126,4 @@ def test_leitura_robustez_destaca_estabilidade_e_suporte_nd():
     )
     texto = leitura_robustez(robustez)
     assert "incluem zero em todas as variantes estimáveis" in texto
-    assert r"H3 total (-7,3\%)" in texto
     assert "menos de dez municípios em um dos lados do corte" in texto

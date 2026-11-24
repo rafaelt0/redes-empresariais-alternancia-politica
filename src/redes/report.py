@@ -38,21 +38,8 @@ MAXIMO_PAGINAS = 5
 CONTRASTES = (
     ("H1", "conectada_menos_sem_conexao", "participacao_2025", "H1"),
     *(
-        ("H3", "ambos_menos_demais", r, f"H3 ({nome})")
-        for r, nome in (
-            ("variacao_total", "total"),
-            ("termo_r1", "R1"),
-            ("termo_r2", "R2"),
-            ("termo_r3", "R3"),
-        )
-    ),
-    *(
         ("H2", f"vencedor_faixa_{d}", "participacao_2025", f"H2 ($\\delta={d}$)")
         for d in ("0", "1", "2", "3+")
-    ),
-    *(
-        ("H4", f"ligada_ao_vencedor_{p}", f"mantem_posicao_{p}", rf"H4 ({p}\%)")
-        for p in (25, 50, 75)
     ),
 )
 
@@ -92,12 +79,10 @@ def _intervalo(linha: dict, sufixo: str = "") -> str:
     return ND if ND in (inferior, superior) else f"[{inferior}, {superior}]"
 
 
-def _status_contraste(linha: dict, hipotese: str = "") -> str:
+def _status_contraste(linha: dict) -> str:
     inferior, superior = linha.get("ic_inf"), linha.get("ic_sup")
     if inferior is None or superior is None:
         return "indefinido"
-    if hipotese == "H4" and (linha.get("p_holm") is None or linha["p_holm"] >= 0.05):
-        return "inconclusivo_holm"
     if inferior > 0:
         return "positivo"
     if superior < 0:
@@ -155,16 +140,9 @@ def tabela_estimativas(resumo: pl.DataFrame) -> str:
                 _numero(linha, "placebo_estimativa"),
                 _numero(linha, "placebo_p_valor", 3),
                 _numero(linha, "emd"),
-                _numero(linha, "p_holm", 3) if h == "H4" else "---",
             ]
         )
     densidade = _numero(resumo.row(0, named=True), "densidade_p_valor", 3) if resumo.height else ND
-    n_holm = _numero(resumo.row(0, named=True), "n_testes_holm", 0) if resumo.height else ND
-    nota_holm = (
-        f" Holm abrange {n_holm} testes das categorias de H1, H2 e H4 e dos contrastes de H4."
-        if n_holm != ND
-        else ""
-    )
     return _quadro(
         "tab:estimativas",
         "Contrastes no corte eleitoral",
@@ -177,13 +155,12 @@ def tabela_estimativas(resumo: pl.DataFrame) -> str:
             "Placebo",
             "$p$ do placebo",
             "EMD",
-            r"$p_{\mathrm{Holm}}$",
         ),
         corpo,
         rf"Unidades conforme o desenho empírico. Estimativas corrigidas pelo viés e ICs normais "
         rf"de 95\% por reamostragem municipal com bandas fixas. O placebo usa a participação "
-        rf"prévia e se repete nos termos de H3. n.d. indica falta de dados ou falha no ajuste. "
-        rf"Valor-p da densidade de {densidade}." + nota_holm,
+        rf"prévia. n.d. indica falta de dados ou falha no ajuste. "
+        rf"Valor-p da densidade de {densidade}.",
     )
 
 
@@ -197,25 +174,11 @@ def tabela_categorias(resumo: pl.DataFrame) -> str:
             ("conectada_incumbente", "sem_conexao"),
             ("H1 · A direta", "H1 · sem conexão"),
         ),
-        ("H3", "variacao_total", ("ambos", "demais"), ("H3 · ambos", "H3 · demais")),
-        ("H3", "termo_r1", ("ambos",), ("H3 · R1 em ambos",)),
-        ("H3", "termo_compensacao", ("ambos",), ("H3 · R2+R3 em ambos",)),
         (
             "H2",
             "participacao_2025",
             ("faixa_a_0", "faixa_b_0", "faixa_a_1", "faixa_b_1"),
             ("H2 · A direta", "H2 · B direta", "H2 · A a um passo", "H2 · B a um passo"),
-        ),
-        (
-            "H4",
-            "mantem_posicao_50",
-            tuple(f"ligada_{g}_50" for g in ("a", "b", "ambos", "nenhum")),
-            (
-                r"H4 (50\%) · só A",
-                r"H4 (50\%) · só B",
-                r"H4 (50\%) · ambos",
-                r"H4 (50\%) · nenhuma",
-            ),
         ),
     )
     corpo = []
@@ -251,8 +214,7 @@ def tabela_categorias(resumo: pl.DataFrame) -> str:
         r"IC robusto de 95\% com correção de viés. $b$ está em p.p. Derrotas e vitórias contam "
         r"municípios na banda. Valores-$p$ agrupados por município ($p_{\mathrm{mun}}$) ou por "
         r"rede ($p_{\mathrm{rede}}$, com pelo menos dez redes por lado). Poucas unidades "
-        r"fragilizam a aproximação assintótica. O Quadro~\ref{tab:estimativas} contrasta os "
-        r"saltos de AMBOS e das demais redes. Outros recortes em resumo\_estimacao.csv.",
+        r"fragilizam a aproximação assintótica. Outros recortes em resumo\_estimacao.csv.",
     )
 
 
@@ -277,7 +239,6 @@ def tabela_robustez(robustez: pl.DataFrame) -> str:
             ),
         ]
         for h, c, r, rotulo in CONTRASTES
-        if h != "H4"
         for linha in [linhas.get((h, c, r, "contraste"), {})]
     ]
     return _quadro(
@@ -326,56 +287,22 @@ def leitura_resultados(
     leituras["leituraDensidade"] = " ".join(frases)
 
     h1 = linhas.get(("H1", "conectada_menos_sem_conexao", "participacao_2025", "contraste"), {})
-    h3 = linhas.get(("H3", "ambos_menos_demais", "variacao_total", "contraste"), {})
-    r1 = linhas.get(("H3", "ambos", "termo_r1", "categoria"), {})
-    compensacao = linhas.get(("H3", "ambos", "termo_compensacao", "categoria"), {})
     frases = []
     if h1.get("estimativa") is not None:
-        frases.append(
+        contraste = (
             f"Em H1, o contraste entre fornecedoras diretamente ligadas a A e aquelas sem "
-            f"caminho observado para A ou B foi de {_efeito_com_ic(h1, 'p.p.', 1)}."
+            f"caminho observado para A ou B foi de {_efeito_com_ic(h1, 'p.p.', 1)}"
         )
         if _status_contraste(h1) == "nulo":
-            frases.append("O intervalo admite perdas e ganhos de participação.")
+            contraste += ", intervalo que admite perdas e ganhos de participação"
+        frases.append(f"{contraste}.")
         if h1.get("emd") is not None:
-            frases.append(f"O efeito mínimo detectável é de {_pp(h1, 'emd')} pontos percentuais.")
+            frases.append(f"Nessa comparação, o EMD é de {_pp(h1, 'emd')} p.p.")
         meia_banda = h1.get("estimativa_meia_banda")
         if meia_banda is not None and h1["estimativa"] * meia_banda < 0:
-            frases.append("Com metade da banda, o sinal de H1 se inverte.")
+            frases.append("Com metade da banda, o contraste muda de sinal.")
 
-    frases.append(r"\par")
-    porcento = r"\%"
-    if h3.get("estimativa") is not None:
-        emd = f", com EMD de {_pp(h3, 'emd')}{porcento}" if h3.get("emd") is not None else ""
-        frases.append(
-            f"Em H3, o contraste total entre AMBOS e as demais redes foi de "
-            f"{_efeito_com_ic(h3, porcento)} do gasto prévio{emd}."
-        )
-
-    if r1.get("ic_sup") is None or compensacao.get("ic_inf") is None:
-        if h3:
-            frases.append("A compensação nas redes ligadas aos dois grupos ficou sem estimativa.")
-    else:
-        frases.append(
-            f"Dentro de AMBOS, o salto foi de {_efeito_com_ic(r1, porcento)} em R1 e "
-            f"{_efeito_com_ic(compensacao, porcento)} em R2+R3, na mesma unidade."
-        )
-        if r1["ic_sup"] < 0 < compensacao["ic_inf"]:
-            frases.append("A queda em R1 e o ganho em R2+R3 seguem a previsão de compensação.")
-        else:
-            if (r1.get("estimativa") or 0) > 0 and (compensacao.get("estimativa") or 0) < 0:
-                frases.append("Os sinais se invertem em relação à previsão de compensação.")
-            frases.append("Os intervalos deixam em aberto a hipótese de compensação.")
-
-    if h3.get("placebo_p_valor") is not None and h3.get("placebo_estimativa") is not None:
-        frases.append(
-            rf"O placebo de H3 usa o nível da participação pré-eleitoral. O salto é de "
-            rf"{_pp(h3, 'placebo_estimativa')} p.p. "
-            rf"($p={_decimal_math(h3['placebo_p_valor'], 3)}$)."
-        )
-        if h3.get("estimativa") is not None and h3["placebo_estimativa"] * h3["estimativa"] > 0:
-            frases.append("O sinal coincide com o do contraste pós-eleitoral e pede cautela.")
-    leituras["leituraHUmHTres"] = " ".join(frases)
+    leituras["leituraHUm"] = " ".join(frases)
 
     h2_0 = linhas.get(("H2", "vencedor_faixa_0", "participacao_2025", "contraste"), {})
     h2_1 = linhas.get(("H2", "vencedor_faixa_1", "participacao_2025", "contraste"), {})
@@ -391,13 +318,13 @@ def leitura_resultados(
             h2_1.get("placebo_p_valor") is not None
         ):
             frases.append(
-                f"O placebo de nível pré-eleitoral do contraste tem o mesmo sinal "
+                f"O contraste já tinha esse sinal no placebo de nível pré-eleitoral "
                 f"({_pp(h2_1, 'placebo_estimativa')} p.p., "
                 f"$p={_decimal_math(h2_1['placebo_p_valor'], 3)}$)."
             )
     if b1.get("p_holm") is not None:
         frases.append(
-            rf"O IC do contraste é nominal. O salto da coorte B a um passo tem "
+            rf"O IC nominal refere-se ao contraste, e o salto da coorte B a um passo tem "
             rf"$p_{{Holm}}={_decimal_math(b1['p_holm'], 3)}$ na família secundária."
         )
 
@@ -408,8 +335,8 @@ def leitura_resultados(
         )
         if _status_contraste(placebo_pre_b) == _status_contraste(b1) == "negativo":
             frases.append(
-                "A diferença anterior à eleição enfraquece a leitura causal do salto de 2025 "
-                "nessa coorte."
+                "Como a diferença nessa coorte já aparecia antes da eleição, a leitura causal "
+                "do salto de 2025 fica enfraquecida."
             )
     if _status_contraste(h2_0) == "nulo":
         frases.append("O IC da faixa de ligação direta inclui zero.")
@@ -420,31 +347,6 @@ def leitura_resultados(
         )
     leituras["leituraHDois"] = " ".join(frases)
 
-    h4 = linhas.get(("H4", "ligada_ao_vencedor_50", "mantem_posicao_50", "contraste"), {})
-    frases = []
-    st_h4 = _status_contraste(h4, "H4")
-    if st_h4 == "inconclusivo_holm":
-        emd_h4 = _pp(h4, "emd")
-        sufixo = f" (EMD de {emd_h4} p.p.)" if emd_h4 != ND else ""
-        frases.append(
-            rf"O contraste de H4 (50\%) permaneceu inconclusivo após a correção de Holm{sufixo}."
-        )
-        if h4.get("emd") is not None and h4["emd"] > 1:
-            frases.append("O EMD supera a amplitude da escala de probabilidade e o IC é instável.")
-        b75 = linhas.get(("H4", "ligada_b_75", "mantem_posicao_75", "categoria"), {})
-        if b75.get("banda") is not None:
-            frases.append(
-                rf"Em H4 (75\%), a banda de {_numero(b75, 'banda', 1)} p.p. da coorte B "
-                "abrange disputas distantes do corte."
-            )
-    elif st_h4 in ("positivo", "negativo"):
-        frases.append(
-            rf"O contraste de H4 (50\%) foi {st_h4} ({_pp(h4, 'estimativa')} p.p.) mesmo após Holm."
-        )
-    elif h4 and st_h4 == "indefinido":
-        frases.append(r"O contraste de H4 (50\%) não foi estimável.")
-
-    leituras["leituraHQuatro"] = " ".join(frases)
     return leituras
 
 
@@ -463,11 +365,9 @@ def leitura_robustez(robustez: pl.DataFrame) -> str:
 
     h1 = linhas.get(("H1", "conectada_menos_sem_conexao", "participacao_2025", "contraste"), {})
     h2_0 = linhas.get(("H2", "vencedor_faixa_0", "participacao_2025", "contraste"), {})
-    h3_tot = linhas.get(("H3", "ambos_menos_demais", "variacao_total", "contraste"), {})
-    h3_r2 = linhas.get(("H3", "ambos_menos_demais", "termo_r2", "contraste"), {})
 
     frases = [
-        "Cada versão da rede redefine as coortes e seleciona suas próprias bandas. As "
+        "Como cada versão da rede redefine as coortes e seleciona suas próprias bandas, as "
         "diferenças entre colunas refletem também quem entra em cada comparação."
     ]
     estaveis_nulos = []
@@ -481,27 +381,16 @@ def leitura_robustez(robustez: pl.DataFrame) -> str:
             f"em todas as variantes estimáveis."
         )
 
-    pj_sig = []
-    for nome, linha in (("H3 total", h3_tot), ("H3 R2", h3_r2)):
-        if _significativa(linha, "sem_pj") and not _significativa(linha, "principal"):
-            pj_sig.append(f"{nome} ({_pp(linha, 'estimativa_sem_pj')}\\%)")
-    if pj_sig:
-        frases.append(
-            f"Sem sócios PJ, os ICs de {_juntar_lista(pj_sig)} passam a excluir zero. "
-            f"R3 continua sem evidência de ganho compensatório."
-        )
-
     tem_nd = any(
         linhas.get((h, c, r, "contraste"), {}).get(f"estimativa_{v}") is None
         for h, c, r, _ in CONTRASTES
-        if h != "H4"
         for v in ("sem_articulacao", "sem_administrador")
     )
     if tem_nd:
         frases.append(
-            "Ao retirar pontos de articulação ou administradores, a rede se fragmenta. "
-            "Alguns contrastes indiretos e de rede ficam com menos de dez municípios "
-            "em um dos lados do corte (n.d.)."
+            "A retirada de pontos de articulação ou administradores fragmenta a rede e deixa "
+            "alguns contrastes com menos de dez municípios em um dos lados "
+            "do corte (n.d.)."
         )
     return " ".join(frases)
 
@@ -512,28 +401,13 @@ def sintese_discussao(resumo: pl.DataFrame) -> str:
         return ""
     linhas = _indexar(resumo)
     h1 = linhas.get(("H1", "conectada_menos_sem_conexao", "participacao_2025", "contraste"), {})
-    h3 = linhas.get(("H3", "ambos_menos_demais", "variacao_total", "contraste"), {})
-    r1 = linhas.get(("H3", "ambos", "termo_r1", "categoria"), {})
-    comp = linhas.get(("H3", "ambos", "termo_compensacao", "categoria"), {})
-
-    sem_comp = not (
-        r1.get("ic_sup") is not None
-        and comp.get("ic_inf") is not None
-        and r1["ic_sup"] < 0 < comp["ic_inf"]
-    )
-    if _status_contraste(h1) == "nulo" and sem_comp:
+    if _status_contraste(h1) == "nulo":
         return (
-            r"Nas disputas próximas do empate, as estimativas deixam em aberto se as empresas "
-            r"ligadas diretamente ao incumbente perdem participação quando ele é derrotado e se "
-            r"outras empresas da mesma rede compensam essas perdas. A composição pré-eleitoral "
-            r"das coortes, a sensibilidade das estimativas e o peso do gigante limitam a "
-            r"interpretação dos contrastes por distância."
-        )
-    if _status_contraste(h3, "H3") in ("positivo", "negativo") or not sem_comp:
-        return (
-            r"A alocação após disputas apertadas varia entre coortes. Na comparação com estudos "
-            r"sobre conexões políticas e compras públicas \cite{boas2014,baltrunaite2020}, "
-            r"essa diferença deve ser lida à luz dos placebos, dos EMDs e da definição da rede."
+            "Nas disputas próximas do empate, o contraste de H1 admite perdas e ganhos de "
+            "participação para as fornecedoras ligadas diretamente ao incumbente, em relação "
+            "às sem caminho observado para A ou B. Em H2, a composição pré-eleitoral das "
+            "coortes, a sensibilidade das estimativas e o peso do gigante limitam a interpretação "
+            "dos contrastes por distância."
         )
     return (
         r"A evidência varia entre conexões diretas e indiretas. Para comparar esses resultados "
@@ -556,20 +430,24 @@ def _perfil_rede(numeros: Numeros) -> str:
     pessoas = numeros.valor("rede_resumo", ("PRINCIPAL", "pessoas"), "valor")
     vinculos = numeros.valor("rede_resumo", ("PRINCIPAL", "vinculos"), "valor")
     assortatividade = numeros.valor("rede_resumo", ("PRINCIPAL", "assortatividade_grau"), "valor")
-    frases = []
+    graus = []
     if grau_um is not None and grau_dois is not None:
         proporcao = percentual((grau_um + grau_dois) / empresas)
-        frases.append(f"Entre as empresas, {proporcao} têm um ou dois vínculos.")
+        graus.append(f"{proporcao} têm um ou dois vínculos")
     if isoladas is not None:
-        frases.append(f"{percentual(isoladas / empresas)} não têm vizinha societária.")
+        graus.append(f"{percentual(isoladas / empresas)} não têm vizinha societária")
+    frases = [f"Entre as empresas, {_juntar_lista(graus)}."] if graus else []
+    medidas = []
     if pessoas and vinculos is not None:
         densidade = decimal(1_000_000 * vinculos / (empresas * pessoas), 3)
-        frases.append(f"Há {densidade} vínculo por milhão de pares possíveis.")
+        medidas.append(f"há {densidade} vínculo por milhão de pares possíveis")
     if assortatividade is not None:
-        frases.append(
-            "A correlação entre os graus nas duas pontas dos vínculos é "
-            rf"$r={_decimal_math(assortatividade, 4)}$."
+        medidas.append(
+            "a correlação entre os graus nas duas pontas dos vínculos é "
+            rf"$r={_decimal_math(assortatividade, 4)}$"
         )
+    if medidas:
+        frases.append(f"Na rede, {_juntar_lista(medidas)}.")
     return " ".join(frases).replace("%", r"\%")
 
 
@@ -586,10 +464,10 @@ def numeros_tex(pasta: Path, sintetica: bool = False) -> str:
             nota_auditoria = (
                 f"Antes de aplicar as bandas, nos {decimal(a['estratos'], 0)} estratos do recorte, "
                 f"{decimal(100 * a['jaccard'], 1)}\\% das observações de uma coorte ou da outra "
-                "aparecem nas duas. A correlação entre os saltos, cada um em sua banda, é de "
-                f"{decimal(a['correlacao_bootstrap'], 3)} nas "
-                f"{decimal(a['replicas_validas'], 0)} reamostragens válidas. "
-                "Isso ajuda a explicar o IC estreito do contraste."
+                "aparecem nas duas. Os saltos, estimados em suas respectivas bandas, têm "
+                f"correlação de {decimal(a['correlacao_bootstrap'], 3)} nas "
+                f"{decimal(a['replicas_validas'], 0)} reamostragens válidas, "
+                "o que ajuda a explicar o IC estreito do contraste."
             )
     verificacoes = leitura_sensibilidades(pasta)
 
@@ -611,11 +489,9 @@ def numeros_tex(pasta: Path, sintetica: bool = False) -> str:
         "leituraRobustez": leitura_robustez(robustez),
         "placeboContrasteHDois": texto_verificacoes(verificacoes["placebo H2"]),
         "leituraSensibilidadesHDois": texto_verificacoes(verificacoes["sensibilidade H2"]),
-        "concentracaoHQuatro": texto_verificacoes(verificacoes["H4"]),
         "leituraSensibilidades": texto_verificacoes(verificacoes["gerais"])
         .replace("(DP ", "(desvio-padrão de ")
         .replace("CNPJ", "cadastro de pessoa jurídica"),
-        "concentracaoHTres": texto_verificacoes(verificacoes["H3"]),
         "sinteseDiscussao": sintese_discussao(resumo),
         "leituraHDoisComparaveis": leitura_h2_comparaveis(
             h2_comparaveis.iter_rows(named=True)
@@ -684,7 +560,6 @@ def executar(ctx: Contexto) -> None:
             "robustez",
             "comparabilidade_h2",
             "h2_comparaveis",
-            "permanencia_h4",
             "rede_resumo",
             "links_pc1",
             "validacao_panel",
@@ -696,7 +571,6 @@ def executar(ctx: Contexto) -> None:
             "rede_componentes",
             "rede_distancias",
             "gradiente_h2",
-            "decomposicao_h3",
         ),
         "pdf",
     )
