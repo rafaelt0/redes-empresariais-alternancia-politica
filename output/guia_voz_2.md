@@ -1,21 +1,35 @@
 # Voz 2 · Felipe
 
-**Hipóteses e desenho empírico · 2:25**
+**Hipóteses e desenho empírico · 2:15**
 
-## Slide 4 · Ligação direta e distância ao vencedor (0:00–1:05)
+## Slide 4 · Ligação direta e distância ao vencedor (0:00–1:00)
 
-Definimos A e B município por município. A é a candidatura do grupo que já governava ali. Se o prefeito concorre, ele é A. Na ausência dele, buscamos primeiro o candidato do seu partido e depois o da coligação que inclui o partido. B é o adversário mais votado entre os demais candidatos daquele município.
+**Na fala**
 
-No diagrama, as doações fazem de X a semente de A e de Z a semente de B. Na primeira hipótese, perguntamos se X perde fatia quando A perde, em comparação com empresas sem caminho a A ou B. Na segunda, perguntamos se a vantagem esperada para quem está ligado ao vencedor diminui com a distância. Y está a um passo de cada semente, então entra nos dois grupos.
+Definimos A e B em cada município de primeiro turno no interior paulista, sem a capital e sem ruptura — casos com mais de um candidato no ramo do prefeito. A é o candidato do grupo incumbente: primeiro o próprio prefeito, depois alguém do partido ou da coligação. B é o adversário mais votado entre os demais.
 
-## Slide 5 · O efeito da derrota perto do empate (1:05–2:25)
+No diagrama, doações de sócios tornam X semente de A e Z semente de B. Na H1, comparamos X a firmas sem caminho a A nem a B quando A perde por pouco. Na H2, examinamos se a vantagem ao vencedor cai com a distância societária; Y, por exemplo, está a um passo de cada candidatura.
 
-A amostra exclui a capital, que tem tribunal de contas próprio, e usa eleições decididas no primeiro turno.
+**Se perguntarem**
 
-Em H1 e H2, Y é a fatia da fornecedora nos empenhos municipais de 2025 por tipo de despesa. Se X tem dez reais de um total de cem, sua fatia é de dez por cento. O total inclui novas fornecedoras.
+- De 645 municípios paulistas (644 fora a capital), excluímos 17 com 2º turno, 39 sem eleito único anterior, além de rupturas (>1 candidato no ramo) e cidades sem A ou B identificáveis, restando 506 municípios analisáveis; a validade externa restringe-se a cidades menores decididas em 1º turno.
+- O prefeito anterior é o eleito na última eleição antes de 06/10/2024 (incluindo suplementares); se concorre por outro partido, segue no ramo do prefeito. Nos degraus 2 e 3 (partido ou coligação), trocas partidárias entre 2020 e 2024 podem gerar ruído.
+- A hierarquia entre hipóteses na apresentação foi definida após a análise; H3 e H4 permanecem preservadas apenas nas tabelas em results/tables/, fora do relatório.
 
-M é o percentual de votos válidos de A menos o de B, em pontos percentuais. T vale um na derrota de A e zero na vitória. A banda b é a distância máxima ao empate para entrar no ajuste.
+## Slide 5 · O efeito da derrota perto do empate (1:00–2:15)
 
-Cada lado tem sua reta. Alfa é a fatia prevista no empate pela reta do lado da vitória. Gama é a inclinação dessa reta. Teta multiplica T vezes M e mede a mudança de inclinação na derrota. O termo u é a diferença entre a fatia observada e a prevista.
+**Na fala**
 
-Beta é o salto no empate, a previsão do lado da derrota menos a do lado da vitória. Esse salto estima o efeito local da derrota se a fatia variar continuamente em cada cenário perto do empate. Com dados pré-eleitorais, checamos se já havia um salto.
+Usamos uma regressão descontínua na margem de votos M: percentual de A menos percentual de B. À esquerda do zero, A perde e T vale um; à direita, A vence e T vale zero.
+
+A unidade é empresa, município e elemento de despesa, com peso igual por município por coorte. Se X recebeu dez reais de cem naquele elemento, sua fatia Y é de dez por cento, com entrantes no total.
+
+Ajustamos retas locais dentro da banda b: alfa é a fatia prevista na vitória, beta é o salto na derrota e gama e teta dão as inclinações, com erro u. Sob continuidade perto do corte, beta estima o efeito causal local. Checamos placebos pré-eleitorais e o teste de densidade da margem, sem evidência de manipulação.
+
+**Se perguntarem**
+
+- Na equação, T = 1 se M < 0 e T = 0 se M ≥ 0; usamos núcleo triangular, banda ótima pelo EQM e correção robusta de viés (CCT), com bandas de 13,1 a 28,8 p.p. em H1 e H2 e checagens em b/2 e 2b.
+- Cada município tem peso unitário por coorte (1/n_m para cada observação no município m), evitando que cidades maiores dominem a média.
+- Em primeiras diferenças (Y_2025 − Y_pré) na coorte direta a A, o erro-padrão cai 27% (5,51 para 4,01 p.p.), mantendo estimativa nula (-2,57 p.p.).
+- O teste de densidade de Cattaneo, Jansson e Ma (2020) deu p = 0,993; contrastes entre coortes usam reamostragem municipal em bloco (999 réplicas) com bandas fixas.
+- Fornecedora anterior é quem teve saldo líquido positivo na janela pré-eleitoral (2021–set/2024); o denominador de 2025 inclui todas as empresas com saldo positivo no elemento, inclusive entrantes.

@@ -53,7 +53,7 @@ Na tabela de concentração, a parcela monetária pode ser publicada mesmo quand
 a parcela do peso é suprimida. O valor em reais de cada grupo da coorte fica
 fora da tabela, e a parcela monetária independe das contagens do grupo.
 
-A variante `sem_articulacao` do Quadro 3 e do slide 10 vem de `robustez.csv`:
+A variante `sem_articulacao` do Quadro 3 vem de `robustez.csv`:
 remove as pessoas de articulação e **reseleciona as sementes** entre as pessoas
 restantes. A variante adicional `SEM_ARTICULACAO_SEMENTES_FIXAS` preserva as
 sementes principais e usa outro arquivo, indicado acima. São exercícios

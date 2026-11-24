@@ -12,6 +12,7 @@ from pathlib import Path
 from string import Template
 
 import polars as pl
+from lxml import etree
 from pptx import Presentation
 from pptx.dml.color import RGBColor
 from pptx.enum.shapes import MSO_CONNECTOR, MSO_SHAPE
@@ -24,7 +25,7 @@ from redes.amostra import MARCADOR
 from redes.config import Caminhos
 from redes.etapas import Contexto, Etapa
 from redes.leitura_sensibilidades import piso_gigante_h2
-from redes.numeros import Numeros, decimal, leitura_h2_comparaveis, percentual
+from redes.numeros import Numeros, decimal, percentual
 from redes.portabilidade import ferramenta
 
 APRESENTADORES = {"Voz 1": "Andrei", "Voz 2": "Felipe", "Voz 3": "João Pedro", "Voz 4": "Rafael"}
@@ -111,7 +112,14 @@ def _ler_tabela(pasta: Path, nome: str) -> pl.DataFrame | None:
 def _celula(tabela: pl.DataFrame | None, **filtros: object) -> dict:
     if tabela is None or not filtros.keys() <= set(tabela.columns):
         return {}
-    recorte = tabela.filter(pl.col(coluna) == valor for coluna, valor in filtros.items())
+    recorte = tabela.filter(
+        (
+            pl.col(coluna).cast(pl.String) == valor
+            if isinstance(valor, str)
+            else pl.col(coluna) == valor
+        )
+        for coluna, valor in filtros.items()
+    )
     return recorte.row(0, named=True) if recorte.height else {}
 
 
@@ -121,6 +129,19 @@ def _numero(valor: float | None, casas: int = 3) -> str:
 
 def _pp(valor: float | None, casas: int = 1) -> str:
     return "n.d." if valor is None else decimal(100 * valor, casas)
+
+
+def _pct(valor: float | None, casas: int = 1) -> str:
+    return "n.d." if valor is None else percentual(valor, casas)
+
+
+def _pp_sinal(valor: float | None, casas: int = 2) -> str:
+    if valor is None:
+        return "n.d."
+    texto = _pp(valor, casas)
+    if valor > 0 and not texto.startswith("-") and any(c in "123456789" for c in texto):
+        return f"+{texto} p.p."
+    return f"{texto} p.p."
 
 
 def _destaque(numeros: Numeros, apelido: str) -> str:
@@ -172,7 +193,7 @@ def _texto(
     largura: float,
     altura: float,
     *,
-    tamanho: int = 22,
+    tamanho: int | float = 22,
     cor: RGBColor = INK,
     fonte: str = FONTE_CORPO,
     forte: bool = False,
@@ -188,6 +209,32 @@ def _texto(
     p.font.color.rgb = cor
     p.alignment, p.line_spacing = alinhar, 1.06
     return caixa
+
+
+def _sem_estilo(forma) -> None:
+    estilo = forma._element.find(qn("p:style"))
+    if estilo is not None:
+        forma._element.remove(estilo)
+
+
+def _cor_hyperlink_tema(prs: Apresentacao, cor: str = "862F3D") -> None:
+    """Altera as cores de hyperlink do tema para evitar o azul padrão no LibreOffice."""
+    ns = {"a": "http://schemas.openxmlformats.org/drawingml/2006/main"}
+    for mestre in prs.slide_masters:
+        for rel in mestre.part.rels.values():
+            if "theme" not in rel.reltype:
+                continue
+            raiz = etree.fromstring(rel.target_part.blob)
+            alterou = False
+            for tag in ("hlink", "folHlink"):
+                no = raiz.find(f".//a:clrScheme/a:{tag}/a:srgbClr", ns)
+                if no is not None:
+                    no.set("val", cor)
+                    alterou = True
+            if alterou:
+                rel.target_part.blob = etree.tostring(
+                    raiz, xml_declaration=True, encoding="UTF-8", standalone=True
+                )
 
 
 def _traco(slide, x1, y1, x2, y2, cor=LINHA, peso=0.9) -> None:
@@ -222,9 +269,19 @@ def _pagina(prs, titulo: str, secao: str, fonte: str = "", *, fundo: RGBColor = 
     return slide
 
 
-def _bloco(slide, titulo: str, texto: str, x: float, y: float, largura: float) -> None:
+def _bloco(
+    slide,
+    titulo: str,
+    texto: str,
+    x: float,
+    y: float,
+    largura: float,
+    *,
+    tamanho: int | float = 21,
+    altura: float = 1.24,
+) -> None:
     _texto(slide, titulo, x, y, largura, 0.34, tamanho=17, cor=ACCENT, forte=True)
-    _texto(slide, texto, x, y + 0.40, largura, 1.24, tamanho=21)
+    _texto(slide, texto, x, y + 0.40, largura, altura, tamanho=tamanho)
 
 
 def _barra_proporcao(
@@ -354,6 +411,7 @@ def _grafico_intervalos(
         ponto = slide.shapes.add_shape(
             MSO_SHAPE.OVAL, Inches(x - 0.062), Inches(y - 0.062), Inches(0.124), Inches(0.124)
         )
+        _sem_estilo(ponto)
         ponto.fill.solid()
         ponto.fill.fore_color.rgb = cor
         ponto.line.fill.background()
@@ -410,6 +468,7 @@ def _mini_barra_ic(slide, linha: dict, x: float, y: float, largura: float, altur
     ponto = slide.shapes.add_shape(
         MSO_SHAPE.OVAL, Inches(p - 0.068), Inches(y_eixo - 0.068), Inches(0.136), Inches(0.136)
     )
+    _sem_estilo(ponto)
     ponto.fill.solid()
     ponto.fill.fore_color.rgb = ACCENT
     ponto.line.fill.background()
@@ -471,13 +530,35 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
     pasta = caminhos.resultados / "tables"
     resumo = _ler_tabela(pasta, "resumo_estimacao")
     pre_periodos = _ler_tabela(pasta, "sensibilidade_pre_periodos")
+    placebo_tbl = _ler_tabela(pasta, "sensibilidade_placebo")
     comparaveis = _ler_tabela(pasta, "h2_comparaveis")
+    auditoria_comp = _ler_tabela(pasta, "auditoria_h2_comparaveis")
+    comp_h2 = _ler_tabela(pasta, "comparabilidade_h2")
+    conc_gigante_h2 = _ler_tabela(pasta, "concentracao_gigante_h2")
     perfil = _ler_tabela(pasta, "rede_resumo")
     graus = _ler_tabela(pasta, "rede_graus")
     componentes = _ler_tabela(pasta, "rede_componentes")
+    distancias_rede = _ler_tabela(pasta, "rede_distancias")
+    links_pc1 = _ler_tabela(pasta, "links_pc1")
+    descritivas = _ler_tabela(pasta, "descritivas_estimacao")
+    h1_tab = _ler_tabela(pasta, "h1")
+    h2_tab = _ler_tabela(pasta, "h2")
+    h4_tab = _ler_tabela(pasta, "h4")
+    escopo_tcesp = _ler_tabela(pasta, "sensibilidade_escopo_tcesp")
+    sem_pessoal = _ler_tabela(pasta, "sensibilidade_sem_pessoal_ou_credor_publico")
+    sem_auto = _ler_tabela(pasta, "sensibilidade_sem_autofinanciamento")
+    apenas_set = _ler_tabela(pasta, "sensibilidade_apenas_setembro")
+    robustez_tbl = _ler_tabela(pasta, "robustez")
+    sens_gigante = _ler_tabela(pasta, "sensibilidade_gigante")
+    val_tcesp = _ler_tabela(pasta, "validacao_tcesp")
+    val_tse = _ler_tabela(pasta, "validacao_tse")
+    val_panel = _ler_tabela(pasta, "validacao_panel")
+    val_rfb = _ler_tabela(pasta, "validacao_rfb")
+    ambig_rfb = _ler_tabela(pasta, "ambiguidade_rfb")
     figuras = caminhos.resultados / "figures"
     exemplo = figuras / "figura1_exemplo.png"
     prs = Presentation()
+    _cor_hyperlink_tema(prs, "862F3D")
     prs.slide_width, prs.slide_height = Inches(LARGURA), Inches(ALTURA)
     notas: list[Nota] = []
 
@@ -505,8 +586,8 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
         notas,
         "Voz 1",
         15,
-        "Vamos apresentar nosso estudo sobre redes empresariais e eleições municipais "
-        "em São Paulo.",
+        "Vamos apresentar nosso estudo sobre redes empresariais, eleições municipais de 2024 em "
+        "São Paulo e empenhos de 2025, cobrindo teoria, método, rede e resultados.",
     )
 
     # 2. Economia política
@@ -579,47 +660,85 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
     _nota(
         notas,
         "Voz 1",
-        60,
-        "Para Acemoglu, Johnson e Robinson, grupos com interesses diferentes disputam as "
-        "regras da economia. "
-        "O poder formal vem das instituições políticas. Numa prefeitura, por exemplo, "
-        "o mandato dá autoridade a quem assume o governo. O poder de fato vem dos recursos "
-        "que permitem a empresas e outros grupos se organizar e influenciar decisões.\n\n"
-        "O esquema mostra como esse poder pode persistir. Quem tem mais poder político "
-        "pode influenciar as regras econômicas, que ajudam a definir quem recebe recursos. "
-        "Quem se beneficia dessa distribuição hoje pode ter mais influência nas decisões "
-        "de amanhã.",
-        "No esquema completo, o poder político também influencia as instituições "
-        "políticas do período seguinte.",
+        55,
+        "Para Acemoglu, Johnson e Robinson (2005) e Acemoglu e Robinson (2008), grupos com "
+        "interesses distintos disputam as regras econômicas. O poder formal, ou de jure, vem das "
+        "instituições políticas, como o mandato de quem assume a prefeitura. O poder de fato vem "
+        "dos recursos econômicos que permitem organizar e influenciar decisões.\n\n"
+        "O diagrama resume por que esse poder pode persistir: quem detém poder político hoje "
+        "influencia as regras econômicas, que moldam a distribuição de recursos, e quem acumula "
+        "recursos hoje pode ampliar sua influência amanhã.",
+        "No esquema completo de Acemoglu e Robinson (2008), o poder político também molda as "
+        "instituições políticas futuras; em equilíbrio, elites capturam ou mantêm instituições "
+        "favoráveis.",
+        "Na literatura empírica no Brasil, Boas et al. (2014) encontram ganhos em contratos "
+        "federais para doadoras do PT, enquanto Duarte (2025) obtém estimativas imprecisas para "
+        "doadoras diretas em municípios; Guerra et al. (2025) analisam empresas após o fim das "
+        "doações empresariais, e Balán et al. (2026) examinam laços familiares como poder "
+        "corporativo.",
+        "Sobre redes e burocracia: Jackson e Wolinsky (1996) formalizam a formação estratégica de "
+        "redes e efeitos indiretos; Akhtari et al. (2022) mostram que a troca de governo gera "
+        "rotatividade burocrática capaz de afetar contratos públicos.",
     )
 
+    # 3. Aplicação
+    escopo_2025 = _celula(escopo_tcesp, periodo="2025", recorte="amostra")
+    frac_excluido = escopo_2025.get("fracao_excluido")
+    val_total_2025 = _celula(val_tcesp, ano=2025, medida="valor_liquido", categoria="total").get(
+        "valor"
+    )
+    val_pref_2025 = _celula(
+        val_tcesp, ano=2025, medida="valor_por_tipo_orgao", categoria="PREFEITURA"
+    ).get("valor")
+    frac_nao_pref = (
+        (val_total_2025 - val_pref_2025) / val_total_2025
+        if val_total_2025 and val_pref_2025 is not None
+        else None
+    )
+    taxa_vinc = numeros.valor("validacao_panel", ("", "vinculacao_valor_2025"), "valor")
+    sem_pessoal_h1 = _celula(
+        sem_pessoal,
+        hipotese="H1",
+        tipo="contraste",
+        categoria="conectada_menos_sem_conexao",
+        resultado="participacao_2025",
+    )
+    sem_pessoal_h2 = _celula(
+        sem_pessoal,
+        hipotese="H2",
+        tipo="contraste",
+        categoria="vencedor_faixa_1",
+        resultado="participacao_2025",
+    )
     slide = _pagina(prs, "A troca de governo muda a fatia das fornecedoras?", CONTEXTO)
     _bloco(
         slide,
-        "Ligação direta com A (H1)",
+        "Ligação direta ao incumbente (H1)",
         "Quando o grupo incumbente perde por pouco, as fornecedoras ligadas a ele perdem fatia?",
         MARGEM,
-        1.94,
+        1.90,
         5.42,
     )
-    _traco(slide, 6.55, 1.92, 6.55, 3.44)
+    _traco(slide, 6.55, 1.88, 6.55, 3.46)
     _bloco(
         slide,
-        "Distância a A e B (H2)",
-        "Como a fatia das fornecedoras varia conforme a distância a cada candidatura na rede?",
+        "Distância ao incumbente e ao adversário (H2)",
+        "Como a fatia das fornecedoras varia conforme a distância societária a cada candidatura?",
         MEIO,
-        1.94,
+        1.90,
         5.42,
     )
-    _traco(slide, MARGEM, 3.68, LARGURA - MARGEM, 3.68)
+    _traco(slide, MARGEM, 3.64, LARGURA - MARGEM, 3.64)
     _bloco(
         slide,
         "Vínculos antes da eleição de 2024",
-        "Ligamos as fornecedoras às candidaturas pelas doações de seus sócios ou "
-        "administradores e pelos vínculos societários entre empresas.",
+        "Sem doações empresariais (ADI 4650), ligamos fornecedoras às candidaturas pelas doações "
+        "de sócios ou administradores (PF) e pela rede societária.",
         MARGEM,
-        3.94,
+        3.86,
         CORPO,
+        tamanho=20,
+        altura=1.08,
     )
     _bloco(
         slide,
@@ -628,45 +747,57 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
         "anterior, medimos a fatia no saldo líquido dos empenhos de 2025 por elemento de "
         "despesa, com entrantes no denominador.",
         MARGEM,
-        5.29,
+        5.38,
         CORPO,
+        tamanho=20,
+        altura=1.08,
     )
     _nota(
         notas,
         "Voz 1",
-        70,
-        "Nas eleições municipais de 2024 em São Paulo, perguntamos se a derrota apertada "
-        "de quem governava mudou a fatia das empresas que já forneciam aos órgãos "
-        "municipais cobertos pelo TCESP, exceto a capital. Observamos as fornecedoras com "
-        "ligação direta ao incumbente e as que chegam a uma candidatura por vínculos "
-        "societários.\n\n"
-        "Definimos essas ligações antes do voto, a partir das doações de sócios ou "
-        "administradores e dos vínculos entre empresas. Depois da eleição, observamos os "
-        "empenhos dos órgãos municipais cobertos pelo TCESP, exceto a capital; o saldo "
-        "líquido é emissão mais reforço menos anulação. Para cada fornecedora anterior, "
-        "calculamos sua fatia no saldo líquido de 2025 do respectivo elemento de despesa, "
-        "com entrantes no denominador. A medida usa todos os empenhos de 2025, não só "
-        "contratos novos.",
-        "As doações e os vínculos societários são medidas de conexão observada. "
-        "A teoria motiva a hipótese de influência.",
-        "O relatório explora se, dentro de uma rede, ganhos de umas empresas compensam "
-        "perdas de outras (H3). As estimativas deixam essa hipótese em aberto.",
+        65,
+        "Aplicamos essa lógica às eleições para prefeito de 2024 em São Paulo. Primeiro (H1), "
+        "perguntamos se a derrota apertada do grupo incumbente — que chamaremos de A — reduz a "
+        "fatia de mercado de suas fornecedoras diretas. Segundo (H2), investigamos se essa "
+        "vantagem prevista varia conforme a distância societária até A e até o principal "
+        "adversário, B.\n\n"
+        "Como o STF proibiu doações empresariais na ADI 4650, construímos os vínculos antes do "
+        "voto cruzando doações de sócios ou administradores pessoas físicas com o quadro "
+        "societário das empresas.\n\n"
+        "Depois da eleição, medimos em 2025 a fatia de cada fornecedora anterior no saldo líquido "
+        "dos empenhos do respectivo elemento de despesa no TCESP, com novas fornecedoras no "
+        "denominador.",
+        "A ADI 4650 (2015) proibiu doações de pessoas jurídicas; no TSE, usamos doações de "
+        "pessoas físicas (inclusive autofinanciamento dos candidatos) e ligamos ao QSA da "
+        "Receita Federal.",
+        "Doações e vínculos societários medem conexão observada antes do pleito, e não "
+        "influência política direta; a teoria motiva a hipótese.",
+        "Nos dados do TCESP (excluída a capital), pessoal ou credores públicos somam "
+        f"{_pct(frac_excluido)} do valor com CNPJ válido na amostra de 2025, órgãos fora das "
+        f"prefeituras respondem por {_pct(frac_nao_pref)} do saldo líquido de 2025 e "
+        f"{_pct(taxa_vinc)} do valor está ligado a ajustes; sem pessoal/credor público, as "
+        f"estimativas seguem próximas (H1 {_estimativa_pp(sem_pessoal_h1)} e H2 a 1 passo "
+        f"{_estimativa_pp(sem_pessoal_h2, 2)}).",
+        "Testes adicionais de compensação dentro da rede e permanência no topo (H3 e H4) foram "
+        "preservados apenas nas tabelas em results/tables/, fora do relatório e da apresentação.",
     )
 
     # 4. Hipóteses com o diagrama de exemplo
+    mun_tse = _celula(val_tse, indicador="municipios_2024").get("valor")
+    segundo_turno = _celula(val_tse, indicador="municipios_segundo_turno_2024").get("valor")
+    sem_eleito = _celula(val_tse, indicador="eleicoes_sem_eleito_unico").get("valor")
+    total_sp = mun_tse + 1 if mun_tse is not None else None
     slide = _pagina(
         prs,
         "Ligação direta e distância ao vencedor",
         HIPOTESES,
-        "Prefeito · 1º turno de 2024 em SP (sem a capital, 2º turno, ruptura ou ausência de A/B). "
-        "Diagrama ilustrativo.",
+        "Prefeito · 1º turno de 2024 em SP (sem capital, 2º turno, ruptura — >1 candidato no ramo "
+        "— ou ausência de A/B). Diagrama ilustrativo.",
     )
     faixa_ab = slide.shapes.add_shape(
         MSO_SHAPE.RECTANGLE, Inches(MARGEM), Inches(1.60), Inches(CORPO), Inches(1.06)
     )
-    estilo = faixa_ab._element.find(qn("p:style"))
-    if estilo is not None:
-        faixa_ab._element.remove(estilo)
+    _sem_estilo(faixa_ab)
     faixa_ab.fill.solid()
     faixa_ab.fill.fore_color.rgb = PALIDO
     faixa_ab.line.fill.background()
@@ -772,23 +903,63 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
     _nota(
         notas,
         "Voz 2",
-        65,
-        "Definimos A e B município por município. A é a candidatura do grupo que já "
-        "governava ali. Se o prefeito concorre, ele é A. Na ausência dele, buscamos "
-        "primeiro o candidato do seu partido e depois o da coligação que inclui o partido. "
-        "B é o adversário mais votado entre os demais candidatos daquele município.\n\n"
-        "No diagrama, as doações fazem de X a semente de A e de Z a semente de B. "
-        "Na primeira hipótese, perguntamos se X perde fatia quando A perde, em comparação "
-        "com empresas sem caminho a A ou B. Na segunda, perguntamos se a vantagem esperada "
-        "para quem está ligado ao vencedor diminui com a distância. Y está a um passo de "
-        "cada semente, então entra nos dois grupos.",
+        60,
+        "Definimos A e B em cada município de primeiro turno no interior paulista, sem a "
+        "capital e sem ruptura — casos com mais de um candidato no ramo do prefeito. A é o "
+        "candidato do grupo incumbente: primeiro o próprio prefeito, depois alguém do partido ou "
+        "da coligação. B é o adversário mais votado entre os demais.\n\n"
+        "No diagrama, doações de sócios tornam X semente de A e Z semente de B. Na H1, "
+        "comparamos X a firmas sem caminho a A nem a B quando A perde por pouco. Na H2, "
+        "examinamos se a vantagem ao vencedor cai com a distância societária; Y, por exemplo, "
+        "está a um passo de cada candidatura.",
+        f"De {_numero(total_sp, 0)} municípios paulistas ({_numero(mun_tse, 0)} fora a capital), "
+        f"excluímos {_numero(segundo_turno, 0)} com 2º turno, {_numero(sem_eleito, 0)} sem "
+        "eleito único anterior, além de rupturas (>1 candidato no ramo) e cidades sem A ou B "
+        f"identificáveis, restando {_destaque(numeros, 'munAnalisaveis')} municípios analisáveis; "
+        "a validade externa restringe-se a cidades menores decididas em 1º turno.",
         "O prefeito anterior é o eleito na última eleição antes de 06/10/2024 (incluindo "
-        "suplementares). O prefeito concorrendo por outro partido continua no ramo do prefeito.",
-        "A hierarquia da apresentação foi definida após a análise. O relatório e "
-        "as tabelas preservam os testes originais.",
+        "suplementares); se concorre por outro partido, segue no ramo do prefeito. Nos degraus "
+        "2 e 3 (partido ou coligação), trocas partidárias entre 2020 e 2024 podem gerar ruído.",
+        "A hierarquia entre hipóteses na apresentação foi definida após a análise; H3 e H4 "
+        "permanecem preservadas apenas nas tabelas em results/tables/, fora do relatório.",
     )
 
     # 5. Desenho empírico
+    densidade_margem = (
+        resumo.row(0, named=True).get("densidade_p_valor")
+        if resumo is not None and resumo.height
+        else None
+    )
+    bandas_h1_h2 = (
+        resumo.filter(pl.col("hipotese").is_in(["H1", "H2"]) & pl.col("banda").is_not_null())[
+            "banda"
+        ]
+        if resumo is not None and {"hipotese", "banda"} <= set(resumo.columns)
+        else pl.Series(dtype=pl.Float64)
+    )
+    banda_min = _numero(bandas_h1_h2.min(), 1) if len(bandas_h1_h2) else "n.d."
+    banda_max = _numero(bandas_h1_h2.max(), 1) if len(bandas_h1_h2) else "n.d."
+    a0_nivel = _celula(
+        h2_tab,
+        hipotese="H2",
+        tipo="categoria",
+        categoria="faixa_a_0",
+        resultado="participacao_2025",
+    )
+    a0_diff = _celula(
+        placebo_tbl,
+        hipotese="H2",
+        tipo="categoria",
+        categoria="faixa_a_0",
+        resultado="variacao_participacao",
+    )
+    ep_a0_nivel = a0_nivel.get("ep_robusto")
+    ep_a0_diff = a0_diff.get("ep_robusto")
+    reducao_ep = (
+        f"{_numero(100 * (1 - ep_a0_diff / ep_a0_nivel), 0)}%"
+        if ep_a0_nivel and ep_a0_diff is not None
+        else "n.d."
+    )
     slide = _pagina(
         prs,
         "O efeito da derrota perto do empate",
@@ -868,77 +1039,139 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
         (MEIO, 2, 0.34, "γ", "Inclinação da reta do lado da vitória"),
         (MEIO, 3, 0.34, "θ", "Diferença de inclinação (derrota menos vitória)"),
     ):
-        y = 3.99 + 0.43 * linha
+        y = 3.94 + 0.41 * linha
         _texto(slide, simbolo, x, y, 0.25, 0.34, tamanho=18, cor=ACCENT, forte=True)
         _texto(slide, definicao, x + 0.35, y, 5.3, altura, tamanho=18)
     _texto(
         slide,
-        "Exemplo de Y · R$ 10 de R$ 100 em material de consumo dão 10%. "
-        "O total inclui novas fornecedoras.",
+        "Unidade: empresa–município–elemento (peso igual por município). "
+        "Ex.: R$ 10 de R$ 100 = 10% (entrantes no total).",
         MARGEM,
-        5.91,
+        5.68,
         CORPO,
-        0.38,
-        tamanho=17,
+        0.34,
+        tamanho=15,
     )
     _texto(
         slide,
-        f"{_destaque(numeros, 'munAnalisaveis')} municípios paulistas (eleições para prefeito, "
-        "sem capital e sem 2º turno). Ajuste linear local e placebos.",
+        f"{_destaque(numeros, 'munAnalisaveis')} municípios paulistas (sem capital, 2º turno, "
+        "ruptura ou ausência de A/B). Ajuste linear local, placebos"
+        + (
+            f" e densidade da margem (p = {_numero(densidade_margem, 3)})."
+            if densidade_margem is not None
+            else "."
+        ),
         MARGEM,
-        6.48,
+        6.14,
         CORPO,
-        0.38,
-        tamanho=17,
+        0.58,
+        tamanho=15,
         cor=CINZA,
-    )
-    densidade_margem = (
-        resumo.row(0, named=True).get("densidade_p_valor")
-        if resumo is not None and resumo.height
-        else None
     )
     _nota(
         notas,
         "Voz 2",
-        80,
-        "A amostra exclui a capital, que tem tribunal de contas próprio, e usa eleições "
-        "decididas no primeiro turno.\n\n"
-        "Em H1 e H2, Y é a fatia da fornecedora nos empenhos municipais de 2025 por tipo "
-        "de despesa. Se X tem dez reais de um total de cem, sua fatia é de dez por cento. "
-        "O total inclui novas fornecedoras.\n\n"
-        "M é o percentual de votos válidos de A menos o de B, em pontos percentuais. T vale "
-        "um na derrota de A e zero na vitória. A banda b é a distância máxima ao empate para "
-        "entrar no ajuste.\n\n"
-        "Cada lado tem sua reta. Alfa é a fatia prevista no empate pela reta do lado da "
-        "vitória. Gama é a inclinação dessa reta. Teta multiplica T vezes M e mede a mudança "
-        "de inclinação na derrota. O termo u é a diferença entre a fatia observada e a "
-        "prevista.\n\n"
-        "Beta é o salto no empate, a previsão do lado da derrota menos a do lado da vitória. "
-        "Esse salto estima o efeito local da derrota se a fatia variar continuamente em cada "
-        "cenário perto do empate. Com dados pré-eleitorais, checamos se já havia um salto.",
-        "Na equação, T = 1 se M < 0 e T = 0 se M ≥ 0. A reta do lado da derrota tem "
-        "inclinação γ + θ e intercepto α + β.",
-        "Nossa base de empenhos vem do Tribunal de Contas do Estado. Em disputas com "
-        "segundo turno, o líder do primeiro ainda pode perder.",
-        "Também excluímos os municípios sem A identificável ou sem adversário. "
-        "O suporte na banda varia por coorte.",
-        "Usamos núcleo triangular, banda escolhida pelo erro quadrático médio estimado e "
-        "correção de viés. Os contrastes reamostram municípios de cada lado em conjunto, "
-        "com bandas fixas.",
-        f"O teste de densidade da margem deu p = {_numero(densidade_margem)}. "
-        "Também verificamos placebos e sensibilidade à metade e ao dobro da banda.",
-        "Fornecedora anterior tem saldo líquido positivo na janela pré-eleitoral. "
-        "O desfecho de H1 e H2 inclui os saldos positivos das entrantes no denominador.",
+        75,
+        "Usamos uma regressão descontínua na margem de votos M: percentual de A menos percentual "
+        "de B. À esquerda do zero, A perde e T vale um; à direita, A vence e T vale zero.\n\n"
+        "A unidade é empresa, município e elemento de despesa, com peso igual por município por "
+        "coorte. Se X recebeu dez reais de cem naquele elemento, sua fatia Y é de dez por cento, "
+        "com entrantes no total.\n\n"
+        "Ajustamos retas locais dentro da banda b: alfa é a fatia prevista na vitória, beta é o "
+        "salto na derrota e gama e teta dão as inclinações, com erro u. Sob continuidade perto "
+        "do corte, beta estima o efeito causal local. Checamos placebos pré-eleitorais e o teste "
+        "de densidade da margem, sem evidência de manipulação.",
+        "Na equação, T = 1 se M < 0 e T = 0 se M ≥ 0; usamos núcleo triangular, banda ótima pelo "
+        f"EQM e correção robusta de viés (CCT), com bandas de {banda_min} a {banda_max} p.p. em "
+        "H1 e H2 e checagens em b/2 e 2b.",
+        "Cada município tem peso unitário por coorte (1/n_m para cada observação no município m), "
+        "evitando que cidades maiores dominem a média.",
+        f"Em primeiras diferenças (Y_2025 − Y_pré) na coorte direta a A, o erro-padrão cai "
+        f"{reducao_ep} ({_pp(ep_a0_nivel, 2)} para {_pp(ep_a0_diff, 2)} p.p.), mantendo "
+        f"estimativa nula ({_estimativa_pp(a0_diff, 2)}).",
+        f"O teste de densidade de Cattaneo, Jansson e Ma (2020) deu "
+        f"p = {_numero(densidade_margem, 3)}; contrastes entre coortes usam reamostragem "
+        "municipal em bloco (999 réplicas) com bandas fixas.",
+        "Fornecedora anterior é quem teve saldo líquido positivo na janela pré-eleitoral "
+        "(2021–set/2024); o denominador de 2025 inclui todas as empresas com saldo positivo no "
+        "elemento, inclusive entrantes.",
     )
 
     # 6. Fontes e estrutura da rede
-    slide = _pagina(prs, "Uma rede societária para todos os municípios", REDE)
-    faixa = slide.shapes.add_shape(
-        MSO_SHAPE.RECTANGLE, Inches(MARGEM), Inches(1.66), Inches(CORPO), Inches(1.28)
+    empresas = _estatistica_rede(perfil, "empresas")
+    pessoas = _estatistica_rede(perfil, "pessoas")
+    vinculos = _estatistica_rede(perfil, "vinculos")
+    grau_medio = vinculos / empresas if empresas and vinculos is not None else None
+    grau_medio_pessoa = vinculos / pessoas if pessoas and vinculos is not None else None
+    por_milhao = grau_medio * 1_000_000 / pessoas if pessoas and grau_medio is not None else None
+    contagem_1_2 = [
+        _celula(graus, variante="PRINCIPAL", vertice="empresa", faixa_grau=faixa).get("vertices")
+        for faixa in ("1", "2")
+    ]
+    grau_baixo = (
+        sum(contagem_1_2) / empresas
+        if empresas and all(n is not None for n in contagem_1_2)
+        else None
     )
-    estilo = faixa._element.find(qn("p:style"))
-    if estilo is not None:
-        faixa._element.remove(estilo)
+    assortatividade = _estatistica_rede(perfil, "assortatividade_grau")
+    isoladas = _celula(componentes, variante="PRINCIPAL", faixa_tamanho="1").get("empresas")
+    fracao_isoladas = isoladas / empresas if empresas and isoladas is not None else None
+    maior = numeros.valor("rede_resumo", ("PRINCIPAL", "fracao_no_maior_componente"), "valor")
+    maior_sem_art = numeros.valor(
+        "rede_resumo", ("SEM_ARTICULACAO", "fracao_no_maior_componente"), "valor"
+    )
+    municipios = numeros.valor("links_pc1", ("municipios_analisaveis", ""), "valor")
+    mun_a = _estatistica_rede(perfil, "municipios_com_conexao_a")
+    mun_b = _estatistica_rede(perfil, "municipios_com_conexao_b")
+    h1_a = _celula(resumo, hipotese="H1", tipo="categoria", categoria="conectada_incumbente")
+    derrotas_a = h1_a.get("municipios_tratados")
+    vitorias_a = h1_a.get("municipios_controle")
+    pares_0_a = _celula(distancias_rede, variante="PRINCIPAL", grupo="A", faixa="0").get(
+        "pares_empresa_municipio"
+    )
+    pf_501 = _celula(ambig_rfb, tipo_socio="PF", faixa_empresas="501+").get("pessoas")
+    max_501 = _celula(ambig_rfb, tipo_socio="PF", faixa_empresas="501+").get("maximo")
+    sem_rede_n = _celula(val_panel, variante="PRINCIPAL", medida="n_fornecedoras_sem_rede").get(
+        "valor"
+    )
+    frac_pre_sem_rede = _celula(val_panel, variante="PRINCIPAL", medida="valor_pre_sem_rede").get(
+        "valor"
+    )
+    cand_auto_a = _celula(links_pc1, indicador="candidatos_autofinanciados", grupo="A").get("valor")
+    cand_auto_b = _celula(links_pc1, indicador="candidatos_autofinanciados", grupo="B").get("valor")
+    so_auto_a = _celula(
+        links_pc1, indicador="empresas_conectadas_so_por_autofinanciamento", grupo="A"
+    ).get("valor")
+    so_auto_b = _celula(
+        links_pc1, indicador="empresas_conectadas_so_por_autofinanciamento", grupo="B"
+    ).get("valor")
+    vinc_out = _celula(val_rfb, medida="socios_linhas_por_origem", categoria="2024-10").get("valor")
+    vinc_tot_rfb = _celula(val_rfb, medida="socios_linhas_gravadas", categoria="total").get("valor")
+    frac_outubro = vinc_out / vinc_tot_rfb if vinc_out is not None and vinc_tot_rfb else None
+    emp_preenchidas = _celula(
+        val_rfb, medida="preenchimento_empresas", categoria="preenchidas"
+    ).get("valor")
+    data_socios0_raw = _celula(
+        val_rfb, medida="arquivo_de_outra_extracao", categoria="Socios0.zip"
+    ).get("valor")
+    data_socios0 = (
+        f"{str(int(data_socios0_raw))[6:8]}/{str(int(data_socios0_raw))[4:6]}/"
+        f"{str(int(data_socios0_raw))[:4]}"
+        if data_socios0_raw is not None
+        else "n.d."
+    )
+
+    slide = _pagina(
+        prs,
+        "Uma rede societária para todos os municípios",
+        REDE,
+        f"Densidade bipartida: {_numero(por_milhao)} vínculo por milhão de pares · "
+        f"Assortatividade r = {_numero(assortatividade, 4)} (sem padrão entre graus).",
+    )
+    faixa = slide.shapes.add_shape(
+        MSO_SHAPE.RECTANGLE, Inches(MARGEM), Inches(1.58), Inches(CORPO), Inches(1.36)
+    )
+    _sem_estilo(faixa)
     faixa.fill.solid()
     faixa.fill.fore_color.rgb = PALIDO
     faixa.line.fill.background()
@@ -966,25 +1199,25 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
     ):
         x = MARGEM + i * (largura_painel + 0.50)
         if i:
-            _traco(slide, x - 0.25, 1.80, x - 0.25, 2.80)
+            _traco(slide, x - 0.25, 1.72, x - 0.25, 2.80)
         _texto(
             slide,
             titulo,
             x + 0.10,
-            1.76,
+            1.68,
             largura_painel - 0.16,
             0.28,
             tamanho=13,
             cor=ACCENT,
             forte=True,
         )
-        _texto(slide, corpo, x + 0.10, 2.04, largura_painel - 0.16, 0.86, tamanho=12, cor=INK)
+        _texto(slide, corpo, x + 0.10, 1.98, largura_painel - 0.16, 0.90, tamanho=13, cor=INK)
 
     _texto(
         slide,
         "Calculamos as ligações com A e B em cada município",
         MARGEM,
-        3.08,
+        3.10,
         CORPO,
         0.33,
         tamanho=17,
@@ -995,7 +1228,7 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
         slide,
         "Z fornece nas duas cidades. As doações a A definem uma semente diferente em cada uma.",
         MARGEM,
-        3.42,
+        3.44,
         CORPO,
         0.30,
         tamanho=15,
@@ -1004,42 +1237,17 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
         (MARGEM, "Município 1", "X", "Sócia de X doou a A. De X a Z, 2 passos."),
         (MEIO, "Município 2", "Y", "Sócio de Y doou a A. De Y a Z, 1 passo."),
     ):
-        _texto(slide, titulo, x, 3.77, 5.42, 0.24, tamanho=14, forte=True)
-        caminho = _texto(slide, "", x, 4.00, 5.42, 0.38, tamanho=21, forte=True)
+        _texto(slide, titulo, x, 3.80, 5.42, 0.24, tamanho=14, forte=True)
+        caminho = _texto(slide, "", x, 4.04, 5.42, 0.38, tamanho=21, forte=True)
         paragrafo = caminho.text_frame.paragraphs[0]
         for trecho in ("X", " — ", "Y", " — ", "Z"):
             run = paragrafo.add_run()
             run.text = f"{trecho} (semente)" if trecho == semente else trecho
             if trecho == semente:
                 run.font.color.rgb = ACCENT
-        _texto(slide, corpo, x, 4.43, 5.42, 0.26, tamanho=14, cor=CINZA)
+        _texto(slide, corpo, x, 4.48, 5.42, 0.28, tamanho=14, cor=CINZA)
 
-    _traco(slide, MARGEM, 4.76, LARGURA - MARGEM, 4.76)
-    empresas = _estatistica_rede(perfil, "empresas")
-    pessoas = _estatistica_rede(perfil, "pessoas")
-    vinculos = _estatistica_rede(perfil, "vinculos")
-    grau_medio = vinculos / empresas if empresas and vinculos is not None else None
-    grau_medio_pessoa = vinculos / pessoas if pessoas and vinculos is not None else None
-    por_milhao = grau_medio * 1_000_000 / pessoas if pessoas and grau_medio is not None else None
-    contagem_1_2 = [
-        _celula(graus, variante="PRINCIPAL", vertice="empresa", faixa_grau=faixa).get("vertices")
-        for faixa in ("1", "2")
-    ]
-    grau_baixo = (
-        sum(contagem_1_2) / empresas
-        if empresas and all(n is not None for n in contagem_1_2)
-        else None
-    )
-    assortatividade = _estatistica_rede(perfil, "assortatividade_grau")
-    isoladas = _celula(componentes, variante="PRINCIPAL", faixa_tamanho="1").get("empresas")
-    fracao_isoladas = isoladas / empresas if empresas and isoladas is not None else None
-    maior = numeros.valor("rede_resumo", ("PRINCIPAL", "fracao_no_maior_componente"), "valor")
-    maior_sem_art = numeros.valor(
-        "rede_resumo", ("SEM_ARTICULACAO", "fracao_no_maior_componente"), "valor"
-    )
-    municipios = numeros.valor("links_pc1", ("municipios_analisaveis", ""), "valor")
-    mun_a = _estatistica_rede(perfil, "municipios_com_conexao_a")
-    mun_b = _estatistica_rede(perfil, "municipios_com_conexao_b")
+    _traco(slide, MARGEM, 4.94, LARGURA - MARGEM, 4.94)
     paineis = (
         (
             "Maioria pequena ou isolada",
@@ -1089,86 +1297,119 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
     for i, (titulo, barras, detalhe) in enumerate(paineis):
         x = MARGEM + i * (largura_painel + 0.50)
         if i:
-            _traco(slide, x - 0.25, 4.94, x - 0.25, 6.55)
-        _texto(slide, titulo, x, 4.94, largura_painel, 0.32, tamanho=16, forte=True)
+            _traco(slide, x - 0.25, 5.12, x - 0.25, 6.80)
+        _texto(slide, titulo, x, 5.12, largura_painel, 0.32, tamanho=16, forte=True)
         for j, (rotulo, valor, proporcao) in enumerate(barras):
-            _barra_proporcao(slide, rotulo, valor, proporcao, x, 5.32 + j * 0.52, largura_painel)
+            _barra_proporcao(slide, rotulo, valor, proporcao, x, 5.52 + j * 0.54, largura_painel)
         if detalhe:
-            _texto(slide, detalhe, x, 6.36, largura_painel, 0.25, tamanho=12, cor=CINZA)
+            _texto(slide, detalhe, x, 6.58, largura_painel, 0.25, tamanho=12, cor=CINZA)
 
-    _texto(
-        slide,
-        f"Rede muito esparsa: {_numero(por_milhao)} vínculo por milhão de pares possíveis "
-        "(densidade bipartida).",
-        MARGEM,
-        6.78,
-        7.10,
-        0.34,
-        tamanho=12,
-        cor=CINZA,
-    )
-    _texto(
-        slide,
-        f"Assortatividade r = {_numero(assortatividade, 4)} (sem padrão entre graus).",
-        7.95,
-        6.78,
-        4.63,
-        0.34,
-        tamanho=12,
-        cor=CINZA,
-        alinhar=PP_ALIGN.RIGHT,
+    suporte_h1 = (
+        _numero(derrotas_a + vitorias_a, 0)
+        if derrotas_a is not None and vitorias_a is not None
+        else "n.d."
     )
     _nota(
         notas,
         "Voz 3",
-        75,
-        "A rede societária é nacional. Calculamos as ligações com A e B para as "
-        "candidaturas de cada município. As doações a essas candidaturas definem as "
-        "empresas-semente de onde partimos.\n\n"
-        "No exemplo do slide, a empresa Z fornece para duas prefeituras. Na primeira, "
-        "uma sócia de X doou a A. X é a semente, então contamos dois passos até Z, passando "
-        "por Y. Na segunda, um sócio de Y doou a A. Agora a semente é Y, e Z está a um "
+        65,
+        "Cruzamos três bases: o cadastro nacional da Receita Federal, as doações ao TSE até 5 "
+        "de outubro de 2024 e os empenhos do TCESP no interior paulista.\n\n"
+        "No centro, mostramos como as distâncias são municipais: se uma sócia de X doou a A na "
+        "cidade 1, Z fica a dois passos; se um sócio de Y doou a A na cidade 2, Z fica a um "
         "passo.\n\n"
-        "A rede é esparsa, e muitas empresas ficam em grupos separados. Ainda assim, "
-        f"o maior grupo conectado reúne {_destaque(numeros, 'fracGigante')} das empresas. "
-        "Quando retiramos os sócios ou administradores que funcionam como pontes, "
-        "esse grupo encolhe.",
-        "A Receita Federal liga "
-        f"{_destaque(numeros, 'empresasRede')} empresas a "
+        "A rede é muito esparsa e fragmentada, mas o maior componente conecta "
+        f"{_destaque(numeros, 'fracGigante')} das empresas — percentual que cai para "
+        f"{_destaque(numeros, 'fracGiganteSemArt')} sem sócios-ponte. Por fim, nem todos os "
+        f"{_destaque(numeros, 'munConexaoA')} municípios com semente de A fornecem ao próprio "
+        "município; só os com fornecedoras anteriores entram na estimação.",
+        f"A Receita Federal liga {_destaque(numeros, 'empresasRede')} empresas a "
         f"{_destaque(numeros, 'pessoasRede')} vértices de sócios/administradores PF/PJ em "
-        f"{_destaque(numeros, 'vinculosRede')} vínculos. "
-        "O TSE registra as doações às candidaturas. "
-        "Os empenhos líquidos dos órgãos municipais cobertos pelo TCESP, exceto a capital, "
-        "identificam as fornecedoras e mostram sua fatia em 2025; o denominador inclui "
-        "entrantes. Usamos todos os empenhos de 2025, não só contratos novos.",
-        "A rede é fragmentada. Quase toda empresa tem um ou dois vínculos (grau médio de "
-        f"{_numero(grau_medio, 2)} para empresas e {_numero(grau_medio_pessoa, 2)} para "
-        "sócios) e quase metade não tem vizinha. Entre "
-        f"{_destaque(numeros, 'componentesRede')} grupos separados, um único componente "
-        f"gigante reúne {_destaque(numeros, 'fracGigante')} das empresas. Sem os sócios ou "
-        "administradores que funcionam como ponte, o maior grupo cai para "
-        f"{_destaque(numeros, 'fracGiganteSemArt')}.",
-        f"Nos {_destaque(numeros, 'munAnalisaveis')} municípios analisáveis, encontramos "
-        f"sementes de A em {_destaque(numeros, 'munConexaoA')} e de B em "
-        f"{_destaque(numeros, 'munConexaoB')}.",
-        "O complemento de 12/10/2024 só usa vínculos iniciados até 13/09/2024 "
-        "em empresas do cadastro de setembro sem quadro válido naquela fotografia. "
-        "Vínculos encerrados até outubro podem faltar.",
-        f"Ligamos a empresas {_destaque(numeros, 'taxaCruzamentoA')} dos doadores de A "
-        f"e {_destaque(numeros, 'taxaCruzamentoB')} dos de B.",
-        "A assortatividade é a correlação de Pearson entre os graus da empresa e do "
-        "sócio ou administrador em cada aresta. A densidade divide o número de arestas "
-        "pelo produto das duas contagens de vértices.",
-        "Na versão sem pontos de articulação, o universo de empresas é mantido e os "
-        "caminhos societários mudam.",
+        f"{_destaque(numeros, 'vinculosRede')} vínculos e "
+        f"{_destaque(numeros, 'componentesRede')} componentes (grau médio {_numero(grau_medio, 2)} "
+        f"para empresas e {_numero(grau_medio_pessoa, 2)} para sócios; densidade bipartida de "
+        f"{_numero(por_milhao)} por milhão; assortatividade r = {_numero(assortatividade, 4)}).",
+        f"Dos {_destaque(numeros, 'munConexaoA')} municípios com semente de A "
+        f"({_destaque(numeros, 'munConexaoB')} para B), chegamos a {_numero(pares_0_a, 0)} pares "
+        f"empresa–município fornecedores ligados diretamente a A, dos quais {suporte_h1} "
+        f"municípios ({_numero(derrotas_a, 0)} derrotas e {_numero(vitorias_a, 0)} vitórias) "
+        "entram na banda principal de H1.",
+        f"Na ambiguidade de nomes da RFB, há {_numero(pf_501, 0)} pseudônimos PF em 501+ "
+        f"empresas (máximo de {_numero(max_501, 0)} firmas); retirar pontes de articulação "
+        f"({_destaque(numeros, 'fracGiganteSemArt')}) ou administradores "
+        f"({_destaque(numeros, 'fracGiganteSemAdm')}) testa essa sensibilidade.",
+        f"No painel, {_numero(sem_rede_n, 0)} fornecedoras anteriores sem QSA "
+        f"({percentual(frac_pre_sem_rede) if frac_pre_sem_rede is not None else 'n.d.'} do valor "
+        'pré-eleitoral) permanecem no grupo "Sem ligação".',
+        f"Ligamos a empresas {_destaque(numeros, 'taxaCruzamentoA')} dos doadores de A e "
+        f"{_destaque(numeros, 'taxaCruzamentoB')} dos de B; no autofinanciamento, "
+        f"{_numero(cand_auto_a, 0)} candidatos A ({_numero(cand_auto_b, 0)} B) conectam "
+        f"{_numero(so_auto_a, 0)} firmas A ({_numero(so_auto_b, 0)} B) só por recursos próprios.",
+        f"A recomposição de outubro supre "
+        f"{percentual(frac_outubro) if frac_outubro is not None else 'n.d.'} dos vínculos "
+        f"({_numero(emp_preenchidas, 0)} empresas) porque Socios0.zip da pasta de setembro veio "
+        f"da extração de {data_socios0}.",
     )
 
     # 7. Resultados de H1 (ligação direta)
     h1 = _celula(resumo, hipotese="H1", tipo="contraste")
-    h1_a = _celula(resumo, hipotese="H1", tipo="categoria", categoria="conectada_incumbente")
     h1_sem = _celula(resumo, hipotese="H1", tipo="categoria", categoria="sem_conexao")
+    h1_a_ep = _celula(
+        h1_tab,
+        hipotese="H1",
+        tipo="categoria",
+        categoria="conectada_incumbente",
+        resultado="participacao_2025",
+    ).get("ep_robusto")
+    h1_c_ep = _celula(
+        h1_tab,
+        hipotese="H1",
+        tipo="contraste",
+        categoria="conectada_menos_sem_conexao",
+        resultado="participacao_2025",
+    ).get("ep_robusto")
+    razao_ep = (
+        f"{_numero(100 * (h1_c_ep / h1_a_ep - 1), 0)}%"
+        if h1_a_ep and h1_c_ep is not None
+        else "n.d."
+    )
+    pre_h1 = _celula(
+        pre_periodos, hipotese="H1", tipo="contraste", categoria="conectada_menos_sem_conexao"
+    )
+    auto_h1 = _celula(
+        sem_auto,
+        hipotese="H1",
+        tipo="contraste",
+        categoria="conectada_menos_sem_conexao",
+        resultado="participacao_2025",
+    )
+    set_h1 = _celula(
+        apenas_set,
+        hipotese="H1",
+        tipo="contraste",
+        categoria="conectada_menos_sem_conexao",
+        resultado="participacao_2025",
+    )
+    rob_h1 = _celula(
+        robustez_tbl,
+        hipotese="H1",
+        tipo="contraste",
+        categoria="conectada_menos_sem_conexao",
+        resultado="participacao_2025",
+    )
     h4 = _celula(resumo, hipotese="H4", tipo="contraste", categoria="ligada_ao_vencedor_50")
-    direta = _celula(_ler_tabela(pasta, "descritivas_estimacao"), categoria="faixa_a_0")
+    h4_det = _celula(
+        h4_tab,
+        hipotese="H4",
+        tipo="contraste",
+        categoria="ligada_ao_vencedor_50",
+        resultado="mantem_posicao_50",
+    )
+    emd_h4 = h4.get("emd") if h4.get("emd") is not None else h4_det.get("emd")
+    h3_ambos_gig = _celula(sens_gigante, coorte="H3_ambos").get("fracao_empenho_gigante")
+    h4_a_gig = _celula(sens_gigante, coorte="H4_rdd_A_50").get("fracao_peso_gigante")
+    h4_b_gig = _celula(sens_gigante, coorte="H4_rdd_B_50").get("fracao_peso_gigante")
+    direta = _celula(descritivas, categoria="faixa_a_0")
     media_direta = direta.get("media_participacao_2025")
     emd_h1 = h1.get("emd")
     escala_emd = (
@@ -1177,8 +1418,6 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
         if emd_h1 is not None and media_direta is not None and media_direta > 0
         else None
     )
-    derrotas_a = h1_a.get("municipios_tratados")
-    vitorias_a = h1_a.get("municipios_controle")
     amostra_a = (
         f"{_numero(derrotas_a, 0)} municípios com A derrotado e "
         f"{_numero(vitorias_a, 0)} com A vitorioso"
@@ -1202,8 +1441,8 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
         prs,
         "As fornecedoras ligadas a A perdem fatia (H1)?",
         RESULTADOS,
-        "p.p.: pontos percentuais da fatia dos empenhos de 2025 no elemento de despesa. "
-        "ICs de 95% (contraste por reamostragem municipal).",
+        "p.p.: fatia em 2025 por elemento. Categorias: IC robusto analítico (CCT); "
+        "contraste: reamostragem municipal (999 réplicas).",
     )
     _texto(
         slide,
@@ -1313,22 +1552,34 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
         notas,
         "Voz 3",
         70,
-        "Para testar H1, estimamos o salto na fatia das fornecedoras ligadas diretamente a "
-        "A quando ele perde perto do empate. Repetimos a estimativa para as empresas sem "
-        "caminho a A ou B. Cada grupo tem sua própria janela de margens eleitorais. "
-        "O contraste subtrai o salto das empresas sem caminho do salto das ligadas a A.\n\n"
-        f"A estimativa foi de {_pp(h1.get('estimativa'))} pontos percentuais. O intervalo "
-        f"de confiança de 95% vai de {_intervalo(h1)} pontos percentuais. {leitura_h1}"
+        "Na H1, comparamos o salto na fatia de 2025 das fornecedoras ligadas diretamente a A com "
+        "o salto das empresas sem caminho a A nem a B, cada grupo em sua banda.\n\n"
+        f"A estimativa do contraste foi de {_pp(h1.get('estimativa'))} pontos percentuais, com "
+        f"intervalo de 95% de {_intervalo(h1)} pontos percentuais. {leitura_h1}"
         f"{frase_emd}{frase_amostra}",
-        f"A estimativa das ligadas a A é {_estimativa_pp(h1_a)} "
-        f"({_ic_pp(h1_a)}) e a das sem ligação é {_estimativa_pp(h1_sem)} ({_ic_pp(h1_sem)}).",
-        f"Meia banda: {_pp(h1.get('estimativa_meia_banda'))} p.p.; dobro da banda: "
-        f"{_pp(h1.get('estimativa_dobro_banda'))} p.p.; placebo pré-eleitoral: "
-        f"{_pp(h1.get('placebo_estimativa'))} p.p. (p = {_numero(h1.get('placebo_p_valor'), 2)}); "
-        f"EMD: {_pp(h1.get('emd'))} p.p.",
-        "H4 (permanência no topo) ficou fora da apresentação principal por falta de "
-        f"uma comparação informativa. No limiar de 50%, o efeito mínimo detectável é "
-        f"{_pp(h4.get('emd'))} p.p. numa escala de 0 a 100%. O relatório preserva o teste.",
+        f"Ligadas a A: {_estimativa_pp(h1_a)} ({_ic_pp(h1_a)}, EP robusto CCT de "
+        f"{_pp(h1_a_ep, 2)} p.p.); Sem ligação: {_estimativa_pp(h1_sem)} ({_ic_pp(h1_sem)}). "
+        f"O contraste tem EP de {_pp(h1_c_ep, 2)} p.p. por reamostragem municipal (999 réplicas) — "
+        f"cerca de {razao_ep} mais largo que o de Ligadas a A por combinar incerteza amostral "
+        f"entre coortes com suporte assimétrico ({_numero(derrotas_a, 0)}/{_numero(vitorias_a, 0)} "
+        "municípios).",
+        "Os dois placebos de H1 incluem zero: nível pré-eleitoral de "
+        f"{_pp_sinal(h1.get('placebo_estimativa'), 1)} "
+        f"(p = {_numero(h1.get('placebo_p_valor'), 2)}) e tendência pré-eleitoral (2023–24 vs. "
+        f"2021–22) de {_pp_sinal(pre_h1.get('estimativa'), 2)} "
+        f"(p = {_numero(pre_h1.get('p_valor'), 2)}).",
+        f"Sensibilidades de H1: meia banda {_pp_sinal(h1.get('estimativa_meia_banda'), 1)}, "
+        f"dobro da banda {_pp_sinal(h1.get('estimativa_dobro_banda'), 1)}, sem autofinanciamento "
+        f"{_estimativa_pp(auto_h1)}, apenas setembro {_estimativa_pp(set_h1)}, sem pontes "
+        f"{_pp_sinal(rob_h1.get('estimativa_sem_articulacao'), 1)} e sem pessoal/credor público "
+        f"{_estimativa_pp(sem_pessoal_h1)}",
+        "H3 e H4 ficaram fora da apresentação principal e do relatório, preservadas apenas em "
+        f"results/tables/: na H3, a coorte AMBOS concentra "
+        f"{percentual(h3_ambos_gig, 2) if h3_ambos_gig is not None else 'n.d.'} do empenho no "
+        f"gigante; na H4 a 50%, o EMD é {_pp(emd_h4)} p.p. numa escala de 0 a 100% e "
+        f"{percentual(h4_a_gig, 0) if h4_a_gig is not None else 'n.d.'}/"
+        f"{percentual(h4_b_gig, 0) if h4_b_gig is not None else 'n.d.'} do peso/empenho nas "
+        "bandas está no gigante.",
     )
 
     # 8. Contrastes por distância
@@ -1338,6 +1589,41 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
     }
     pre_b = _celula(pre_periodos, hipotese="H2", tipo="categoria", categoria="faixa_b_1")
     pre_h2 = _celula(pre_periodos, hipotese="H2", tipo="contraste", categoria="vencedor_faixa_1")
+    diff_h2_1 = _celula(
+        placebo_tbl,
+        hipotese="H2",
+        tipo="contraste",
+        categoria="vencedor_faixa_1",
+        resultado="variacao_participacao",
+    )
+    auto_h2_1 = _celula(
+        sem_auto,
+        hipotese="H2",
+        tipo="contraste",
+        categoria="vencedor_faixa_1",
+        resultado="participacao_2025",
+    )
+    set_h2_1 = _celula(
+        apenas_set,
+        hipotese="H2",
+        tipo="contraste",
+        categoria="vencedor_faixa_1",
+        resultado="participacao_2025",
+    )
+    rob_h2_1 = _celula(
+        robustez_tbl,
+        hipotese="H2",
+        tipo="contraste",
+        categoria="vencedor_faixa_1",
+        resultado="participacao_2025",
+    )
+    h2_1_det = _celula(
+        h2_tab,
+        hipotese="H2",
+        tipo="contraste",
+        categoria="vencedor_faixa_1",
+        resultado="participacao_2025",
+    )
     b1 = _celula(
         resumo,
         hipotese="H2",
@@ -1345,12 +1631,28 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
         categoria="faixa_b_1",
         resultado="participacao_2025",
     )
-    destaque_h2 = "Testar se o efeito diminui exige comparar as faixas entre si."
-    salto_pre_b = _status(pre_b) == _status(b1) == "negativo"
-    piso = piso_gigante_h2(pasta)
-    recorte = (
-        leitura_h2_comparaveis(comparaveis.iter_rows(named=True)) if comparaveis is not None else ""
+    a1 = _celula(
+        resumo,
+        hipotese="H2",
+        tipo="categoria",
+        categoria="faixa_a_1",
+        resultado="participacao_2025",
     )
+    gig_b1 = _celula(conc_gigante_h2, recorte="principal", faixa="1", grupo="B", janela="h")
+    gig_a1 = _celula(conc_gigante_h2, recorte="principal", faixa="1", grupo="A", janela="h")
+    media_b1 = _celula(descritivas, categoria="faixa_b_1").get("media_participacao_2025")
+    media_a1 = _celula(descritivas, categoria="faixa_a_1").get("media_participacao_2025")
+    sobrep_0 = _celula(comp_h2, faixa="0").get("sobreposicao_mercado_porte")
+    sobrep_1 = _celula(comp_h2, faixa="1").get("sobreposicao_mercado_porte")
+    comp_b1 = _celula(
+        comparaveis,
+        hipotese="H2",
+        tipo="categoria",
+        categoria="faixa_b_1",
+        resultado="participacao_2025",
+    )
+    destaque_h2 = "Testar se o efeito diminui exige comparar as faixas entre si."
+    piso = piso_gigante_h2(pasta)
     comparavel_1 = _celula(
         comparaveis,
         hipotese="H2",
@@ -1359,6 +1661,7 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
         resultado="participacao_2025",
     )
     sem_suporte_1 = comparaveis is not None and not comparavel_1.get("estimavel", True)
+    sinal_oposto = (h2["1"].get("estimativa") or 0) < 0
     slide = _pagina(
         prs,
         "Fatia em 2025 por distância a A e B",
@@ -1368,12 +1671,12 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
     )
     _texto(
         slide,
-        "Análise exploratória. Para cada distância, calculamos (salto da coorte B − salto da "
-        "coorte A) ÷ 2. As coortes são definidas antes do voto e podem incluir as mesmas firmas.",
+        "Análise exploratória. Em cada distância, calculamos (salto de B − salto de A) ÷ 2 "
+        "(> 0 = vantagem ao vencedor). Coortes pré-eleitorais podem compartilhar firmas.",
         MARGEM,
-        1.56,
+        1.54,
         CORPO,
-        0.68,
+        0.58,
         tamanho=15,
         cor=CINZA,
     )
@@ -1384,122 +1687,226 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
         slide,
         destaque_h2,
         MARGEM,
-        6.12,
+        6.08,
         6.45,
-        0.30,
-        tamanho=14,
+        0.26,
+        tamanho=13,
         cor=CINZA,
     )
+    notas_esq_h2 = []
     if piso is not None:
-        _texto(
-            slide,
-            f"A 3+ passos, ao menos {_pp(piso, 0)}% no componente gigante.",
-            MARGEM,
-            6.40,
-            6.45,
-            0.24,
-            tamanho=13,
-            cor=CINZA,
-        )
+        notas_esq_h2.append(f"A 3+ passos, ao menos {_pp(piso, 0)}% no gigante.")
     if sem_suporte_1:
+        notas_esq_h2.append(
+            "Estratos (município × elemento × quintil prévio): 1 passo sem suporte."
+        )
+    if notas_esq_h2:
         _texto(
             slide,
-            "Recorte comparável por estratos: sem estimativa a 1 passo.",
+            " ".join(notas_esq_h2),
             MARGEM,
-            6.66,
+            6.38,
             6.45,
-            0.24,
-            tamanho=11,
+            0.46,
+            tamanho=12,
             cor=CINZA,
         )
-    _traco(slide, 7.43, 2.34, 7.43, 6.56)
+    _traco(slide, 7.43, 2.26, 7.43, 6.72)
     _texto(
         slide,
-        "CONTRASTE ENTRE COORTES A 1 PASSO",
-        7.81,
-        2.34,
-        4.76,
-        0.28,
-        tamanho=13,
+        "CONTRASTE A 1 PASSO EM 2025",
+        7.75,
+        2.26,
+        4.83,
+        0.26,
+        tamanho=12,
         cor=ACCENT,
         forte=True,
     )
     _texto(
         slide,
-        _pp(h2["1"].get("estimativa"), 2)
-        + (" p.p." if h2["1"].get("estimativa") is not None else ""),
-        7.81,
-        2.62,
-        4.76,
-        0.70,
-        tamanho=38,
+        _estimativa_pp(h2["1"], 2),
+        7.75,
+        2.50,
+        4.83,
+        0.64,
+        tamanho=36,
         fonte=FONTE_TITULO,
         cor=ACCENT,
     )
     _texto(
         slide,
         _ic_pp(h2["1"], 2),
-        7.81,
-        3.38,
-        4.76,
-        0.64,
-        tamanho=14,
-    )
-    _traco(slide, 7.81, 4.10, 12.57, 4.10)
-    _texto(
-        slide,
-        "PLACEBO PRÉ-ELEITORAL · COORTE B A 1 PASSO",
-        7.81,
-        4.24,
-        4.76,
+        7.75,
+        3.14,
+        4.83,
         0.26,
         tamanho=13,
+        forte=True,
+    )
+    if sinal_oposto:
+        _texto(
+            slide,
+            "Sinal oposto ao previsto (> 0 = vantagem ao vencedor)",
+            7.75,
+            3.42,
+            4.83,
+            0.24,
+            tamanho=12.5,
+            cor=ACCENT,
+            forte=True,
+        )
+
+    def _linha_coorte_h2(nome: str, linha: dict, gigante: dict) -> str:
+        partes = []
+        mun_t, mun_c = linha.get("municipios_tratados"), linha.get("municipios_controle")
+        if mun_t is not None and mun_c is not None:
+            partes.append(f"{_numero(mun_t, 0)}/{_numero(mun_c, 0)} mun.")
+        peso_g = gigante.get("fracao_peso_gigante")
+        if peso_g is not None:
+            partes.append(f"{_pp(peso_g, 0)}% no gigante")
+        detalhe = f" ({', '.join(partes)})" if partes else ""
+        return f"{nome}: {_pp_sinal(linha.get('estimativa'), 2)}{detalhe}"
+
+    _texto(
+        slide,
+        _linha_coorte_h2("B", b1, gig_b1),
+        7.75,
+        3.70,
+        4.83,
+        0.24,
+        tamanho=12,
+        cor=CINZA,
+    )
+    _texto(
+        slide,
+        _linha_coorte_h2("A", a1, gig_a1),
+        7.75,
+        3.94,
+        4.83,
+        0.24,
+        tamanho=12,
+        cor=CINZA,
+    )
+    _traco(slide, 7.75, 4.24, 12.58, 4.24)
+    _texto(
+        slide,
+        "DIAGNÓSTICO E SENSIBILIDADE (1 PASSO)",
+        7.75,
+        4.34,
+        4.83,
+        0.26,
+        tamanho=12,
         cor=ACCENT,
         forte=True,
     )
-    _texto(
-        slide,
-        "Na mesma coorte B, usamos a mudança de fatia entre jan/2021–dez/2022 e "
-        "jan/2023–set/2024. Mantemos a margem e as bandas da análise de 2025.",
-        7.81,
-        4.54,
-        4.76,
-        0.92,
-        tamanho=13,
-        cor=INK,
+    b1_placebo = {"estimativa": b1.get("placebo_estimativa")}
+    ic_diff = _intervalo(diff_h2_1, 2)
+    ic_auto = _intervalo(auto_h2_1, 2)
+    sem_suporte = []
+    if apenas_set is not None and not set_h2_1.get("estimavel", True):
+        sem_suporte.append("set/24")
+    if rob_h2_1 and rob_h2_1.get("estimativa_sem_articulacao") is None:
+        sem_suporte.append("sem pontes")
+    if rob_h2_1 and rob_h2_1.get("estimativa_sem_administrador") is None:
+        sem_suporte.append("sem adm.")
+    if sem_suporte_1:
+        sem_suporte.append("estratos")
+    if len(sem_suporte) > 1:
+        texto_sem = f" Sem suporte em {', '.join(sem_suporte[:-1])} ou {sem_suporte[-1]}."
+    elif sem_suporte:
+        texto_sem = f" Sem suporte em {sem_suporte[0]}."
+    else:
+        texto_sem = ""
+    diagnosticos = (
+        f"• Pré-eleição em B: salto prévio de {_estimativa_pp(b1_placebo, 2)} (nível) e "
+        f"{_estimativa_pp(pre_b, 2)} (tendência 2023–24 vs. 2021–22).",
+        f"• Pós − pré (2025 − 2021–24): {_pp_sinal(diff_h2_1.get('estimativa'), 2)}"
+        + (f" (IC {ic_diff})." if ic_diff != "n.d." else "."),
+        f"• Sem autofinanciamento: {_estimativa_pp(auto_h2_1, 2)}"
+        + (f" (IC {ic_auto})." if ic_auto != "n.d." else ".")
+        + texto_sem,
     )
-    comparacao_b = (
-        f"O salto em B foi de {_estimativa_pp(pre_b, 2)} antes do voto e de "
-        f"{_estimativa_pp(b1, 2)} em 2025."
-    )
-    leitura_b = " O salto antes do voto enfraquece a leitura causal para B." if salto_pre_b else ""
-    _texto(slide, f"{comparacao_b}{leitura_b}", 7.81, 5.52, 4.76, 1.16, tamanho=14)
+    for y_diag, linha_diag in zip((4.66, 5.32, 5.78), diagnosticos, strict=True):
+        _texto(
+            slide,
+            linha_diag,
+            7.75,
+            y_diag,
+            4.83,
+            0.58,
+            tamanho=12.5,
+            cor=INK,
+        )
+
+    fragilidades_nota = []
+    if apenas_set is not None and not set_h2_1.get("estimavel", True):
+        fragilidades_nota.append("apenas setembro")
+    if rob_h2_1 and rob_h2_1.get("estimativa_sem_articulacao") is None:
+        fragilidades_nota.append("sem pontos de articulação")
+    if rob_h2_1 and rob_h2_1.get("estimativa_sem_administrador") is None:
+        fragilidades_nota.append("sem administradores")
+    if h2_1_det and h2_1_det.get("estimativa_meia_banda") is None:
+        fragilidades_nota.append("meia banda")
+    if len(fragilidades_nota) > 1:
+        lista_frag = f"{', '.join(fragilidades_nota[:-1])} e {fragilidades_nota[-1]}"
+        texto_frag = f"; fica sem estimação válida em {lista_frag}"
+    elif fragilidades_nota:
+        texto_frag = f"; fica sem estimação válida em {fragilidades_nota[0]}"
+    else:
+        texto_frag = ""
     _nota(
         notas,
         "Voz 4",
-        100,
-        "Na H2, formamos grupos pela distância a A e a B na rede, com os vínculos que já "
-        "existiam antes do voto. Para cada distância, pegamos o salto do grupo de B, "
-        "subtraímos o salto do grupo de A e dividimos por dois. No quadro à esquerda, "
-        f"o contraste a um passo em 2025 foi de {_pp(h2['1'].get('estimativa'), 2)} pontos "
-        f"percentuais, com intervalo de confiança de 95% de {_intervalo(h2['1'], 2)}. "
-        "No recorte comparável por estratos, a estimação fica indefinida a um passo, então "
-        "a leitura depende de quão comparáveis são os dois grupos.\n\n"
-        "À direita, o diagnóstico é só da coorte B: testamos se o salto já aparecia antes da "
-        "eleição nesse grupo. No placebo, mantemos a margem eleitoral e usamos a mudança de "
-        "fatia do biênio 2021–2022 para o período de janeiro de 2023 a setembro de 2024. "
-        f"O salto em B foi de {_pp(pre_b.get('estimativa'), 2)} pontos percentuais no "
-        f"placebo e de {_pp(b1.get('estimativa'), 2)} em 2025.{leitura_b}",
-        "Ler o contraste como vantagem da ligação ao vencedor exige coortes comparáveis e "
-        "simetria entre os efeitos de ganhar e perder essa ligação. A mesma firma pode entrar "
-        "nas duas coortes, e um passo societário não mede necessariamente proximidade política.",
-        f"O placebo para B a um passo tem {_ic_pp(pre_b, 2)} (nominal). Em 2025, "
-        f"o salto de B tem p de Holm = {_numero(b1.get('p_holm'))} na família secundária.",
-        f"O contraste entre A e B a um passo, no placebo de mudança pré-eleitoral, foi de "
-        f"{_estimativa_pp(pre_h2, 2)} ({_ic_pp(pre_h2, 2)}, nominal).",
+        85,
+        "Na H2, olhamos a distância societária a A e a B antes da eleição e calculamos, em cada "
+        "faixa, o salto de B menos o de A dividido por dois, em que valores positivos indicam "
+        "vantagem ao vencedor.\n\n"
+        f"A um passo, o contraste em 2025 foi de {_estimativa_pp(h2['1'], 2)}, com intervalo de "
+        f"{_intervalo(h2['1'], 2)} — ou seja, sinal oposto ao previsto, puxado pela queda em B "
+        f"({_estimativa_pp(b1, 2)}), enquanto A fica perto de zero "
+        f"({_pp_sinal(a1.get('estimativa'), 2)}).\n\n"
+        "Além disso, o recorte comparável por estratos fica sem suporte a um passo, e o "
+        "diagnóstico pré-eleitoral mostra que B já apresentava salto negativo antes da eleição: "
+        f"{_estimativa_pp(b1_placebo, 2)} em nível e {_estimativa_pp(pre_b, 2)} na tendência. "
+        f"Quando fazemos pós menos pré no contraste, o efeito vira "
+        f"{_pp_sinal(diff_h2_1.get('estimativa'), 2)}, e sem autofinanciamento cai para "
+        f"{_estimativa_pp(auto_h2_1, 2)}, ambos cruzando o zero.",
+        f"Decomposição a 1 passo: B tem {_estimativa_pp(b1, 2)} "
+        f"(p de Holm = {_numero(b1.get('p_holm'))}, média na banda "
+        f"{_pct(media_b1, 2)}) e A tem "
+        f"{_pp_sinal(a1.get('estimativa'), 2)} (p de Holm = {_numero(a1.get('p_holm'))}, média "
+        f"{_pct(media_a1, 2)}); os grupos diferem em porte.",
+        "Três diagnósticos de 1 passo: nível pré-eleitoral de "
+        f"{_estimativa_pp({'estimativa': h2['1'].get('placebo_estimativa')}, 2)} no contraste "
+        f"({_estimativa_pp(b1_placebo, 2)} em B); tendência pré-eleitoral de "
+        f"{_estimativa_pp(pre_h2, 2)} ({_estimativa_pp(pre_b, 2)} em B); e pós − pré de "
+        f"{_pp_sinal(diff_h2_1.get('estimativa'), 2)} ({_ic_pp(diff_h2_1, 2)}).",
+        f"Fragilidade a 1 passo: sem autofinanciamento dá {_estimativa_pp(auto_h2_1, 2)} "
+        f"({_ic_pp(auto_h2_1, 2)}){texto_frag}.",
+        "Nos estratos (município × elemento × quintil prévio), a sobreposição de mercado e porte "
+        f"é de {_pct(sobrep_0)} na faixa direta e {_pct(sobrep_1)} a 1 passo; no recorte "
+        f"comparável a 1 passo restam {_numero(comp_b1.get('municipios_tratados'), 0)}/"
+        f"{_numero(comp_b1.get('municipios_controle'), 0)} municípios, abaixo do mínimo de 10.",
+        f"Na banda principal a 1 passo, o suporte é pequeno "
+        f"({_numero(b1.get('redes_tratadas'), 0)}/{_numero(b1.get('redes_controle'), 0)} redes "
+        f"em B; {_numero(a1.get('redes_tratadas'), 0)}/{_numero(a1.get('redes_controle'), 0)} "
+        f"em A; p de rede = {_numero(b1.get('p_valor_rede'))}), com "
+        f"{_pct(gig_b1.get('fracao_peso_gigante'))} do peso de B e "
+        f"{_pct(gig_a1.get('fracao_peso_gigante'))} do peso de A no componente gigante.",
     )
 
     # 9. Conclusão
+    gig_3_a = _celula(conc_gigante_h2, recorte="principal", faixa="3+", grupo="A", janela="h")
+    gig_3_b = _celula(conc_gigante_h2, recorte="principal", faixa="3+", grupo="B", janela="h")
+    comp_3 = _celula(
+        comparaveis,
+        hipotese="H2",
+        tipo="contraste",
+        categoria="vencedor_faixa_3+",
+        resultado="participacao_2025",
+    )
+    aud_3 = _celula(auditoria_comp, faixa="3+")
     slide = _pagina(
         prs,
         "O que os dados permitem concluir",
@@ -1524,11 +1931,9 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
     x_h2 = MARGEM + largura_card + 0.36
     for x_card in (x_h1, x_h2):
         card = slide.shapes.add_shape(
-            MSO_SHAPE.RECTANGLE, Inches(x_card), Inches(2.26), Inches(largura_card), Inches(3.92)
+            MSO_SHAPE.RECTANGLE, Inches(x_card), Inches(2.16), Inches(largura_card), Inches(3.72)
         )
-        estilo = card._element.find(qn("p:style"))
-        if estilo is not None:
-            card._element.remove(estilo)
+        _sem_estilo(card)
         card.fill.solid()
         card.fill.fore_color.rgb = BRANCO
         card.line.color.rgb = LINHA
@@ -1539,21 +1944,21 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
         slide,
         "H1  ·  LIGAÇÃO DIRETA",
         x_h1 + 0.26,
-        2.48,
+        2.36,
         3.40,
         0.26,
         tamanho=12,
         cor=ACCENT,
         forte=True,
     )
-    _selo(slide, "EM ABERTO", x_h1 + largura_card - 1.72, 2.42, 1.46)
+    _selo(slide, "EM ABERTO", x_h1 + largura_card - 1.72, 2.30, 1.46)
     _texto(
         slide,
         _estimativa_pp(h1),
         x_h1 + 0.26,
-        2.86,
+        2.70,
         largura_card - 0.52,
-        0.66,
+        0.64,
         tamanho=38,
         fonte=FONTE_TITULO,
         cor=ACCENT,
@@ -1562,21 +1967,21 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
         slide,
         _ic_pp(h1),
         x_h1 + 0.26,
-        3.56,
+        3.36,
         largura_card - 0.52,
-        0.28,
+        0.26,
         tamanho=13,
         cor=CINZA,
     )
-    _mini_barra_ic(slide, h1, x_h1 + 0.26, 3.96, largura_card - 0.52, 0.86)
+    _mini_barra_ic(slide, h1, x_h1 + 0.26, 3.72, largura_card - 0.52, 0.86)
     _texto(
         slide,
         "•  O intervalo inclui perdas e ganhos relevantes.",
         x_h1 + 0.26,
-        5.04,
+        4.80,
         largura_card - 0.52,
         0.34,
-        tamanho=14,
+        tamanho=13.5,
         cor=INK,
     )
     if h1.get("emd") is not None:
@@ -1584,10 +1989,10 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
             slide,
             f"•  Efeito mínimo detectável de {_pp(h1['emd'])} p.p.",
             x_h1 + 0.26,
-            5.46,
+            5.26,
             largura_card - 0.52,
             0.34,
-            tamanho=14,
+            tamanho=13.5,
             cor=INK,
         )
 
@@ -1596,76 +2001,78 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
         slide,
         "H2  ·  DISTÂNCIA AO VENCEDOR",
         x_h2 + 0.26,
-        2.48,
+        2.36,
         3.40,
         0.26,
         tamanho=12,
         cor=ACCENT,
         forte=True,
     )
-    _selo(slide, "EXPLORATÓRIO", x_h2 + largura_card - 2.08, 2.42, 1.82)
+    _selo(slide, "EXPLORATÓRIO", x_h2 + largura_card - 2.08, 2.30, 1.82)
     _texto(
         slide,
         _estimativa_pp(h2["1"], 2),
         x_h2 + 0.26,
-        2.86,
+        2.70,
         largura_card - 0.52,
-        0.66,
+        0.64,
         tamanho=38,
         fonte=FONTE_TITULO,
         cor=ACCENT,
     )
     _texto(
         slide,
-        "Contraste (B − A)/2 a 1 passo em 2025",
+        f"{_ic_pp(h2['1'], 2)} · sinal oposto ao previsto" if sinal_oposto else _ic_pp(h2["1"], 2),
         x_h2 + 0.26,
-        3.56,
+        3.36,
         largura_card - 0.52,
-        0.28,
-        tamanho=13,
-        cor=CINZA,
+        0.26,
+        tamanho=12.5,
+        cor=ACCENT if sinal_oposto else CINZA,
     )
     caixa_placebo = slide.shapes.add_shape(
         MSO_SHAPE.ROUNDED_RECTANGLE,
         Inches(x_h2 + 0.26),
-        Inches(3.96),
+        Inches(3.72),
         Inches(largura_card - 0.52),
-        Inches(0.98),
+        Inches(0.96),
     )
-    estilo = caixa_placebo._element.find(qn("p:style"))
-    if estilo is not None:
-        caixa_placebo._element.remove(estilo)
+    _sem_estilo(caixa_placebo)
     caixa_placebo.fill.solid()
     caixa_placebo.fill.fore_color.rgb = PALIDO
     caixa_placebo.line.fill.background()
+    usa_diff_h2 = diff_h2_1.get("estimativa") is not None
+    linha_box = diff_h2_1 if usa_diff_h2 else pre_h2
     _texto(
         slide,
-        "PRÉ-ELEITORAL · MESMO CONTRASTE",
+        "VARIAÇÃO PÓS − PRÉ (2025 − 2021–24)"
+        if usa_diff_h2
+        else "VARIAÇÃO PRÉ-ELEITORAL (2023–24 VS. 2021–22)",
         x_h2 + 0.44,
-        4.08,
+        3.82,
         3.44,
-        0.24,
+        0.22,
         tamanho=11,
         cor=CINZA,
         forte=True,
     )
     _texto(
         slide,
-        "Contraste (B − A)/2 antes do voto",
+        "Contraste (B − A)/2 a 1 passo",
         x_h2 + 0.44,
-        4.34,
+        4.08,
         3.10,
-        0.26,
+        0.24,
         tamanho=12,
         cor=CINZA,
     )
     _texto(
         slide,
-        _estimativa_pp(pre_h2, 2),
+        _pp_sinal(diff_h2_1.get("estimativa"), 2) if usa_diff_h2 else _estimativa_pp(pre_h2, 2),
         x_h2 + largura_card - 2.16,
-        4.12,
+        3.88,
         1.72,
-        0.48,
+        0.46,
         tamanho=24,
         fonte=FONTE_TITULO,
         cor=ACCENT,
@@ -1674,44 +2081,73 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
     )
     _texto(
         slide,
-        _ic_pp(pre_h2, 2),
+        _ic_pp(linha_box, 2),
         x_h2 + 0.44,
-        4.62,
+        4.36,
         3.90,
         0.22,
         tamanho=11,
         cor=CINZA,
     )
-    leitura_pre = (
-        "•  O mesmo contraste antes do voto também é negativo, mas o intervalo inclui zero."
-        if _status(pre_h2) == "inclui zero" and (pre_h2.get("estimativa") or 0) < 0
-        else "•  O mesmo contraste antes do voto contextualiza a estimativa de 2025."
+    nivel_h2_1 = h2["1"].get("placebo_estimativa")
+    texto_antes = (
+        f"•  Antes do voto: {_estimativa_pp(pre_h2, 2)} na tendência e "
+        f"{_pp(nivel_h2_1, 2)} p.p. no nível."
+        if nivel_h2_1 is not None
+        else f"•  Antes do voto: {_estimativa_pp(pre_h2, 2)} na tendência."
     )
     _texto(
         slide,
-        leitura_pre,
+        texto_antes,
         x_h2 + 0.26,
-        5.04,
+        4.80,
         largura_card - 0.52,
-        0.48,
-        tamanho=13,
+        0.44,
+        tamanho=12.5,
         cor=INK,
     )
     _texto(
         slide,
-        "•  A previsão de queda do efeito com a distância segue em aberto.",
+        "•  A queda do efeito com a distância segue em aberto.",
         x_h2 + 0.26,
-        5.56,
+        5.32,
         largura_card - 0.52,
-        0.48,
-        tamanho=13,
+        0.40,
+        tamanho=12.5,
         cor=INK,
+    )
+
+    _traco(slide, MARGEM, 6.00, LARGURA - MARGEM, 6.00)
+    _texto(slide, "LIMITAÇÕES", 0.75, 6.10, 1.35, 0.28, tamanho=11, cor=ACCENT, forte=True)
+    taxa_a = numeros.valor("links_pc1", ("taxa_cruzamento", "A"), "valor")
+    taxa_b = numeros.valor("links_pc1", ("taxa_cruzamento", "B"), "valor")
+    parte_empenhos = (
+        f"1 ano de empenhos ({percentual(frac_excluido)} pessoal/credores públicos; "
+        f"{percentual(taxa_vinc)} ligados a ajustes)"
+        if frac_excluido is not None and taxa_vinc is not None
+        else "1 ano de empenhos"
+    )
+    parte_doadores = (
+        f"cruzamento parcial de doadores ({percentual(taxa_a)} A; {percentual(taxa_b)} B) "
+        "e firmas sem QSA"
+        if taxa_a is not None and taxa_b is not None
+        else "cruzamento parcial de doadores e firmas sem QSA"
+    )
+    _texto(
+        slide,
+        f"{parte_empenhos} · {parte_doadores} · componente gigante e troca burocrática.",
+        2.10,
+        6.08,
+        10.483,
+        0.44,
+        tamanho=11.5,
+        cor=CINZA,
     )
     link = _texto(
         slide,
         "Código e dados agregados",
         LARGURA - MARGEM - 2.60,
-        6.30,
+        6.58,
         2.60,
         0.34,
         tamanho=14,
@@ -1724,27 +2160,30 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
     _nota(
         notas,
         "Voz 4",
-        45,
-        "As duas hipóteses seguem em aberto. A estimativa para a ligação direta é "
-        "imprecisa. No H2, o contraste a um passo em 2025 foi de "
-        f"{_estimativa_pp(h2['1'], 2)} O mesmo contraste antes do voto foi de "
-        f"{_estimativa_pp(pre_h2, 2)} ({_intervalo(pre_h2, 2)} p.p.). "
-        "Para saber se a vantagem diminui com a distância, precisamos comparar os "
-        "resultados entre as faixas. Obrigado.",
-        f"Em 2025, o contraste a 1 passo foi de {_estimativa_pp(h2['1'], 2)} "
-        f"({_ic_pp(h2['1'], 2)}); antes do voto, o mesmo contraste foi de "
-        f"{_estimativa_pp(pre_h2, 2)} ({_ic_pp(pre_h2, 2)}).",
-        f"A três passos ou mais, o contraste é {_estimativa_pp(h2['3+'], 2)} "
-        f"({_ic_pp(h2['3+'], 2)}).",
-        *(
-            (
-                f"Ao menos {_pp(piso, 0)}% das observações nas bandas dessa faixa pertencem "
-                "ao componente gigante. A mesma rede pode gerar dependência entre municípios.",
-            )
-            if piso is not None
-            else ()
-        ),
-        *((recorte,) if recorte else ()),
+        50,
+        "Para concluir, nenhuma das duas hipóteses se confirma de forma robusta. Em H1, a "
+        f"estimativa de {_estimativa_pp(h1)} é imprecisa e admite efeitos grandes nos dois "
+        f"sentidos. Em H2 a um passo, o contraste de {_estimativa_pp(h2['1'], 2)} tem sinal "
+        "oposto ao esperado, já aparecia antes da eleição e vira "
+        f"{_pp_sinal(diff_h2_1.get('estimativa'), 2)} na variação pós menos pré.\n\n"
+        "Três limitações explicam essa cautela: um único ano de empenhos com contratos herdados "
+        "e folha, cruzamento parcial de doadores e empresas sem QSA, e a concentração no "
+        "componente gigante somada à troca burocrática. Obrigado.",
+        f"Resumo H2 a 1 passo: {_estimativa_pp(h2['1'], 2)} em 2025, "
+        f"{_pp_sinal(diff_h2_1.get('estimativa'), 2)} em pós − pré ({_ic_pp(diff_h2_1, 2)}) e "
+        f"{_estimativa_pp(pre_h2, 2)} na tendência pré-eleitoral ({_ic_pp(pre_h2, 2)}).",
+        f"A 3+ passos no painel principal, o contraste é "
+        f"{_pp_sinal(h2['3+'].get('estimativa'), 2)} ({_ic_pp(h2['3+'], 2)}), mas ao menos "
+        f"{_pp(piso, 0)}% das observações ({_pct(gig_3_a.get('fracao_peso_gigante'), 2)} do peso "
+        f"de A e {_pct(gig_3_b.get('fracao_peso_gigante'), 2)} do de B) pertencem ao componente "
+        "gigante.",
+        f"Na auditoria do recorte comparável a 3+ passos, o contraste de "
+        f"{_pp(comp_3.get('estimativa'), 3)} p.p. ({_ic_pp(comp_3, 3)}) decorre de sobreposição "
+        f"de {_pct(aud_3.get('jaccard'))} (Jaccard) entre A e B nos "
+        f"{_numero(aud_3.get('estratos'), 0)} estratos ({_pct(aud_3.get('na_banda_jaccard'))} "
+        f"nas bandas), gerando correlação de {_numero(aud_3.get('correlacao_bootstrap'), 3)} no "
+        f"bootstrap que reduz o EP de {_pp(aud_3.get('ep_contraste_sem_covariancia'), 3)} para "
+        f"{_pp(aud_3.get('ep_contraste_bootstrap'), 3)} p.p.",
     )
 
     for slide, nota in zip(prs.slides, notas, strict=True):
@@ -1888,10 +2327,16 @@ def guias_individuais(notas: list[Nota], titulos: list[str]) -> dict[str, str]:
                 (
                     f"## Slide {i} · {titulo} ({_cronometro(inicio)}–{_cronometro(fim)})",
                     "",
+                    "**Na fala**",
+                    "",
                     nota.fala,
                     "",
                 )
             )
+            if nota.apoio:
+                linhas.extend(
+                    ("**Se perguntarem**", "", *(f"- {ponto}" for ponto in nota.apoio), "")
+                )
             inicio = fim
         roteiros[ARQUIVOS_GUIAS[voz]] = "\n".join(linhas)
     return roteiros
