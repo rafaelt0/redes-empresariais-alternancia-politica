@@ -20,8 +20,8 @@
 | 3 | Muda o governo. Mudam as redes fornecedoras? | Voz 1 | 30 s | 1:05 |
 | 4 | Ligação direta, compensação e distância | Voz 1 | 65 s | 2:10 |
 | 5 | O efeito da derrota perto do empate | Voz 2 | 130 s | 4:20 |
-| 6 | Poucos vínculos por empresa | Voz 3 | 95 s | 5:55 |
-| 7 | Ligação direta e compensação na rede | Voz 3 | 35 s | 6:30 |
+| 6 | Como montamos a rede e o que ela mostra | Voz 3 | 85 s | 5:45 |
+| 7 | Ligação direta (H1) e compensação na rede (H3) | Voz 3 | 45 s | 6:30 |
 | 8 | A participação de 2025 por distância | Voz 4 | 75 s | 7:45 |
 | 9 | O resultado a um passo depende da especificação | Voz 4 | 55 s | 8:40 |
 
@@ -81,11 +81,11 @@ Subtraímos a porcentagem de votos de B da de A. À esquerda do empate, A perde 
 
 ## Voz 3 · Estrutura da rede e resultados de H1 e H3
 
-### 6. Poucos vínculos por empresa (95 s)
+### 6. Como montamos a rede e o que ela mostra (85 s)
 
 **Na fala**
 
-A partir das fontes listadas na base do slide, construímos a rede principal com 14.069.286 empresas, 16.547.513 vértices de sócios/administradores PF/PJ e 24.689.604 vínculos. A maioria das empresas tem um ou dois vínculos. O grau médio é de 1,75 para empresas e 1,49 para sócios ou administradores. Um componente é um conjunto de empresas ligadas por caminhos societários. Muitas empresas estão sozinhas, mas o maior componente reúne 14,6% delas. No diagrama das hipóteses, retirar Bruno separaria X de Y e Z. Quando retiramos os sócios ou administradores que funcionam assim, o maior componente cai para 2,1%. Na conexão eleitoral, contamos os municípios com ao menos uma empresa-semente de A ou de B. A rede tem poucos vínculos em relação ao número de pares possíveis. A assortatividade próxima de zero indica pouca associação linear entre os graus nas pontas dos vínculos.
+Montamos a rede em três passos. Primeiro, a Receita Federal liga 14.069.286 empresas a 16.547.513 vértices de sócios/administradores PF/PJ em 24.689.604 vínculos. Segundo, as doações de pessoas físicas do TSE marcam as empresas-semente, aquelas com sócio ou administrador que doou para A ou B. Terceiro, os empenhos do TCESP mostram quem já fornecia antes da eleição e qual fatia recebeu em 2025. Por dentro, a rede é muito fragmentada: quase toda empresa tem só um ou dois vínculos (grau médio de 1,75 para empresas e 1,49 para sócios) e quase metade não divide sócio com nenhuma outra. Mesmo assim, entre 8.003.121 grupos separados, um único componente gigante reúne 14,6% das empresas. Ele depende de poucas pessoas que funcionam como ponte: retirando esses pontos de articulação, como o Bruno no diagrama, o maior grupo cai para 2,1%. Nos 506 municípios analisáveis, encontramos sementes de A em 376 e de B em 356.
 
 **Se perguntarem**
 
@@ -94,11 +94,11 @@ A partir das fontes listadas na base do slide, construímos a rede principal com
 - A assortatividade é a correlação de Pearson entre os graus da empresa e do sócio ou administrador em cada aresta. A densidade divide o número de arestas pelo produto das duas contagens de vértices.
 - Na versão sem pontos de articulação, o universo de empresas é mantido e os caminhos societários mudam.
 
-### 7. Ligação direta e compensação na rede (35 s)
+### 7. Ligação direta (H1) e compensação na rede (H3) (45 s)
 
 **Na fala**
 
-H1 compara as fornecedoras ligadas diretamente ao incumbente com as sem caminho observado para A ou B. H3 separa as ligadas diretamente a A das demais nas redes dos dois grupos. Os sinais vão na direção oposta à prevista para compensação. Os intervalos incluem zero. Um só componente concentra 99,98% do empenho prévio da coorte. Sem esse componente, faltam municípios para estimar o contraste.
+Agora vamos às duas perguntas centrais. Em H1, perguntamos se empresas ligadas diretamente ao incumbente A perdem fatia de empenhos em 2025 quando A perde, comparadas a firmas sem ligação a A ou B. A estimativa é de -1,7 p.p., com IC de 95% de -16,2 a 12,8 p.p. — vai de queda forte a ganho forte, então não há evidência de perda. Em H3, olhamos redes ligadas aos dois grupos para ver se ganhos de outras empresas compensam eventuais perdas das ligadas a A. Para compensar, ligadas a A deveriam cair e as demais subir. Vemos o oposto — e os dois ICs incluem zero. Além disso, Os intervalos incluem zero. um só componente gigante concentra 99,98% do empenho prévio da coorte. Sem esse componente, faltam municípios para estimar o contraste.
 
 **Se perguntarem**
 

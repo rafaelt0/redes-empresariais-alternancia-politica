@@ -120,8 +120,13 @@ def test_deck_usa_os_numeros_das_tabelas(tmp_path: Path) -> None:
     assert "1.234 empresas" in notas_texto
     assert "5.678 vértices de sócios/administradores PF/PJ" in notas_texto
     metricas = {forma.text_frame.text for forma in prs.slides[5].shapes if forma.has_text_frame}
-    assert {"1.234", "5.678", "9.999", "250", "20,0%", "5,0%", "38", "32"} <= metricas
-    assert "De 50 municípios analisáveis." in metricas
+    rede_slide = " ".join(metricas)
+    assert {"20,0%", "5,0%", "38", "32"} <= metricas
+    assert all(termo in rede_slide for termo in ("1.234", "5.678", "9.999", "250"))
+    assert (
+        "De 50 municípios analisáveis. Semente: firma com sócio ou administrador doador."
+        in metricas
+    )
     assert "1.427,072 vínculo por milhão" in textos
     assert "r = -0,1200" in textos
     assert "-1,2 p.p." in textos
@@ -174,12 +179,15 @@ def test_deck_ordena_os_cinco_blocos_e_preserva_hierarquia(tmp_path: Path) -> No
     )
     assert hipoteses.index("H1") < hipoteses.index("H3") < hipoteses.index("H2")
     assert "teste principal" in resultados.lower()
-    assert "Decomposição" in resultados
+    assert "decomposição" in resultados.lower()
+    assert "p.p. da fatia dos empenhos de 2025 no elemento de despesa" in resultados
     assert "H4" not in " ".join((hipoteses, resultados, distancia, conclusao))
     assert "H4" not in notas[6].fala
     assert any("H4" in ponto for ponto in notas[6].apoio)
     assert "análise exploratória" in distancia.lower()
     assert "não testam se o efeito diminui" in distancia
+    assert "pontos percentuais da fatia dos empenhos no elemento de despesa" in distancia
+    assert "pontos percentuais da fatia dos empenhos no elemento de despesa" in conclusao
     assert "compensação na rede seguem em aberto" in conclusao
     titulos = [slide.shapes[0].text_frame.text for slide in list(prs.slides)[-2:]]
     assert "distância" in titulos[0]

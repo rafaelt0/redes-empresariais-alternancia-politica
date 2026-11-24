@@ -295,7 +295,7 @@ def _grafico_distancia(slide, linhas: list[tuple[str, dict]]) -> None:
 
     _texto(
         slide,
-        "Contraste em p.p. e IC nominal de 95%",
+        "Contraste em p.p. da fatia (IC nominal de 95%)",
         MARGEM,
         2.25,
         6.4,
@@ -710,9 +710,9 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
     )
 
     # 6. Fontes e estrutura da rede
-    slide = _pagina(prs, "Poucos vínculos por empresa", REDE)
+    slide = _pagina(prs, "Como montamos a rede e o que ela mostra", REDE)
     faixa = slide.shapes.add_shape(
-        MSO_SHAPE.RECTANGLE, Inches(MARGEM), Inches(1.68), Inches(CORPO), Inches(1.03)
+        MSO_SHAPE.RECTANGLE, Inches(MARGEM), Inches(1.66), Inches(CORPO), Inches(1.28)
     )
     estilo = faixa._element.find(qn("p:style"))
     if estilo is not None:
@@ -720,41 +720,42 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
     faixa.fill.solid()
     faixa.fill.fore_color.rgb = PALIDO
     faixa.line.fill.background()
-    largura_indicador = CORPO / 4
-    for i, (apelido, rotulo) in enumerate(
+    largura_painel = (CORPO - 1.0) / 3
+    for i, (titulo, corpo) in enumerate(
         (
-            ("empresasRede", "Empresas"),
-            ("pessoasRede", "Sócios e administradores (PF e PJ)"),
-            ("vinculosRede", "Vínculos societários"),
-            ("componentesRede", "Componentes"),
+            (
+                "1. Receita Federal · Quadro societário",
+                f"{_destaque(numeros, 'empresasRede')} empresas e "
+                f"{_destaque(numeros, 'pessoasRede')} sócios/administradores (PF e PJ), "
+                f"unidos por {_destaque(numeros, 'vinculosRede')} vínculos (set/out 2024).",
+            ),
+            (
+                "2. TSE · Doações definem sementes",
+                "Doações de pessoas físicas até 5/10/2024 marcam as sementes: "
+                "empresas cujo sócio ou administrador doou para A ou B.",
+            ),
+            (
+                "3. TCESP · Empenhos municipais",
+                "Jan/2021–set/2024 mostra quem já vendia à prefeitura; "
+                "2025 mede a fatia de empenhos após a eleição.",
+            ),
         )
     ):
-        x = MARGEM + i * largura_indicador
-        _texto(
-            slide,
-            _destaque(numeros, apelido),
-            x,
-            1.80,
-            largura_indicador,
-            0.50,
-            tamanho=31,
-            fonte=FONTE_TITULO,
-            forte=True,
-            alinhar=PP_ALIGN.CENTER,
-        )
-        _texto(
-            slide,
-            rotulo,
-            x,
-            2.32,
-            largura_indicador,
-            0.29,
-            tamanho=13,
-            cor=CINZA,
-            alinhar=PP_ALIGN.CENTER,
-        )
+        x = MARGEM + i * (largura_painel + 0.50)
         if i:
-            _traco(slide, x, 1.88, x, 2.51)
+            _traco(slide, x - 0.25, 1.80, x - 0.25, 2.80)
+        _texto(
+            slide,
+            titulo,
+            x + 0.10,
+            1.76,
+            largura_painel - 0.16,
+            0.28,
+            tamanho=13,
+            cor=ACCENT,
+            forte=True,
+        )
+        _texto(slide, corpo, x + 0.10, 2.08, largura_painel - 0.16, 0.80, tamanho=13, cor=INK)
 
     empresas = _estatistica_rede(perfil, "empresas")
     pessoas = _estatistica_rede(perfil, "pessoas")
@@ -781,38 +782,38 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
     municipios = numeros.valor("links_pc1", ("municipios_analisaveis", ""), "valor")
     mun_a = _estatistica_rede(perfil, "municipios_com_conexao_a")
     mun_b = _estatistica_rede(perfil, "municipios_com_conexao_b")
-    largura_painel = (CORPO - 1.0) / 3
     paineis = (
         (
-            "Perfil das empresas",
+            "Maioria pequena ou isolada",
             (
                 (
-                    "1 ou 2 vínculos",
+                    "Só 1 ou 2 vínculos",
                     percentual(grau_baixo) if grau_baixo is not None else "n.d.",
                     grau_baixo,
                 ),
                 (
-                    "Sem vizinha societária",
+                    "Sem nenhuma vizinha",
                     percentual(fracao_isoladas) if fracao_isoladas is not None else "n.d.",
                     fracao_isoladas,
                 ),
             ),
-            "",
+            "Quase metade das firmas não divide sócio ou administrador com nenhuma outra.",
         ),
         (
-            "Empresas no maior componente",
+            "Um gigante preso por pontes",
             (
-                ("Rede principal", _destaque(numeros, "fracGigante"), maior),
+                ("No maior componente", _destaque(numeros, "fracGigante"), maior),
                 (
-                    "Sem pontos de articulação",
+                    "Sem sócios-ponte",
                     _destaque(numeros, "fracGiganteSemArt"),
                     maior_sem_art,
                 ),
             ),
-            "Sem os sócios e administradores que, ao sair, separam partes da rede.",
+            f"De {_destaque(numeros, 'componentesRede')} grupos separados, um só reúne "
+            f"{_destaque(numeros, 'fracGigante')} das firmas — cai sem pontos de articulação.",
         ),
         (
-            "Conexão eleitoral",
+            "Municípios com semente",
             (
                 (
                     "Com semente de A",
@@ -825,77 +826,65 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
                     mun_b / municipios if municipios and mun_b is not None else None,
                 ),
             ),
-            f"De {_destaque(numeros, 'munAnalisaveis')} municípios analisáveis.",
+            f"De {_destaque(numeros, 'munAnalisaveis')} municípios analisáveis. "
+            "Semente: firma com sócio ou administrador doador.",
         ),
     )
     for i, (titulo, barras, detalhe) in enumerate(paineis):
         x = MARGEM + i * (largura_painel + 0.50)
         if i:
-            _traco(slide, x - 0.25, 2.99, x - 0.25, 5.15)
-        _texto(slide, titulo, x, 2.99, largura_painel, 0.40, tamanho=16, forte=True)
+            _traco(slide, x - 0.25, 3.24, x - 0.25, 5.82)
+        _texto(slide, titulo, x, 3.24, largura_painel, 0.36, tamanho=16, forte=True)
         for j, (rotulo, valor, proporcao) in enumerate(barras):
-            _barra_proporcao(slide, rotulo, valor, proporcao, x, 3.55 + j * 0.66, largura_painel)
+            _barra_proporcao(slide, rotulo, valor, proporcao, x, 3.76 + j * 0.68, largura_painel)
         if detalhe:
-            _texto(slide, detalhe, x, 4.79, largura_painel, 0.49, tamanho=13, cor=CINZA)
+            _texto(slide, detalhe, x, 5.04, largura_painel, 0.78, tamanho=13, cor=CINZA)
 
+    _traco(slide, MARGEM, 6.04, LARGURA - MARGEM, 6.04)
     _texto(
         slide,
-        f"Densidade bipartida  ·  {_numero(por_milhao)} vínculo por milhão de pares possíveis",
+        f"Rede muito esparsa: {_numero(por_milhao)} vínculo por milhão de pares possíveis "
+        "(densidade bipartida).",
         MARGEM,
-        5.39,
-        7.75,
-        0.33,
-        tamanho=14,
+        6.22,
+        7.10,
+        0.34,
+        tamanho=13,
         cor=CINZA,
     )
     _texto(
         slide,
-        f"Assortatividade de grau  ·  r = {_numero(assortatividade, 4)}",
-        8.75,
-        5.39,
-        3.8,
-        0.33,
-        tamanho=14,
+        f"Assortatividade r = {_numero(assortatividade, 4)} (sem padrão entre graus).",
+        7.95,
+        6.22,
+        4.63,
+        0.34,
+        tamanho=13,
         cor=CINZA,
         alinhar=PP_ALIGN.RIGHT,
     )
-    _traco(slide, MARGEM, 5.82, LARGURA - MARGEM, 5.82)
-    for i, (titulo, corpo) in enumerate(
-        (
-            ("Receita Federal · Quadro societário", "Set/2024, com complemento de out/2024."),
-            (
-                "TSE · Eleições e doações",
-                "Votos de 2024 e doações de pessoas físicas até 5/10/2024.",
-            ),
-            (
-                "TCESP · Empenhos municipais",
-                "Jan/2021–set/2024 para identificar fornecedoras anteriores. "
-                "Empenhos de 2025 no desfecho.",
-            ),
-        )
-    ):
-        x = MARGEM + i * (largura_painel + 0.50)
-        _texto(slide, titulo, x, 6.00, largura_painel, 0.27, tamanho=13, cor=ACCENT, forte=True)
-        _texto(slide, corpo, x, 6.31, largura_painel, 0.66, tamanho=13, cor=CINZA)
     _nota(
         notas,
         "Voz 3",
-        95,
-        "A partir das fontes listadas na base do slide, construímos a rede principal com "
-        f"{_destaque(numeros, 'empresasRede')} empresas, "
-        f"{_destaque(numeros, 'pessoasRede')} vértices de sócios/administradores PF/PJ e "
-        f"{_destaque(numeros, 'vinculosRede')} vínculos. A maioria das empresas tem "
-        f"um ou dois vínculos. O grau médio é de {_numero(grau_medio, 2)} para empresas e "
-        f"{_numero(grau_medio_pessoa, 2)} para sócios ou administradores. "
-        "Um componente é um conjunto de empresas ligadas por caminhos societários. "
-        "Muitas empresas estão sozinhas, mas o maior componente reúne "
-        f"{_destaque(numeros, 'fracGigante')} delas. No diagrama das hipóteses, retirar "
-        "Bruno separaria X de Y e Z. Quando retiramos os sócios ou administradores que "
-        f"funcionam assim, o maior componente cai para {_destaque(numeros, 'fracGiganteSemArt')}. "
-        "Na conexão eleitoral, contamos os municípios com ao menos uma empresa-semente de A "
-        "ou de B. "
-        "A rede tem poucos vínculos em relação ao número de pares possíveis. A assortatividade "
-        "próxima de zero indica pouca associação linear entre os graus nas pontas dos vínculos.",
+        85,
+        "Montamos a rede em três passos. Primeiro, a Receita Federal liga "
+        f"{_destaque(numeros, 'empresasRede')} empresas a "
+        f"{_destaque(numeros, 'pessoasRede')} vértices de sócios/administradores PF/PJ em "
+        f"{_destaque(numeros, 'vinculosRede')} vínculos. Segundo, as doações de pessoas "
+        "físicas do TSE marcam as empresas-semente, aquelas com sócio ou administrador que "
+        "doou para A ou B. Terceiro, os empenhos do TCESP mostram quem já fornecia antes da "
+        "eleição e qual fatia recebeu em 2025. Por dentro, a rede é muito fragmentada: quase "
+        "toda empresa tem só um ou dois vínculos (grau médio de "
+        f"{_numero(grau_medio, 2)} para empresas e {_numero(grau_medio_pessoa, 2)} para "
+        "sócios) e quase metade não divide sócio com nenhuma outra. Mesmo assim, entre "
+        f"{_destaque(numeros, 'componentesRede')} grupos separados, um único componente "
+        f"gigante reúne {_destaque(numeros, 'fracGigante')} das empresas. Ele depende de "
+        "poucas pessoas que funcionam como ponte: retirando esses pontos de articulação, "
+        "como o Bruno no diagrama, o maior grupo cai para "
+        f"{_destaque(numeros, 'fracGiganteSemArt')}. "
+        f"Nos {_destaque(numeros, 'munAnalisaveis')} municípios analisáveis, encontramos "
+        f"sementes de A em {_destaque(numeros, 'munConexaoA')} e de B em "
+        f"{_destaque(numeros, 'munConexaoB')}.",
         "O complemento de 12/10/2024 só usa vínculos iniciados até 13/09/2024 "
         "em empresas do cadastro de setembro sem quadro válido naquela fotografia. "
         "Vínculos encerrados até outubro podem faltar.",
@@ -914,9 +903,12 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
     r23 = _celula(
         resumo, hipotese="H3", tipo="categoria", categoria="ambos", resultado="termo_compensacao"
     )
-    leitura_h3 = "Procuramos queda entre as ligadas a A e ganho nas demais."
+    leitura_h3 = "Procuramos queda nas ligadas a A e ganho nas demais da mesma rede."
     if (r1.get("estimativa") or 0) > 0 > (r23.get("estimativa") or 0):
-        leitura_h3 = "Os sinais vão na direção oposta à prevista para compensação."
+        leitura_h3 = (
+            "Para compensar, ligadas a A deveriam cair e as demais subir. "
+            "Vemos o oposto — e os dois ICs incluem zero."
+        )
     intervalos_incluem_zero = all(_status(linha) == "inclui zero" for linha in (h1, r1, r23))
     leitura_intervalos = "Os intervalos incluem zero. " if intervalos_incluem_zero else ""
     gigante_h3 = _celula(_ler_tabela(pasta, "sensibilidade_gigante"), coorte="H3_ambos")
@@ -938,59 +930,86 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
     h4 = _celula(resumo, hipotese="H4", tipo="contraste", categoria="ligada_ao_vencedor_50")
     slide = _pagina(
         prs,
-        "Ligação direta e compensação na rede",
+        "Ligação direta (H1) e compensação na rede (H3)",
         RESULTADOS,
-        "H1: IC de 95% por reamostragem municipal. "
+        "H1: p.p. da fatia dos empenhos de 2025 no elemento de despesa (IC municipal). "
         "H3: variação em % do empenho anual médio pré-eleitoral.",
     )
-    for y, titulo, valor, detalhe, leitura in (
+    leitura_h1 = (
+        "Comparamos a fatia de 2025 das sementes de A contra firmas sem ligação a A ou B. "
+        + (
+            "O intervalo vai de queda forte a ganho forte: não há evidência de perda."
+            if _status(h1) == "inclui zero"
+            else "A diferença resume o salto na fatia de empenhos de 2025."
+        )
+    )
+    for y, kicker, pergunta, valor, detalhe, leitura in (
         (
-            1.89,
-            "H1  ·  Teste principal",
+            1.78,
+            "H1  ·  TESTE PRINCIPAL",
+            "Se A perde, quem doou para A vende menos?",
             _estimativa_pp(h1),
             _ic_pp(h1),
-            "Sementes de A ante firmas sem caminho observado a A ou B.",
+            leitura_h1,
         ),
         (
-            3.42,
-            "H3  ·  Decomposição",
-            f"{_pp(r1.get('estimativa'), 2)}% e {_pp(r23.get('estimativa'), 2)}%",
-            "Ligadas diretamente a A e demais, nas redes ligadas a A e B.",
+            3.36,
+            "H3  ·  DECOMPOSIÇÃO NA REDE",
+            "Outras firmas da mesma rede compensam a perda?",
+            f"A: {_pp(r1.get('estimativa'), 2)}% · Demais: {_pp(r23.get('estimativa'), 2)}%",
+            "Em redes ligadas a A e B (% do empenho anual prévio).",
             leitura_h3,
         ),
         (
-            4.95,
-            "H3  ·  Concentração",
+            4.94,
+            "H3  ·  LIMITE DO TESTE",
+            "Quase todo o volume está no componente gigante",
             parcela_h3,
-            "Parcela do empenho prévio da coorte no componente gigante.",
+            "Do empenho prévio dessa coorte está em um só componente.",
             leitura_suporte_h3,
         ),
     ):
-        _texto(slide, titulo, MARGEM, y + 0.06, 3.28, 0.48, tamanho=19, cor=ACCENT, forte=True)
-        _texto(slide, valor, 4.17, y, 3.76, 0.43, tamanho=24, fonte=FONTE_TITULO, forte=True)
-        _texto(slide, detalhe, 4.17, y + 0.48, 3.83, 0.56, tamanho=15, cor=CINZA)
-        _texto(slide, leitura, 8.26, y + 0.07, 4.31, 0.91, tamanho=17)
-        _traco(slide, MARGEM, y + 1.23, LARGURA - MARGEM, y + 1.23)
+        _texto(slide, kicker, MARGEM, y, 3.45, 0.28, tamanho=13, cor=ACCENT, forte=True)
+        _texto(slide, pergunta, MARGEM, y + 0.30, 3.45, 0.78, tamanho=17, forte=True)
+        _texto(
+            slide,
+            valor,
+            4.38,
+            y + 0.04,
+            3.65,
+            0.44,
+            tamanho=19 if "Demais" in valor else 25,
+            fonte=FONTE_TITULO,
+            forte=True,
+        )
+        _texto(slide, detalhe, 4.38, y + 0.52, 3.55, 0.56, tamanho=14, cor=CINZA)
+        _texto(slide, leitura, 8.15, y + 0.06, 4.43, 1.02, tamanho=15)
+        _traco(slide, MARGEM, y + 1.28, LARGURA - MARGEM, y + 1.28)
     if intervalos_incluem_zero:
         _texto(
             slide,
-            "Os intervalos deixam em aberto a perda em H1 e a compensação em H3.",
+            "Resumo: os intervalos incluem zero — não dá para confirmar perda (H1) "
+            "nem compensação (H3).",
             MARGEM,
-            6.41,
+            6.40,
             CORPO,
             0.40,
-            tamanho=19,
+            tamanho=18,
             forte=True,
         )
     _nota(
         notas,
         "Voz 3",
-        35,
-        "H1 compara as fornecedoras ligadas diretamente ao incumbente com as sem caminho "
-        "observado para A ou B. H3 separa as ligadas diretamente a A das demais nas redes "
-        f"dos dois grupos. {leitura_h3} {leitura_intervalos}"
+        45,
+        "Agora vamos às duas perguntas centrais. Em H1, perguntamos se empresas ligadas "
+        "diretamente ao incumbente A perdem fatia de empenhos em 2025 quando A perde, "
+        "comparadas a firmas sem ligação a A ou B. A estimativa é de "
+        f"{_estimativa_pp(h1)}, com {_ic_pp(h1)} — vai de queda forte a ganho forte, "
+        "então não há evidência de perda. Em H3, olhamos redes ligadas aos dois grupos "
+        "para ver se ganhos de outras empresas compensam eventuais perdas das ligadas a A. "
+        f"{leitura_h3} Além disso, {leitura_intervalos}"
         + (
-            f"Um só componente concentra {parcela_h3} do empenho prévio da coorte. "
+            f"um só componente gigante concentra {parcela_h3} do empenho prévio da coorte. "
             if concentracao_h3 is not None
             else ""
         )
@@ -1024,6 +1043,7 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
         prs,
         "A participação de 2025 por distância",
         f"{RESULTADOS}  /  H2",
+        "p.p.: pontos percentuais da fatia dos empenhos no elemento de despesa. "
         "ICs por reamostragem municipal. A é o incumbente e B, o adversário.",
     )
     _texto(
@@ -1123,7 +1143,8 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
         prs,
         "O resultado a um passo depende da especificação",
         f"{RESULTADOS}  /  H2",
-        "Participação no elemento de despesa. Os contrastes usam ICs nominais.",
+        "p.p.: pontos percentuais da fatia dos empenhos no elemento de despesa. "
+        "Os contrastes usam ICs nominais.",
         fundo=PALIDO,
     )
     _texto(slide, "Contraste a um passo", MARGEM, 1.96, 6.3, 0.42, tamanho=23, forte=True)
