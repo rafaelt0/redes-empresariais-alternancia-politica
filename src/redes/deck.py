@@ -795,46 +795,46 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
         slide,
         "Margem M = % de votos válidos de A − % de votos válidos de B (em p.p.)",
         MARGEM,
-        1.81,
+        1.68,
         CORPO,
         0.38,
         tamanho=18,
         cor=CINZA,
     )
-    _texto(slide, "A perde", MARGEM, 2.42, 5.15, 0.52, tamanho=28, fonte=FONTE_TITULO)
+    _texto(slide, "A perde · T = 1", MARGEM, 2.13, 5.15, 0.42, tamanho=24, fonte=FONTE_TITULO)
     _texto(
         slide,
         "0",
         6.29,
-        2.34,
+        2.04,
         0.76,
-        0.58,
-        tamanho=34,
+        0.48,
+        tamanho=30,
         cor=ACCENT,
         forte=True,
         alinhar=PP_ALIGN.CENTER,
     )
     _texto(
         slide,
-        "A vence",
+        "A vence · T = 0",
         7.44,
-        2.42,
+        2.13,
         5.14,
-        0.52,
-        tamanho=28,
+        0.42,
+        tamanho=24,
         fonte=FONTE_TITULO,
         alinhar=PP_ALIGN.RIGHT,
     )
-    _traco(slide, MARGEM, 3.06, LARGURA - MARGEM, 3.06, LINHA, 1.6)
-    _traco(slide, LARGURA / 2, 2.94, LARGURA / 2, 3.19, ACCENT, 2.3)
+    _traco(slide, MARGEM, 2.62, LARGURA - MARGEM, 2.62, LINHA, 1.6)
+    _traco(slide, LARGURA / 2, 2.52, LARGURA / 2, 2.72, ACCENT, 2.3)
     _texto(
         slide,
         "Regressão descontínua no empate",
         MARGEM,
-        3.45,
+        2.88,
         CORPO,
-        0.51,
-        tamanho=29,
+        0.44,
+        tamanho=26,
         fonte=FONTE_TITULO,
         cor=ACCENT,
     )
@@ -842,41 +842,50 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
         slide,
         "Y = α + βT + γM + θ(T × M) + u,     |M| ≤ b",
         MARGEM,
-        4.03,
+        3.34,
         CORPO,
         0.51,
         tamanho=28,
         fonte=FONTE_TITULO,
     )
+    for x, linha, altura, simbolo, definicao in (
+        (
+            MARGEM,
+            0,
+            0.65,
+            "Y",
+            "Fatia da fornecedora nos empenhos de 2025\n"
+            "do município, por tipo de despesa (H1 e H2).",
+        ),
+        (MARGEM, 2, 0.34, "u", "Fatia observada menos a fatia prevista"),
+        (MARGEM, 3, 0.34, "b", "Distância máxima ao empate (em p.p.)"),
+        (MEIO, 0, 0.34, "α", "Fatia prevista no empate pelo lado da vitória"),
+        (MEIO, 1, 0.34, "β", "Salto no empate (derrota menos vitória)"),
+        (MEIO, 2, 0.34, "γ", "Inclinação da reta do lado da vitória"),
+        (MEIO, 3, 0.34, "θ", "Diferença de inclinação (derrota menos vitória)"),
+    ):
+        y = 3.99 + 0.43 * linha
+        _texto(slide, simbolo, x, y, 0.25, 0.34, tamanho=18, cor=ACCENT, forte=True)
+        _texto(slide, definicao, x + 0.35, y, 5.3, altura, tamanho=18)
     _texto(
         slide,
-        "T = 1 quando A perde. β é o salto no empate. b delimita a janela de estimação.",
+        "Exemplo de Y · R$ 10 de R$ 100 em material de consumo dão 10%. "
+        "O total inclui novas fornecedoras.",
         MARGEM,
-        4.62,
+        5.91,
         CORPO,
         0.38,
-        tamanho=18,
-        cor=CINZA,
+        tamanho=17,
     )
     _texto(
         slide,
-        "Se a prefeitura empenhou R$ 10 para X de um total de R$ 100 em material de consumo "
-        "em 2025, a fatia de X é 10%. O total inclui novas fornecedoras.",
+        f"{_destaque(numeros, 'munAnalisaveis')} municípios paulistas (eleições para prefeito, "
+        "sem capital e sem 2º turno). Ajuste linear local e placebos.",
         MARGEM,
-        5.22,
-        11.4,
-        0.87,
-        tamanho=20,
-    )
-    _texto(
-        slide,
-        f"{_destaque(numeros, 'munAnalisaveis')} municípios paulistas (prefeito, sem capital/2º "
-        "turno). Estimação linear local e placebos.",
-        MARGEM,
-        6.37,
+        6.48,
         CORPO,
-        0.42,
-        tamanho=19,
+        0.38,
+        tamanho=17,
         cor=CINZA,
     )
     densidade_margem = (
@@ -888,20 +897,25 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
         notas,
         "Voz 2",
         80,
-        "A capital paulista fica fora porque tem tribunal de contas próprio, e nossa base "
-        "de empenhos vem do Tribunal de Contas do Estado. Usamos eleições decididas no "
-        "primeiro turno porque, se houver segundo turno, quem liderou no primeiro ainda "
-        "pode perder.\n\n"
-        "Com os votos válidos do TSE, calculamos a margem de A sobre B. À esquerda do "
-        "empate, A perde e B assume. À direita, A vence. Na regressão descontínua, "
-        "ajustamos uma reta de cada lado. O salto no empate estima o efeito local da "
-        "derrota se, para um mesmo resultado eleitoral, a fatia variar continuamente "
-        "perto do empate. Repetimos a comparação com dados anteriores ao voto para "
-        "verificar se já havia um salto.\n\n"
-        "Se a prefeitura empenhou dez reais para X de um total de cem em material de "
-        "consumo, X ficou com dez por cento. O total inclui novas fornecedoras.",
-        "A especificação é Y = α + βT + γM + θ(T × M) + u. β é o salto no empate "
-        "e T indica derrota de A.",
+        "A amostra exclui a capital, que tem tribunal de contas próprio, e usa eleições "
+        "decididas no primeiro turno.\n\n"
+        "Em H1 e H2, Y é a fatia da fornecedora nos empenhos municipais de 2025 por tipo "
+        "de despesa. Se X tem dez reais de um total de cem, sua fatia é de dez por cento. "
+        "O total inclui novas fornecedoras.\n\n"
+        "M é o percentual de votos válidos de A menos o de B, em pontos percentuais. T vale "
+        "um na derrota de A e zero na vitória. A banda b é a distância máxima ao empate para "
+        "entrar no ajuste.\n\n"
+        "Cada lado tem sua reta. Alfa é a fatia prevista no empate pela reta do lado da "
+        "vitória. Gama é a inclinação dessa reta. Teta multiplica T vezes M e mede a mudança "
+        "de inclinação na derrota. O termo u é a diferença entre a fatia observada e a "
+        "prevista.\n\n"
+        "Beta é o salto no empate, a previsão do lado da derrota menos a do lado da vitória. "
+        "Esse salto estima o efeito local da derrota se a fatia variar continuamente em cada "
+        "cenário perto do empate. Com dados pré-eleitorais, checamos se já havia um salto.",
+        "Na equação, T = 1 se M < 0 e T = 0 se M ≥ 0. A reta do lado da derrota tem "
+        "inclinação γ + θ e intercepto α + β.",
+        "Nossa base de empenhos vem do Tribunal de Contas do Estado. Em disputas com "
+        "segundo turno, o líder do primeiro ainda pode perder.",
         "Também excluímos os municípios sem A identificável ou sem adversário. "
         "O suporte na banda varia por coorte.",
         "Usamos núcleo triangular, banda escolhida pelo erro quadrático médio estimado e "

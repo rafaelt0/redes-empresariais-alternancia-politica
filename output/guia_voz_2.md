@@ -10,8 +10,12 @@ No diagrama, as doações fazem de X a semente de A e de Z a semente de B. Na pr
 
 ## Slide 5 · O efeito da derrota perto do empate (1:05–2:25)
 
-A capital paulista fica fora porque tem tribunal de contas próprio, e nossa base de empenhos vem do Tribunal de Contas do Estado. Usamos eleições decididas no primeiro turno porque, se houver segundo turno, quem liderou no primeiro ainda pode perder.
+A amostra exclui a capital, que tem tribunal de contas próprio, e usa eleições decididas no primeiro turno.
 
-Com os votos válidos do TSE, calculamos a margem de A sobre B. À esquerda do empate, A perde e B assume. À direita, A vence. Na regressão descontínua, ajustamos uma reta de cada lado. O salto no empate estima o efeito local da derrota se, para um mesmo resultado eleitoral, a fatia variar continuamente perto do empate. Repetimos a comparação com dados anteriores ao voto para verificar se já havia um salto.
+Em H1 e H2, Y é a fatia da fornecedora nos empenhos municipais de 2025 por tipo de despesa. Se X tem dez reais de um total de cem, sua fatia é de dez por cento. O total inclui novas fornecedoras.
 
-Se a prefeitura empenhou dez reais para X de um total de cem em material de consumo, X ficou com dez por cento. O total inclui novas fornecedoras.
+M é o percentual de votos válidos de A menos o de B, em pontos percentuais. T vale um na derrota de A e zero na vitória. A banda b é a distância máxima ao empate para entrar no ajuste.
+
+Cada lado tem sua reta. Alfa é a fatia prevista no empate pela reta do lado da vitória. Gama é a inclinação dessa reta. Teta multiplica T vezes M e mede a mudança de inclinação na derrota. O termo u é a diferença entre a fatia observada e a prevista.
+
+Beta é o salto no empate, a previsão do lado da derrota menos a do lado da vitória. Esse salto estima o efeito local da derrota se a fatia variar continuamente em cada cenário perto do empate. Com dados pré-eleitorais, checamos se já havia um salto.
