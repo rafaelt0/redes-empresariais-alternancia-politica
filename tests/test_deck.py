@@ -123,10 +123,12 @@ def test_deck_usa_os_numeros_das_tabelas(tmp_path: Path) -> None:
     rede_slide = " ".join(metricas)
     assert {"20,0%", "5,0%", "38", "32"} <= metricas
     assert all(termo in rede_slide for termo in ("1.234", "5.678", "9.999", "250"))
-    assert (
-        "De 50 municípios analisáveis. Semente: firma com sócio ou administrador doador."
-        in metricas
-    )
+    assert "De 50 municípios analisáveis." in metricas
+    assert {
+        "X (semente) — Y — Z",
+        "X — Y (semente) — Z",
+    } <= metricas
+    assert all(trecho in notas[5].fala for trecho in ("sócia de X doou a A", "sócio de Y doou a A"))
     assert "1.427,072 vínculo por milhão" in textos
     assert "r = -0,1200" in textos
     assert "-1,2 p.p." in textos
@@ -162,11 +164,11 @@ def test_deck_ordena_os_cinco_blocos_e_preserva_hierarquia(tmp_path: Path) -> No
         termo in aplicacao
         for termo in (
             "incumbente",
-            "mesma rede",
-            "podem compensar a perda",
-            "eleições municipais de 2024",
-            "doações de campanha",
-            "fatia dos empenhos de cada grupo de empresas",
+            "Distância a A e B",
+            "Vínculos antes da eleição de 2024",
+            "doações de seus sócios ou administradores",
+            "Para cada fornecedora anterior",
+            "fatia dos empenhos de 2025",
         )
     )
     rede = " ".join(forma.text_frame.text for forma in prs.slides[5].shapes if forma.has_text_frame)
@@ -179,7 +181,7 @@ def test_deck_ordena_os_cinco_blocos_e_preserva_hierarquia(tmp_path: Path) -> No
     )
     assert all(
         termo in hipoteses
-        for termo in ("prefeito na reeleição", "ruptura", "Adversário mais votado", "1º turno")
+        for termo in ("Prefeito candidato", "ruptura", "Adversário mais votado", "1º turno")
     )
     assert hipoteses.index("H1") < hipoteses.index("H2")
     assert "teste principal" in resultados.lower()
@@ -190,11 +192,13 @@ def test_deck_ordena_os_cinco_blocos_e_preserva_hierarquia(tmp_path: Path) -> No
     assert "H4" not in notas[6].fala
     assert any("H4" in ponto for ponto in notas[6].apoio)
     assert "análise exploratória" in distancia.lower()
-    assert "não testam se o efeito diminui" in distancia
+    assert "Testar se o efeito diminui exige comparar as faixas entre si." in distancia
     assert "pontos percentuais da fatia dos empenhos no elemento de despesa" in distancia
     assert "pontos percentuais da fatia dos empenhos no elemento de despesa" in conclusao
     assert "EM ABERTO" in conclusao
-    assert "NÃO SE SUSTENTA" in conclusao
+    assert "EXPLORATÓRIO" in conclusao
+    assert "Contraste entre coortes a 1 passo em 2025" in conclusao
+    assert "PLACEBO PRÉ-ELEITORAL · SÓ A COORTE B" in conclusao
     titulos = [slide.shapes[0].text_frame.text for slide in list(prs.slides)[-2:]]
     assert "distância" in titulos[0]
     assert "concluir" in titulos[1]
