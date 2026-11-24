@@ -81,7 +81,12 @@ def test_pipeline_percorre_a_amostra(caminhos_amostra):
     slides = deck.contar_slides(saida / "deck.pptx")
     assert slides == deck.NUMERO_SLIDES
     assert slides == deck.contar_paginas(saida / "deck.pdf")
-    assert (saida / "guia_de_fala.md").stat().st_size > 0
+    for roteiro in ("guia_de_fala.md", *deck.ARQUIVOS_GUIAS.values()):
+        assert (
+            (saida / roteiro)
+            .read_text(encoding="utf-8")
+            .startswith("> Amostra sintética para teste.\n")
+        )
     for arquivo in (
         "resumo_estimacao.csv",
         "validacao.csv",

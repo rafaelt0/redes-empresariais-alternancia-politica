@@ -29,7 +29,7 @@ SAIDAS_panel := $(addprefix $(DADOS)/,painel_firma.parquet painel_rede.parquet) 
 SAIDAS_estimate := $(addprefix $(TABELAS)/,h1.csv h2.csv h2_comparaveis.csv h3.csv h4.csv densidade.csv resumo_estimacao.csv robustez.csv validacao.csv comparabilidade_h2.csv sensibilidade_placebo.csv descritivas_estimacao.csv permanencia_h4.csv)
 SAIDAS_estimate += $(foreach nome,rdd_h1 rdd_h2 rdd_h3 figura1_exemplo rede_componentes rede_distancias rede_graus rede_exemplo_observado gradiente_h2 decomposicao_h3,$(FIGURAS)/$(nome).pdf $(FIGURAS)/$(nome).png)
 SAIDAS_report := $(SAIDA)/relatorio.pdf
-SAIDAS_deck := $(addprefix $(SAIDA)/,deck.pptx deck.pdf guia_de_fala.md)
+SAIDAS_deck := $(addprefix $(SAIDA)/,deck.pptx deck.pdf guia_de_fala.md guia_de_fala.html guia_voz_1.md guia_voz_2.md guia_voz_3.md guia_voz_4.md)
 ENTRADAS_PUBLICACAO := $(wildcard $(TABELAS)/*.csv)
 faltando = $(shell for arquivo in $(SAIDAS_$(1)); do if ! test -s "$$arquivo"; then echo refazer; break; fi; done)
 
@@ -85,7 +85,7 @@ $(FEITO)/network: $(FEITO)/ingest-rfb $(FEITO)/ingest-tcesp $(FEITO)/links src/r
 $(FEITO)/panel: $(FEITO)/ingest-tcesp $(FEITO)/elections $(FEITO)/network src/redes/panel.py $(call faltando,panel)
 $(FEITO)/estimate: $(FEITO)/panel $(wildcard src/redes/estimate/*.py) src/redes/figures.py $(call faltando,estimate)
 $(FEITO)/report: $(FEITO)/estimate $(ENTRADAS_PUBLICACAO) $(wildcard $(FIGURAS)/*.pdf) src/redes/report.py src/redes/numeros.py src/redes/leitura_sensibilidades.py report/relatorio.tex report/referencias.bib $(call faltando,report)
-$(FEITO)/deck: $(FEITO)/estimate $(ENTRADAS_PUBLICACAO) $(wildcard $(FIGURAS)/*.png) src/redes/deck.py src/redes/numeros.py src/redes/leitura_sensibilidades.py $(call faltando,deck)
+$(FEITO)/deck: $(FEITO)/estimate $(ENTRADAS_PUBLICACAO) $(wildcard $(FIGURAS)/*.png) src/redes/deck.py src/redes/guia_de_fala.html src/redes/numeros.py src/redes/leitura_sensibilidades.py $(call faltando,deck)
 
 $(MODO_FONTES):
 	@mkdir -p $(FEITO)
