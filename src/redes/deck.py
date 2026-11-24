@@ -47,7 +47,7 @@ LINHA = RGBColor.from_string("DFD5CE")
 BRANCO = RGBColor.from_string("FFFFFF")
 FONTE_TITULO = "Liberation Serif"
 FONTE_CORPO = "Liberation Sans"
-TITULO = "Redes empresariais e persistência econômica sob alternância política"
+TITULO = "Redes empresariais, eleições e empenhos municipais"
 AUTORES = (
     "Felipe Ferreira Alexandre",
     "Andrei Schoschlakow Bonifácio",
@@ -348,7 +348,7 @@ def _grafico_distancia(slide, linhas: list[tuple[str, dict]]) -> None:
     _grafico_intervalos(
         slide,
         linhas,
-        titulo="Contraste em p.p. da fatia de 2025 (IC nominal de 95%)",
+        titulo="Contraste entre coortes em 2025 (p.p., IC nominal de 95%)",
         destaque="1 passo",
     )
 
@@ -473,7 +473,8 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
     slide = _pagina(prs, TITULO, curso, fundo=PALIDO)
     _texto(
         slide,
-        "Eleições para prefeito em SP (2024, sem a capital) e empenhos municipais de 2025",
+        f"Eleições para prefeito em SP (2024, {_destaque(numeros, 'munAnalisaveis')} municípios) "
+        "e empenhos municipais de 2025",
         MARGEM,
         2.15,
         CORPO,
@@ -489,8 +490,8 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
         notas,
         "Voz 1",
         10,
-        "Estudamos as eleições municipais paulistas de 2024 e os empenhos de 2025 "
-        "para saber se a troca de governo muda quais redes empresariais recebem recursos.",
+        "Estudamos se a derrota do grupo incumbente em eleições apertadas em 2024 mudou "
+        "a fatia dos empenhos de fornecedoras municipais em 2025.",
     )
 
     # 2. Economia política
@@ -573,11 +574,11 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
         "políticas do período seguinte.",
     )
 
-    slide = _pagina(prs, "Muda o governo. Mudam as redes fornecedoras?", CONTEXTO)
+    slide = _pagina(prs, "A troca de governo muda a fatia das fornecedoras?", CONTEXTO)
     _bloco(
         slide,
-        "Muda o comando da prefeitura",
-        "Se o incumbente perde, outro grupo passa a decidir sobre as despesas municipais.",
+        "Ligação direta com A (H1)",
+        "Quando o grupo incumbente perde por pouco, as fornecedoras ligadas a ele perdem fatia?",
         MARGEM,
         1.94,
         5.42,
@@ -585,8 +586,8 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
     _traco(slide, 6.55, 1.92, 6.55, 3.44)
     _bloco(
         slide,
-        "As redes podem persistir",
-        "Uma rede societária pode manter vínculos com os dois grupos políticos.",
+        "Distância a A e B (H2)",
+        "Como a fatia das fornecedoras varia conforme a distância a cada candidatura na rede?",
         MEIO,
         1.94,
         5.42,
@@ -594,43 +595,35 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
     _traco(slide, MARGEM, 3.68, LARGURA - MARGEM, 3.68)
     _bloco(
         slide,
-        "A perda fica na empresa ou chega à rede?",
-        "Se uma fornecedora ligada ao derrotado perde espaço, ganhos de outras empresas "
-        "da mesma rede podem compensar a perda.",
+        "Vínculos antes da eleição de 2024",
+        "Ligamos as fornecedoras às candidaturas pelas doações de seus sócios ou "
+        "administradores e pelos vínculos societários entre empresas.",
         MARGEM,
         3.94,
         CORPO,
     )
     _bloco(
         slide,
-        "Como testamos",
-        "Mapeamos conexões pelas doações de campanha nas eleições municipais de 2024 e por "
-        "vínculos societários. Em 2025, medimos a fatia dos empenhos de cada grupo de empresas.",
+        "Empenhos no primeiro ano após a eleição",
+        "Para cada fornecedora anterior, medimos a fatia dos empenhos de 2025 em sua "
+        "categoria de despesa no município.",
         MARGEM,
-        5.05,
+        5.29,
         CORPO,
-    )
-    _texto(
-        slide,
-        "Os dados não provam influência nem favorecimento.",
-        MARGEM,
-        6.72,
-        CORPO,
-        0.34,
-        tamanho=15,
-        cor=CINZA,
     )
     _nota(
         notas,
         "Voz 1",
         30,
-        "A eleição troca quem decide na prefeitura, mas não desfaz os vínculos entre "
-        "empresas. Uma rede pode estar ligada aos dois grupos. Se uma fornecedora ligada "
-        "ao derrotado perde espaço, ganhos de outras empresas da mesma rede podem "
-        "compensar essa perda. Mapeamos essas conexões com doações de campanha nas eleições "
-        "municipais de 2024 e vínculos societários e olhamos os empenhos de 2025.",
-        "Empenhos são compromissos de despesa, não pagamentos. Os vínculos observados "
-        "não medem diretamente poder de fato nem demonstram favorecimento.",
+        "Quando o grupo incumbente perde por pouco, muda a fatia dos empenhos das "
+        "fornecedoras que já vendiam para a prefeitura? Primeiro olhamos as ligações "
+        "diretas com o incumbente. Depois exploramos a distância a cada candidatura "
+        "na rede. Usamos os vínculos observados antes do voto e os empenhos do primeiro "
+        "ano após a eleição.",
+        "Empenhos registram compromissos de despesa. As doações e os vínculos societários "
+        "são medidas de conexão observada. A teoria motiva a hipótese de influência.",
+        "O relatório explora se, dentro de uma rede, ganhos de umas empresas compensam "
+        "perdas de outras (H3). As estimativas deixam essa hipótese em aberto.",
     )
 
     # 4. Hipóteses com o diagrama de exemplo
@@ -663,7 +656,7 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
     )
     _texto(
         slide,
-        "1º prefeito na reeleição  →  2º seu partido  →  3º sua coligação.",
+        "1º Prefeito candidato. 2º Candidato do partido. 3º Da coligação.",
         MARGEM + 0.16,
         2.00,
         7.15,
@@ -695,15 +688,15 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
         (
             (
                 "H1 · Ligação direta",
-                "Se A perde, X (que doou para A) perde espaço ante firmas sem ligação com A ou B?",
+                "Se A perde, X (cuja sócia doou a A) perde fatia ante firmas sem caminho a A ou B?",
             ),
             (
                 "H2 · Distância ao vencedor",
-                "Estar mais perto de B ajuda? A partir de B: Z (0 passos), Y (1) e X (2).",
+                "A vantagem prevista diminui com a distância? Y está a 1 passo de A e de B.",
             ),
             (
                 "RD · O que medimos",
-                "O efeito de A perder perto do empate — não o efeito de criar uma conexão.",
+                "Estimamos o efeito local de A perder. As conexões são definidas antes do voto.",
             ),
         )
     ):
@@ -751,7 +744,9 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
         "tracejadas são doações: Ana liga X a A e Daniel liga Z a B — essas são as sementes. "
         "As linhas contínuas são vínculos societários: Bruno liga X a Y e Carla liga Y a Z. "
         "Em H1, testamos se X perde espaço quando A perde ante firmas sem caminho a A ou B. "
-        "Em H2, exploramos diferenças por distância de B: Z a zero passos, Y a um e X a dois.",
+        "Em H2, a previsão é que uma vantagem para as ligadas ao vencedor diminua com "
+        "a distância. Medimos a distância até A e até B separadamente. Veja Y: está a um "
+        "passo de ambos e entra nas duas coortes.",
         "O prefeito anterior é o eleito na última eleição antes de 06/10/2024 (incluindo "
         "suplementares). O prefeito concorrendo por outro partido continua no ramo do "
         "prefeito. Municípios sem adversário também são excluídos.",
@@ -835,13 +830,13 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
     )
     _texto(
         slide,
-        "Em H1 e H2, o desfecho é a fatia dos empenhos de 2025 no elemento de despesa. "
-        "As coortes usam doações e vínculos societários pré-eleitorais.",
+        "Se a prefeitura empenhou R$ 10 para X de um total de R$ 100 em material de consumo "
+        "em 2025, a fatia de X é 10%. O total inclui novas fornecedoras.",
         MARGEM,
         5.22,
         11.4,
         0.87,
-        tamanho=22,
+        tamanho=20,
     )
     _texto(
         slide,
@@ -875,8 +870,9 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
         "Usamos os votos do TSE para calcular a margem eleitoral e cruzamos o cadastro com as "
         "doações individuais, incluindo recursos próprios dos candidatos, para identificar "
         "as empresas-semente. Por fim, cruzamos os CNPJs com os empenhos do Tribunal de Contas. "
-        "Os empenhos anteriores à eleição identificam quem já fornecia e os de 2025 mostram "
-        "a fatia de cada grupo.",
+        "Os empenhos anteriores à eleição identificam quem já fornecia. Em 2025, se X teve "
+        "R$ 10 empenhados em material de consumo e o total dessa categoria foi R$ 100, "
+        "a fatia de X foi de 10%. O total inclui fornecedoras que entraram depois da eleição.",
         "A especificação é Y = α + βT + γM + θ(T × M) + u. β é o salto no empate "
         "e T indica derrota de A.",
         "A é o prefeito candidato ou, na ausência dele, representante de seu partido ou "
@@ -892,7 +888,7 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
     )
 
     # 6. Fontes e estrutura da rede
-    slide = _pagina(prs, "Como montamos a rede e o que ela mostra", REDE)
+    slide = _pagina(prs, "Uma rede societária para todos os municípios", REDE)
     faixa = slide.shapes.add_shape(
         MSO_SHAPE.RECTANGLE, Inches(MARGEM), Inches(1.66), Inches(CORPO), Inches(1.28)
     )
@@ -906,15 +902,15 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
     for i, (titulo, corpo) in enumerate(
         (
             (
-                "1. Receita Federal · Grafo único",
+                "1. Receita Federal · Grafo nacional",
                 f"{_destaque(numeros, 'empresasRede')} empresas e "
                 f"{_destaque(numeros, 'pessoasRede')} sócios/adm. (PF e PJ) em "
                 f"{_destaque(numeros, 'vinculosRede')} vínculos (set/out 2024).",
             ),
             (
                 "2. TSE · Doações definem sementes",
-                "Em cada município, doações de PF a prefeito (A/B) até 5/10/2024 "
-                "marcam as sementes (0 passos no grafo).",
+                "A firma é semente se um sócio ou administrador doou à candidatura local "
+                "até 5/10/2024.",
             ),
             (
                 "3. TCESP · Empenhos municipais",
@@ -939,6 +935,41 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
         )
         _texto(slide, corpo, x + 0.10, 2.08, largura_painel - 0.16, 0.80, tamanho=13, cor=INK)
 
+    _texto(
+        slide,
+        "As doações mudam o ponto de partida",
+        MARGEM,
+        3.08,
+        CORPO,
+        0.33,
+        tamanho=17,
+        cor=ACCENT,
+        forte=True,
+    )
+    _texto(
+        slide,
+        "Z fornece nas duas cidades. A indica o candidato do grupo incumbente de cada uma.",
+        MARGEM,
+        3.42,
+        CORPO,
+        0.30,
+        tamanho=15,
+    )
+    for x, titulo, semente, corpo in (
+        (MARGEM, "Município 1", "X", "Sócia de X doou a A. De X a Z, 2 passos."),
+        (MEIO, "Município 2", "Y", "Sócio de Y doou a A. De Y a Z, 1 passo."),
+    ):
+        _texto(slide, titulo, x, 3.77, 5.42, 0.24, tamanho=14, forte=True)
+        caminho = _texto(slide, "", x, 4.00, 5.42, 0.38, tamanho=21, forte=True)
+        paragrafo = caminho.text_frame.paragraphs[0]
+        for trecho in ("X", " — ", "Y", " — ", "Z"):
+            run = paragrafo.add_run()
+            run.text = f"{trecho} (semente)" if trecho == semente else trecho
+            if trecho == semente:
+                run.font.color.rgb = ACCENT
+        _texto(slide, corpo, x, 4.43, 5.42, 0.26, tamanho=14, cor=CINZA)
+
+    _traco(slide, MARGEM, 4.76, LARGURA - MARGEM, 4.76)
     empresas = _estatistica_rede(perfil, "empresas")
     pessoas = _estatistica_rede(perfil, "pessoas")
     vinculos = _estatistica_rede(perfil, "vinculos")
@@ -979,7 +1010,7 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
                     fracao_isoladas,
                 ),
             ),
-            "Quase metade das firmas não divide sócio ou administrador com nenhuma outra.",
+            "",
         ),
         (
             "Um gigante preso por pontes",
@@ -991,9 +1022,7 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
                     maior_sem_art,
                 ),
             ),
-            f"{_destaque(numeros, 'componentesRede')} redes separadas no grafo "
-            f"(várias por município); 1 gigante reúne {_destaque(numeros, 'fracGigante')} "
-            "das firmas.",
+            f"{_destaque(numeros, 'componentesRede')} componentes na rede.",
         ),
         (
             "Municípios com semente",
@@ -1009,40 +1038,38 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
                     mun_b / municipios if municipios and mun_b is not None else None,
                 ),
             ),
-            f"De {_destaque(numeros, 'munAnalisaveis')} municípios analisáveis. "
-            "Semente: firma com sócio ou administrador doador.",
+            f"De {_destaque(numeros, 'munAnalisaveis')} municípios analisáveis.",
         ),
     )
     for i, (titulo, barras, detalhe) in enumerate(paineis):
         x = MARGEM + i * (largura_painel + 0.50)
         if i:
-            _traco(slide, x - 0.25, 3.24, x - 0.25, 5.82)
-        _texto(slide, titulo, x, 3.24, largura_painel, 0.36, tamanho=16, forte=True)
+            _traco(slide, x - 0.25, 4.94, x - 0.25, 6.55)
+        _texto(slide, titulo, x, 4.94, largura_painel, 0.32, tamanho=16, forte=True)
         for j, (rotulo, valor, proporcao) in enumerate(barras):
-            _barra_proporcao(slide, rotulo, valor, proporcao, x, 3.76 + j * 0.68, largura_painel)
+            _barra_proporcao(slide, rotulo, valor, proporcao, x, 5.32 + j * 0.52, largura_painel)
         if detalhe:
-            _texto(slide, detalhe, x, 5.04, largura_painel, 0.78, tamanho=13, cor=CINZA)
+            _texto(slide, detalhe, x, 6.36, largura_painel, 0.25, tamanho=12, cor=CINZA)
 
-    _traco(slide, MARGEM, 6.04, LARGURA - MARGEM, 6.04)
     _texto(
         slide,
         f"Rede muito esparsa: {_numero(por_milhao)} vínculo por milhão de pares possíveis "
         "(densidade bipartida).",
         MARGEM,
-        6.22,
+        6.78,
         7.10,
         0.34,
-        tamanho=13,
+        tamanho=12,
         cor=CINZA,
     )
     _texto(
         slide,
         f"Assortatividade r = {_numero(assortatividade, 4)} (sem padrão entre graus).",
         7.95,
-        6.22,
+        6.78,
         4.63,
         0.34,
-        tamanho=13,
+        tamanho=12,
         cor=CINZA,
         alinhar=PP_ALIGN.RIGHT,
     )
@@ -1050,21 +1077,25 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
         notas,
         "Voz 3",
         85,
-        "Montamos a rede em três passos. Primeiro, a Receita Federal liga "
+        "A Receita Federal registra os vínculos entre empresas no país inteiro. "
+        "Por isso podemos usar a mesma rede em todas as cidades. No exemplo, Z fornece "
+        "para duas prefeituras. A é o candidato do grupo incumbente de cada cidade. "
+        "Na primeira, uma sócia de X doou a A. Começamos em X e contamos dois passos "
+        "até Z, passando por Y. Na segunda, um sócio de Y doou a A. Começamos em Y "
+        "e contamos um passo até Z. Chamamos a empresa de onde partimos de semente.",
+        "A Receita Federal liga "
         f"{_destaque(numeros, 'empresasRede')} empresas a "
         f"{_destaque(numeros, 'pessoasRede')} vértices de sócios/administradores PF/PJ em "
-        f"{_destaque(numeros, 'vinculosRede')} vínculos. Segundo, as doações de pessoas "
-        "físicas do TSE marcam as empresas-semente, aquelas com sócio ou administrador que "
-        "doou para A ou B. Terceiro, os empenhos do TCESP mostram quem já fornecia antes da "
-        "eleição e qual fatia recebeu em 2025. Por dentro, a rede é muito fragmentada: quase "
-        "toda empresa tem só um ou dois vínculos (grau médio de "
+        f"{_destaque(numeros, 'vinculosRede')} vínculos. "
+        "O TSE registra as doações às candidaturas. "
+        "Os empenhos do TCESP identificam as fornecedoras e mostram sua fatia em 2025.",
+        "A rede é fragmentada. Quase toda empresa tem um ou dois vínculos (grau médio de "
         f"{_numero(grau_medio, 2)} para empresas e {_numero(grau_medio_pessoa, 2)} para "
-        "sócios) e quase metade não divide sócio com nenhuma outra. Mesmo assim, entre "
+        "sócios) e quase metade não tem vizinha. Entre "
         f"{_destaque(numeros, 'componentesRede')} grupos separados, um único componente "
-        f"gigante reúne {_destaque(numeros, 'fracGigante')} das empresas. Ele depende de "
-        "poucas pessoas que funcionam como ponte: retirando esses pontos de articulação, "
-        "como o Bruno no diagrama, o maior grupo cai para "
-        f"{_destaque(numeros, 'fracGiganteSemArt')}. "
+        f"gigante reúne {_destaque(numeros, 'fracGigante')} das empresas. Sem os sócios ou "
+        "administradores que funcionam como ponte, o maior grupo cai para "
+        f"{_destaque(numeros, 'fracGiganteSemArt')}.",
         f"Nos {_destaque(numeros, 'munAnalisaveis')} municípios analisáveis, encontramos "
         f"sementes de A em {_destaque(numeros, 'munConexaoA')} e de B em "
         f"{_destaque(numeros, 'munConexaoB')}.",
@@ -1087,7 +1118,7 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
     h4 = _celula(resumo, hipotese="H4", tipo="contraste", categoria="ligada_ao_vencedor_50")
     slide = _pagina(
         prs,
-        "Quem doou ao incumbente perde espaço (H1)?",
+        "As fornecedoras ligadas a A perdem fatia (H1)?",
         RESULTADOS,
         "p.p.: pontos percentuais da fatia dos empenhos de 2025 no elemento de despesa. "
         "ICs de 95% (contraste por reamostragem municipal).",
@@ -1115,15 +1146,12 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
         y_topo=3.22,
         espaco=0.92,
     )
-    if h1_a.get("municipios_tratados") is not None and h1_a.get("municipios_controle") is not None:
-        legenda_h1 = (
-            f"Na banda de H1 ({_numero(h1_a.get('banda'), 1)} p.p.): "
-            f"{int(h1_a['municipios_tratados'])} municípios onde A perdeu e "
-            f"{int(h1_a['municipios_controle'])} onde A venceu (sementes de A)."
-        )
-    else:
-        legenda_h1 = "Contraste = salto das firmas ligadas a A menos salto das sem ligação."
-    _texto(slide, legenda_h1, MARGEM, 6.12, 6.45, 0.64, tamanho=14, cor=CINZA)
+    for i, (rotulo, coorte) in enumerate((("Ligadas a A", h1_a), ("Sem ligação", h1_sem))):
+        derrotas, vitorias = coorte.get("municipios_tratados"), coorte.get("municipios_controle")
+        if derrotas is not None and vitorias is not None:
+            banda = _numero(coorte.get("banda"), 1)
+            legenda = f"{rotulo} · banda de {banda} p.p. · {derrotas} derrotas, {vitorias} vitórias"
+            _texto(slide, legenda, MARGEM, 6.12 + i * 0.28, 6.45, 0.26, tamanho=13, cor=CINZA)
     _traco(slide, 7.43, 2.34, 7.43, 6.56)
     _texto(
         slide,
@@ -1159,11 +1187,22 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
     )
     _texto(slide, _ic_pp(h1), 7.81, 4.36, 4.76, 0.34, tamanho=16, forte=True)
     leitura_h1 = (
-        "Intervalo vai de queda forte a ganho forte: não há evidência de perda quando A sai."
+        "O intervalo admite perdas e ganhos relevantes de participação."
         if _status(h1) == "inclui zero"
         else "A diferença resume o salto na fatia de empenhos de 2025."
     )
     _texto(slide, leitura_h1, 7.81, 4.80, 4.76, 0.80, tamanho=15, cor=CINZA)
+    if h1.get("emd") is not None:
+        _texto(
+            slide,
+            f"Efeito mínimo detectável: {_pp(h1['emd'])} p.p.",
+            7.81,
+            5.58,
+            4.76,
+            0.34,
+            tamanho=14,
+            cor=CINZA,
+        )
     _nota(
         notas,
         "Voz 3",
@@ -1171,11 +1210,11 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
         "Agora vamos ao teste principal, H1. Perguntamos se empresas ligadas diretamente ao "
         "incumbente A perdem fatia dos empenhos de 2025 quando A perde perto do empate, "
         "comparadas a firmas sem ligação a A ou B. O contraste mede o salto das ligadas a A "
-        "menos o salto das firmas sem ligação. No gráfico, tanto as ligadas a A quanto "
-        "o contraste principal cruzam zero com folga. A estimativa do contraste é de "
-        f"{_estimativa_pp(h1)}, com {_ic_pp(h1)} — vai de queda forte a ganho forte, então "
-        "não há evidência de perda quando A sai do cargo.",
-        f"Na banda principal de H1, a estimativa das ligadas a A é {_estimativa_pp(h1_a)} "
+        "menos o salto das firmas sem ligação. Estimamos cada salto em sua própria banda "
+        "de margem eleitoral. A estimativa do contraste é de "
+        f"{_estimativa_pp(h1)}, com {_ic_pp(h1)}. O intervalo admite perdas e ganhos "
+        "relevantes de participação.",
+        f"A estimativa das ligadas a A é {_estimativa_pp(h1_a)} "
         f"({_ic_pp(h1_a)}) e a das sem ligação é {_estimativa_pp(h1_sem)} ({_ic_pp(h1_sem)}).",
         f"Meia banda: {_pp(h1.get('estimativa_meia_banda'))} p.p.; dobro da banda: "
         f"{_pp(h1.get('estimativa_dobro_banda'))} p.p.; placebo pré-eleitoral: "
@@ -1191,7 +1230,8 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
         faixa: _celula(resumo, hipotese="H2", tipo="contraste", categoria=f"vencedor_faixa_{faixa}")
         for faixa in ("0", "1", "2", "3+")
     }
-    pre_b = _celula(pre_periodos, tipo="categoria", categoria="faixa_b_1")
+    pre_b = _celula(pre_periodos, hipotese="H2", tipo="categoria", categoria="faixa_b_1")
+    pre_h2 = _celula(pre_periodos, hipotese="H2", tipo="contraste", categoria="vencedor_faixa_1")
     b1 = _celula(
         resumo,
         hipotese="H2",
@@ -1199,19 +1239,20 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
         categoria="faixa_b_1",
         resultado="participacao_2025",
     )
-    destaque_h2 = "Os contrastes por faixa não testam se o efeito diminui com a distância."
+    destaque_h2 = "Testar se o efeito diminui exige comparar as faixas entre si."
+    salto_pre_b = _status(pre_b) == _status(b1) == "negativo"
+    piso = piso_gigante_h2(pasta)
     slide = _pagina(
         prs,
-        "A distância ao vencedor muda a fatia em 2025?",
+        "Fatia em 2025 por distância a A e B",
         f"{RESULTADOS}  /  H2",
         "p.p.: pontos percentuais da fatia dos empenhos no elemento de despesa. "
         "ICs por reamostragem municipal. A é o incumbente e B, o adversário.",
     )
     _texto(
         slide,
-        "Análise exploratória: quando A perde, B assume. Em cada distância, medimos a vantagem "
-        "média de estar ligado ao vencedor (B) sobre o derrotado (A) — (salto de B − salto de A) "
-        "÷ 2. Acima de 0 = vantagem do vencedor.",
+        "Análise exploratória. Para cada distância, calculamos (salto da coorte B − salto da "
+        "coorte A) ÷ 2. As coortes são definidas antes do voto e podem incluir as mesmas firmas.",
         MARGEM,
         1.56,
         CORPO,
@@ -1224,18 +1265,29 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
     )
     _texto(
         slide,
-        f"3 de 4 faixas cruzam zero; só 1 passo se afasta. {destaque_h2}",
+        destaque_h2,
         MARGEM,
         6.12,
         6.45,
-        0.64,
+        0.30,
         tamanho=14,
         cor=CINZA,
     )
+    if piso is not None:
+        _texto(
+            slide,
+            f"A 3+ passos, ao menos {_pp(piso, 0)}% das observações estão no componente gigante.",
+            MARGEM,
+            6.43,
+            6.45,
+            0.50,
+            tamanho=13,
+            cor=CINZA,
+        )
     _traco(slide, 7.43, 2.34, 7.43, 6.56)
     _texto(
         slide,
-        "1  ·  ÚNICO NÚMERO FORA DO ZERO (1 PASSO)",
+        "CONTRASTE ENTRE COORTES A 1 PASSO",
         7.81,
         2.34,
         4.76,
@@ -1258,7 +1310,7 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
     )
     _texto(
         slide,
-        f"{_ic_pp(h2['1'], 2)} — sinal oposto ao de um ganho de fatia do vencedor.",
+        _ic_pp(h2["1"], 2),
         7.81,
         3.38,
         4.76,
@@ -1268,7 +1320,7 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
     _traco(slide, 7.81, 4.10, 12.57, 4.10)
     _texto(
         slide,
-        "2  ·  TESTE PLACEBO (ANTES DA ELEIÇÃO)",
+        "PLACEBO PRÉ-ELEITORAL · COORTE B A 1 PASSO",
         7.81,
         4.24,
         4.76,
@@ -1279,9 +1331,8 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
     )
     _texto(
         slide,
-        "Como foi construído: mesmas firmas, coortes, margem e bandas de 2024, "
-        "trocando o desfecho pela mudança de fatia antes do voto "
-        "(jan/2023–set/2024 menos jan/2021–dez/2022).",
+        "Na mesma coorte B, usamos a mudança de fatia entre jan/2021–dez/2022 e "
+        "jan/2023–set/2024. Mantemos a margem e as bandas da análise de 2025.",
         7.81,
         4.54,
         4.76,
@@ -1289,37 +1340,30 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
         tamanho=13,
         cor=INK,
     )
-    pre_txt = (
-        f"Na coorte B a 1 passo, o salto já dá {_pp(pre_b['estimativa'], 2)} p.p. "
-        f"(IC nominal de {_intervalo(pre_b, 2)} p.p.)."
-        if pre_b.get("estimativa") is not None
-        else "Diagnóstico indisponível."
+    comparacao_b = (
+        f"O salto em B foi de {_estimativa_pp(pre_b, 2)} antes do voto e de "
+        f"{_estimativa_pp(b1, 2)} em 2025."
     )
-    if _status(pre_b) == _status(b1) == "negativo":
-        pre_txt += " A diferença anterior à eleição enfraquece a leitura causal de 2025."
-    _texto(slide, pre_txt, 7.81, 5.52, 4.76, 1.16, tamanho=14, cor=CINZA)
+    leitura_b = " O salto antes do voto enfraquece a leitura causal para B." if salto_pre_b else ""
+    _texto(slide, f"{comparacao_b}{leitura_b}", 7.81, 5.52, 4.76, 1.16, tamanho=14)
     _nota(
         notas,
         "Voz 4",
         75,
-        "Em H2, perguntamos se estar mais perto do vencedor ajuda em 2025. Quando A perde, "
-        "B assume. Para cada distância — direta, 1, 2 ou 3+ passos — medimos a vantagem "
-        "média de estar ligado ao vencedor B sobre o derrotado A, fazendo salto de B menos "
-        "salto de A dividido por dois. Um valor acima de zero indicaria vantagem do vencedor. "
-        "No gráfico, três das quatro faixas cruzam zero; só 1 passo se afasta, com "
-        f"{_estimativa_pp(h2['1'], 2)} ({_ic_pp(h2['1'], 2)}), já no sinal oposto a um ganho "
-        f"do vencedor. Além disso, {destaque_h2.lower()} Para checar se isso é efeito da "
-        "eleição, montamos um teste placebo com as mesmas firmas, coortes, margem e bandas "
-        "de 2024, trocando o desfecho pela mudança de fatia antes do voto — de jan/2021–dez/2022 "
-        f"para jan/2023–set/2024. {pre_txt}",
+        "Em H2, as coortes ficam fixas pela distância a A e a B antes do voto. "
+        "Para cada distância, subtraímos o salto de A do de B e dividimos por dois. "
+        f"Em 2025, o contraste entre as duas coortes a um passo foi de "
+        f"{_estimativa_pp(h2['1'], 2)} ({_ic_pp(h2['1'], 2)}). "
+        f"{destaque_h2} Para investigar se já havia diferenças antes da eleição, "
+        "repetimos a análise usando a mudança da fatia entre 2021–2022 e 2023 até setembro "
+        f"de 2024. À direita estão os dois saltos da coorte B. {comparacao_b}{leitura_b}",
         "Ler o contraste como vantagem da ligação ao vencedor exige coortes comparáveis e "
         "simetria entre os efeitos de ganhar e perder essa ligação. A mesma firma pode entrar "
         "nas duas coortes, e um passo societário não mede necessariamente proximidade política.",
-        f"A um passo, o salto de B em 2025 foi {_pp(b1.get('estimativa'), 2)} p.p. "
-        f"(p de Holm = {_numero(b1.get('p_holm'))}). O IC do contraste é nominal. A correção "
-        "de Holm se aplica ao salto de B na família de testes secundários.",
-        "O placebo da coorte B mede a mudança de participação de 2021–2022 para "
-        "2023–setembro de 2024. Ele é distinto do placebo de nível pré do contraste.",
+        f"O placebo para B a um passo tem {_ic_pp(pre_b, 2)} (nominal). Em 2025, "
+        f"o salto de B tem p de Holm = {_numero(b1.get('p_holm'))} na família secundária.",
+        f"O contraste entre A e B a um passo, no placebo de mudança pré-eleitoral, foi de "
+        f"{_estimativa_pp(pre_h2, 2)} ({_ic_pp(pre_h2, 2)}, nominal).",
     )
 
     # 9. Conclusão
@@ -1332,7 +1376,7 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
     )
     _texto(
         slide,
-        "Sem evidência clara de perda para ligados ao incumbente ou de vantagem ao vencedor.",
+        "A perda de fatia em H1 e o efeito da distância em H2 seguem em aberto.",
         MARGEM,
         1.64,
         CORPO,
@@ -1394,7 +1438,7 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
     _mini_barra_ic(slide, h1, x_h1 + 0.26, 3.96, largura_card - 0.52, 0.86)
     _texto(
         slide,
-        "•  Intervalo cruza zero com folga (queda ou ganho).",
+        "•  O intervalo inclui perdas e ganhos relevantes.",
         x_h1 + 0.26,
         5.04,
         largura_card - 0.52,
@@ -1402,16 +1446,17 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
         tamanho=14,
         cor=INK,
     )
-    _texto(
-        slide,
-        "•  Sem evidência de perda para quem doou a A.",
-        x_h1 + 0.26,
-        5.46,
-        largura_card - 0.52,
-        0.34,
-        tamanho=14,
-        cor=INK,
-    )
+    if h1.get("emd") is not None:
+        _texto(
+            slide,
+            f"•  Efeito mínimo detectável de {_pp(h1['emd'])} p.p.",
+            x_h1 + 0.26,
+            5.46,
+            largura_card - 0.52,
+            0.34,
+            tamanho=14,
+            cor=INK,
+        )
 
     # Card H2
     _texto(
@@ -1425,7 +1470,7 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
         cor=ACCENT,
         forte=True,
     )
-    _selo(slide, "NÃO SE SUSTENTA", x_h2 + largura_card - 2.08, 2.42, 1.82)
+    _selo(slide, "EXPLORATÓRIO", x_h2 + largura_card - 2.08, 2.42, 1.82)
     _texto(
         slide,
         _estimativa_pp(h2["1"], 2),
@@ -1439,7 +1484,7 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
     )
     _texto(
         slide,
-        "Único destaque (1 passo) · sinal oposto ao vencedor",
+        "Contraste entre coortes a 1 passo em 2025",
         x_h2 + 0.26,
         3.56,
         largura_card - 0.52,
@@ -1462,10 +1507,10 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
     caixa_placebo.line.fill.background()
     _texto(
         slide,
-        "PLACEBO PRÉ (COORTE B · 1 PASSO)",
+        "PLACEBO PRÉ-ELEITORAL · SÓ A COORTE B",
         x_h2 + 0.44,
         4.10,
-        3.10,
+        3.44,
         0.24,
         tamanho=11,
         cor=CINZA,
@@ -1473,7 +1518,7 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
     )
     _texto(
         slide,
-        "Antes do voto (2023–24 vs. 2021–22)",
+        "Salto em B a 1 passo antes do voto",
         x_h2 + 0.44,
         4.38,
         3.10,
@@ -1496,36 +1541,25 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
     )
     _texto(
         slide,
-        "•  3 de 4 faixas cruzam zero; só 1 passo se afasta.",
+        "•  A previsão de queda do efeito com a distância segue em aberto.",
         x_h2 + 0.26,
         5.04,
         largura_card - 0.52,
-        0.34,
-        tamanho=14,
+        0.48,
+        tamanho=13,
         cor=INK,
     )
-    _texto(
-        slide,
-        "•  A queda já aparece no placebo antes do voto.",
-        x_h2 + 0.26,
-        5.46,
-        largura_card - 0.52,
-        0.34,
-        tamanho=14,
-        cor=INK,
-    )
-
-    _texto(
-        slide,
-        "Em síntese: eleições de 2024 e empenhos de 2025 não provam efeito causal nem "
-        "favorecimento.",
-        MARGEM,
-        6.30,
-        9.10,
-        0.40,
-        tamanho=14,
-        cor=CINZA,
-    )
+    if salto_pre_b:
+        _texto(
+            slide,
+            "•  O salto pré-eleitoral em B limita a interpretação causal.",
+            x_h2 + 0.26,
+            5.50,
+            largura_card - 0.52,
+            0.34,
+            tamanho=13,
+            cor=INK,
+        )
     link = _texto(
         slide,
         "Código e dados agregados",
@@ -1540,7 +1574,6 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
     run = link.text_frame.paragraphs[0].runs[0]
     run.hyperlink.address = "https://github.com/rafaelt0/redes-empresariais-alternancia-politica"
     run.font.color.rgb = ACCENT
-    piso = piso_gigante_h2(pasta)
     recorte = (
         leitura_h2_comparaveis(comparaveis.iter_rows(named=True)) if comparaveis is not None else ""
     )
@@ -1548,13 +1581,11 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
         notas,
         "Voz 4",
         55,
-        "Para concluir, voltamos às duas hipóteses apresentadas. Em H1, o intervalo de "
-        "confiança cruza zero com folga, então não há evidência de que empresas ligadas "
-        "diretamente ao incumbente percam espaço quando ele sai do cargo. Em H2, três das "
-        "quatro distâncias cruzam zero, e o único destaque em 2025 — a 1 passo — já tem "
-        "sinal oposto a uma vantagem do vencedor e aparece antes do voto no teste placebo "
-        f"({pre_txt}). Em síntese, os dados de 2024 e 2025 deixam em aberto a perda "
-        "para ligados ao incumbente e não provam efeito causal nem favorecimento.",
+        "Em H1, a estimativa é imprecisa: o intervalo admite perdas e ganhos de fatia "
+        "para as empresas diretamente ligadas a A. Em H2, o primeiro número é a diferença "
+        "entre as duas coortes a um passo em 2025, dividida por dois. O segundo é o salto "
+        f"da coorte B no placebo pré-eleitoral.{leitura_b} "
+        "A hipótese de que o efeito diminui com a distância segue em aberto.",
         f"A três passos ou mais, o contraste é {_estimativa_pp(h2['3+'], 2)} "
         f"({_ic_pp(h2['3+'], 2)}).",
         *(
