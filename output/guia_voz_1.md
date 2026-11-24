@@ -14,6 +14,6 @@ O esquema mostra como esse poder pode persistir. Quem tem mais poder político p
 
 ## Slide 3 · A troca de governo muda a fatia das fornecedoras? (1:15–2:25)
 
-Nas eleições municipais de 2024 em São Paulo, perguntamos se a derrota apertada de quem governava mudou a fatia das empresas que já forneciam para a prefeitura. Observamos as fornecedoras com ligação direta ao incumbente e as que chegam a uma candidatura por vínculos societários.
+Nas eleições municipais de 2024 em São Paulo, perguntamos se a derrota apertada de quem governava mudou a fatia das empresas que já forneciam aos órgãos municipais cobertos pelo TCESP, exceto a capital. Observamos as fornecedoras com ligação direta ao incumbente e as que chegam a uma candidatura por vínculos societários.
 
-Definimos essas ligações antes do voto, a partir das doações de sócios ou administradores e dos vínculos entre empresas. Depois da eleição, observamos os empenhos, que registram os compromissos de despesa da prefeitura. Para cada fornecedora anterior, calculamos sua fatia dos empenhos de 2025 na respectiva categoria de despesa.
+Definimos essas ligações antes do voto, a partir das doações de sócios ou administradores e dos vínculos entre empresas. Depois da eleição, observamos os empenhos dos órgãos municipais cobertos pelo TCESP, exceto a capital; o saldo líquido é emissão mais reforço menos anulação. Para cada fornecedora anterior, calculamos sua fatia no saldo líquido de 2025 do respectivo elemento de despesa, com entrantes no denominador. A medida usa todos os empenhos de 2025, não só contratos novos.

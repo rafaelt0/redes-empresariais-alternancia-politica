@@ -169,6 +169,113 @@ def test_deck_usa_os_numeros_das_tabelas(tmp_path: Path) -> None:
     assert "H3" not in textos
 
 
+def test_deck_contextualiza_o_emd_de_h1_com_a_coorte_direta(tmp_path: Path) -> None:
+    caminhos = _caminhos(tmp_path)
+    tabelas = caminhos.resultados / "tables"
+    tabelas.mkdir(parents=True)
+    pl.DataFrame(
+        {
+            "hipotese": ["H1", "H1", "H1"],
+            "categoria": [
+                "conectada_incumbente",
+                "sem_conexao",
+                "conectada_menos_sem_conexao",
+            ],
+            "tipo": ["categoria", "categoria", "contraste"],
+            "resultado": ["participacao_2025"] * 3,
+            "estimativa": [-0.0157, 0.0014, -0.0171],
+            "ic_inf": [-0.1236, -0.0009, -0.1619],
+            "ic_sup": [0.0923, 0.0037, 0.1277],
+            "banda": [20.5644, 24.2404, 20.5644],
+            "municipios_tratados": [25, 122, None],
+            "municipios_controle": [31, 159, None],
+            "emd": [None, None, 0.20698382950514996],
+        }
+    ).write_csv(tabelas / "resumo_estimacao.csv")
+    pl.DataFrame(
+        {
+            "categoria": ["faixa_b_0", "faixa_a_0"],
+            "banda": [28.8055, 20.5644],
+            "media_participacao_2025": [0.028357186282778078, 0.017703287989352376],
+            "dp_participacao_2025": [0.14759152592236377, 0.09867751401605772],
+        }
+    ).write_csv(tabelas / "descritivas_estimacao.csv")
+    prs, notas = deck.construir(caminhos, Numeros({}))
+    slide = " ".join(
+        forma.text_frame.text for forma in prs.slides[6].shapes if forma.has_text_frame
+    )
+    assert "Efeito mínimo detectável: 20,7 p.p." in slide
+    assert "Equivale a 11,7 vezes a fatia média (1,77%)" in slide
+    assert "Ligadas a A · 25 municípios com derrota e 31 com vitória" in slide
+    assert "20,7 p.p., que equivale a 11,7 vezes a fatia média (1,77%)" in notas[6].fala
+    assert "25 municípios com A derrotado e 31 com A vitorioso" in notas[6].fala
+
+    (tabelas / "descritivas_estimacao.csv").unlink()
+    prs, _ = deck.construir(caminhos, Numeros({}))
+    slide_sem_contexto = " ".join(
+        forma.text_frame.text for forma in prs.slides[6].shapes if forma.has_text_frame
+    )
+    assert "Efeito mínimo detectável: 20,7 p.p." in slide_sem_contexto
+    assert "Equivale a" not in slide_sem_contexto
+
+
+def test_slide_conclusao_emparelha_o_contraste_pre_eleitoral(tmp_path: Path) -> None:
+    caminhos = _caminhos(tmp_path)
+    tabelas = caminhos.resultados / "tables"
+    tabelas.mkdir(parents=True)
+    pl.DataFrame(
+        {
+            "hipotese": ["H2", "H2", "H2"],
+            "categoria": ["vencedor_faixa_1", "faixa_b_1", "vencedor_faixa_3+"],
+            "tipo": ["contraste", "categoria", "contraste"],
+            "resultado": ["participacao_2025"] * 3,
+            "estimavel": [True, True, True],
+            "estimativa": [-0.0406, -0.0807, 0.0005],
+            "ic_inf": [-0.0716, -0.1355, 0.0000],
+            "ic_sup": [-0.0097, -0.0260, 0.0011],
+        }
+    ).write_csv(tabelas / "resumo_estimacao.csv")
+    pl.DataFrame(
+        {
+            "hipotese": ["H2", "H2"],
+            "categoria": ["vencedor_faixa_1", "faixa_b_1"],
+            "tipo": ["contraste", "categoria"],
+            "resultado": ["variacao_pre_periodos"] * 2,
+            "placebo": [True, True],
+            "estimavel": [True, True],
+            "estimativa": [-0.0312, -0.0768],
+            "ic_inf": [-0.0800, -0.1350],
+            "ic_sup": [0.0200, -0.0186],
+        }
+    ).write_csv(tabelas / "sensibilidade_pre_periodos.csv")
+    pl.DataFrame(
+        {
+            "hipotese": ["H2"],
+            "categoria": ["vencedor_faixa_1"],
+            "tipo": ["contraste"],
+            "resultado": ["participacao_2025"],
+            "placebo": [False],
+            "estimavel": [False],
+            "motivo": ["menos de 10 municípios de um lado do corte"],
+        }
+    ).write_csv(tabelas / "h2_comparaveis.csv")
+    prs, notas = deck.construir(caminhos, Numeros({}))
+    distancia = " ".join(
+        forma.text_frame.text for forma in prs.slides[7].shapes if forma.has_text_frame
+    )
+    conclusao = " ".join(
+        forma.text_frame.text for forma in prs.slides[8].shapes if forma.has_text_frame
+    )
+    assert "PLACEBO PRÉ-ELEITORAL · COORTE B A 1 PASSO" in distancia
+    assert "Recorte comparável por estratos: sem estimativa a 1 passo." in distancia
+    assert "PRÉ-ELEITORAL · MESMO CONTRASTE" in conclusao
+    assert "-3,12 p.p." in conclusao
+    assert "IC de 95% de -8,00 a 2,00 p.p." in conclusao
+    assert "PLACEBO PRÉ-ELEITORAL" not in conclusao
+    assert "No recorte comparável por estratos, a estimação fica indefinida" in notas[7].fala
+    assert "O mesmo contraste antes do voto foi de -3,12 p.p." in notas[8].fala
+
+
 def test_deck_ordena_os_cinco_blocos_e_preserva_hierarquia(tmp_path: Path) -> None:
     prs, notas = deck.construir(_caminhos(tmp_path), Numeros({}))
     secoes = [slide.shapes[1].text_frame.text for slide in prs.slides]
@@ -201,11 +308,15 @@ def test_deck_ordena_os_cinco_blocos_e_preserva_hierarquia(tmp_path: Path) -> No
             "Vínculos antes da eleição de 2024",
             "doações de seus sócios ou administradores",
             "Para cada fornecedora anterior",
-            "fatia dos empenhos de 2025",
+            "fatia no saldo líquido dos empenhos de 2025",
+            "entrantes no denominador",
         )
     )
     rede = " ".join(forma.text_frame.text for forma in prs.slides[5].shapes if forma.has_text_frame)
     assert all(termo in rede for termo in ("Receita Federal", "TSE", "TCESP", "maior componente"))
+    assert "Órgãos municipais cobertos pelo TCESP, exceto a capital" in rede
+    assert "saldo líquido por elemento" in rede
+    assert "entrantes no denominador" in rede
     assert "Calculamos as ligações com A e B em cada município" in rede
     hipoteses, resultados, distancia, conclusao = (
         " ".join(
@@ -229,11 +340,13 @@ def test_deck_ordena_os_cinco_blocos_e_preserva_hierarquia(tmp_path: Path) -> No
     assert "análise exploratória" in distancia.lower()
     assert "Testar se o efeito diminui exige comparar as faixas entre si." in distancia
     assert "pontos percentuais da fatia dos empenhos no elemento de despesa" in distancia
+    assert "PLACEBO PRÉ-ELEITORAL · COORTE B A 1 PASSO" in distancia
     assert "pontos percentuais da fatia dos empenhos no elemento de despesa" in conclusao
     assert "EM ABERTO" in conclusao
     assert "EXPLORATÓRIO" in conclusao
-    assert "Contraste entre coortes a 1 passo em 2025" in conclusao
-    assert "PLACEBO PRÉ-ELEITORAL · SÓ A COORTE B" in conclusao
+    assert "Contraste (B − A)/2 a 1 passo em 2025" in conclusao
+    assert "PRÉ-ELEITORAL · MESMO CONTRASTE" in conclusao
+    assert "SÓ A COORTE B" not in conclusao
     titulos = [slide.shapes[0].text_frame.text for slide in list(prs.slides)[-2:]]
     assert "distância" in titulos[0]
     assert "concluir" in titulos[1]
