@@ -426,102 +426,6 @@ def _grafico_distancia(slide, linhas: list[tuple[str, dict]]) -> None:
     )
 
 
-def _mini_barra_ic(slide, linha: dict, x: float, y: float, largura: float, altura: float) -> None:
-    """Faixa compacta com o intervalo de confiança e a linha de referência no zero."""
-    caixa = slide.shapes.add_shape(
-        MSO_SHAPE.ROUNDED_RECTANGLE, Inches(x), Inches(y), Inches(largura), Inches(altura)
-    )
-    estilo = caixa._element.find(qn("p:style"))
-    if estilo is not None:
-        caixa._element.remove(estilo)
-    caixa.fill.solid()
-    caixa.fill.fore_color.rgb = PALIDO
-    caixa.line.fill.background()
-    if _status(linha) == "sem estimativa" or linha.get("estimativa") is None:
-        _texto(
-            slide,
-            "Intervalo indisponível",
-            x + 0.18,
-            y + 0.26,
-            largura - 0.36,
-            0.30,
-            tamanho=13,
-            cor=CINZA,
-            alinhar=PP_ALIGN.CENTER,
-        )
-        return
-    est, inf, sup = (100 * linha[k] for k in ("estimativa", "ic_inf", "ic_sup"))
-    limite = max(abs(inf), abs(sup), 1.0) * 1.18
-    x_esq, x_dir = x + 0.28, x + largura - 0.28
-
-    def pos(valor: float) -> float:
-        return x_esq + (x_dir - x_esq) * (valor + limite) / (2 * limite)
-
-    y_eixo = y + 0.34
-    x0 = pos(0.0)
-    _traco(slide, x_esq, y_eixo, x_dir, y_eixo, LINHA, 1.2)
-    _traco(slide, x0, y + 0.14, x0, y + 0.54, CINZA, 1.2)
-    a, b, p = pos(inf), pos(sup), pos(est)
-    _traco(slide, a, y_eixo, b, y_eixo, ACCENT, 2.8)
-    for ponta in (a, b):
-        _traco(slide, ponta, y_eixo - 0.08, ponta, y_eixo + 0.08, ACCENT, 1.6)
-    ponto = slide.shapes.add_shape(
-        MSO_SHAPE.OVAL, Inches(p - 0.068), Inches(y_eixo - 0.068), Inches(0.136), Inches(0.136)
-    )
-    _sem_estilo(ponto)
-    ponto.fill.solid()
-    ponto.fill.fore_color.rgb = ACCENT
-    ponto.line.fill.background()
-    _texto(slide, f"{decimal(inf, 1)} p.p.", x_esq, y + 0.56, 1.5, 0.24, tamanho=11, cor=CINZA)
-    _texto(
-        slide,
-        "0",
-        x0 - 0.25,
-        y + 0.56,
-        0.50,
-        0.24,
-        tamanho=11,
-        cor=CINZA,
-        forte=True,
-        alinhar=PP_ALIGN.CENTER,
-    )
-    _texto(
-        slide,
-        f"+{decimal(sup, 1)} p.p." if sup > 0 else f"{decimal(sup, 1)} p.p.",
-        x_dir - 1.5,
-        y + 0.56,
-        1.5,
-        0.24,
-        tamanho=11,
-        cor=CINZA,
-        alinhar=PP_ALIGN.RIGHT,
-    )
-
-
-def _selo(slide, texto: str, x: float, y: float, largura: float) -> None:
-    selo = slide.shapes.add_shape(
-        MSO_SHAPE.ROUNDED_RECTANGLE, Inches(x), Inches(y), Inches(largura), Inches(0.32)
-    )
-    estilo = selo._element.find(qn("p:style"))
-    if estilo is not None:
-        selo._element.remove(estilo)
-    selo.fill.solid()
-    selo.fill.fore_color.rgb = PALIDO
-    selo.line.fill.background()
-    _texto(
-        slide,
-        texto,
-        x,
-        y + 0.06,
-        largura,
-        0.22,
-        tamanho=11,
-        cor=ACCENT,
-        forte=True,
-        alinhar=PP_ALIGN.CENTER,
-    )
-
-
 def _estatistica_rede(tabela: pl.DataFrame | None, indicador: str) -> float | None:
     return _celula(tabela, variante="PRINCIPAL", indicador=indicador).get("valor")
 
@@ -1644,7 +1548,6 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
         categoria="faixa_b_1",
         resultado="participacao_2025",
     )
-    destaque_h2 = "Testar se o efeito diminui exige comparar as faixas entre si."
     piso = piso_gigante_h2(pasta)
     comparavel_1 = _celula(
         comparaveis,
@@ -1653,8 +1556,6 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
         categoria="vencedor_faixa_1",
         resultado="participacao_2025",
     )
-    sem_suporte_1 = comparaveis is not None and not comparavel_1.get("estimavel", True)
-    sinal_oposto = (h2["1"].get("estimativa") or 0) < 0
     slide = _pagina(
         prs,
         "Fatia em 2025 por distância a A e B",
@@ -1664,13 +1565,13 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
     )
     _texto(
         slide,
-        "Análise exploratória. Em cada distância, calculamos (salto de B − salto de A) ÷ 2 "
-        "(> 0 = vantagem ao vencedor). Coortes pré-eleitorais podem compartilhar firmas.",
+        "Análise exploratória. O contraste é (salto de B − salto de A) ÷ 2. "
+        "Valores positivos favorecem o vencedor.",
         MARGEM,
-        1.54,
+        1.60,
         CORPO,
-        0.58,
-        tamanho=15,
+        0.56,
+        tamanho=16,
         cor=CINZA,
     )
     _grafico_distancia(
@@ -1678,152 +1579,70 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
     )
     _texto(
         slide,
-        destaque_h2,
+        "Testar o gradiente exige comparar as faixas entre si.",
         MARGEM,
-        6.08,
+        6.16,
         6.45,
-        0.26,
-        tamanho=13,
+        0.40,
+        tamanho=15,
         cor=CINZA,
     )
-    notas_esq_h2 = []
-    if piso is not None:
-        notas_esq_h2.append(f"A 3+ passos, ao menos {_pp(piso, 0)}% no gigante.")
-    if sem_suporte_1:
-        notas_esq_h2.append(
-            "Estratos (município × elemento × quintil prévio): 1 passo sem suporte."
-        )
-    if notas_esq_h2:
-        _texto(
-            slide,
-            " ".join(notas_esq_h2),
-            MARGEM,
-            6.38,
-            6.45,
-            0.46,
-            tamanho=12,
-            cor=CINZA,
-        )
-    _traco(slide, 7.43, 2.26, 7.43, 6.72)
+    x_contraste, largura_contraste = 7.75, 4.83
+    _traco(slide, 7.43, 2.34, 7.43, 5.80)
     _texto(
         slide,
-        "CONTRASTE A 1 PASSO EM 2025",
-        7.75,
-        2.26,
-        4.83,
-        0.26,
-        tamanho=12,
+        "A um passo",
+        x_contraste,
+        2.34,
+        largura_contraste,
+        0.34,
+        tamanho=17,
         cor=ACCENT,
         forte=True,
     )
     _texto(
         slide,
         _estimativa_pp(h2["1"], 2),
-        7.75,
-        2.50,
-        4.83,
-        0.64,
-        tamanho=36,
+        x_contraste,
+        2.83,
+        largura_contraste,
+        0.84,
+        tamanho=45,
         fonte=FONTE_TITULO,
         cor=ACCENT,
     )
     _texto(
         slide,
         _ic_pp(h2["1"], 2),
-        7.75,
-        3.14,
-        4.83,
-        0.26,
-        tamanho=13,
-        forte=True,
-    )
-    if sinal_oposto:
-        _texto(
-            slide,
-            "Sinal oposto ao previsto (> 0 = vantagem ao vencedor)",
-            7.75,
-            3.42,
-            4.83,
-            0.24,
-            tamanho=12.5,
-            cor=ACCENT,
-            forte=True,
-        )
-
-    def _linha_coorte_h2(nome: str, linha: dict, gigante: dict) -> str:
-        partes = []
-        mun_t, mun_c = linha.get("municipios_tratados"), linha.get("municipios_controle")
-        if mun_t is not None and mun_c is not None:
-            partes.append(f"{_numero(mun_t, 0)}/{_numero(mun_c, 0)} mun.")
-        peso_g = gigante.get("fracao_peso_gigante")
-        if peso_g is not None:
-            partes.append(f"{_pp(peso_g, 0)}% no gigante")
-        detalhe = f" ({', '.join(partes)})" if partes else ""
-        return f"{nome}: {_pp_sinal(linha.get('estimativa'), 2)}{detalhe}"
-
-    _texto(
-        slide,
-        _linha_coorte_h2("B", b1, gig_b1),
-        7.75,
-        3.70,
-        4.83,
-        0.24,
-        tamanho=12,
+        x_contraste,
+        3.71,
+        largura_contraste,
+        0.35,
+        tamanho=17,
         cor=CINZA,
-    )
-    _texto(
-        slide,
-        _linha_coorte_h2("A", a1, gig_a1),
-        7.75,
-        3.94,
-        4.83,
-        0.24,
-        tamanho=12,
-        cor=CINZA,
-    )
-    _traco(slide, 7.75, 4.24, 12.58, 4.24)
-    _texto(
-        slide,
-        "DIAGNÓSTICO E SENSIBILIDADE (1 PASSO)",
-        7.75,
-        4.34,
-        4.83,
-        0.26,
-        tamanho=12,
-        cor=ACCENT,
-        forte=True,
     )
     b1_placebo = {"estimativa": b1.get("placebo_estimativa")}
-    ic_diff = _intervalo(diff_h2_1, 2)
-    sem_suporte = []
-    if apenas_set is not None and not set_h2_1.get("estimavel", True):
-        sem_suporte.append("set/24")
-    if rob_h2_1 and rob_h2_1.get("estimativa_sem_articulacao") is None:
-        sem_suporte.append("sem pontes")
-    if rob_h2_1 and rob_h2_1.get("estimativa_sem_administrador") is None:
-        sem_suporte.append("sem adm.")
-    if sem_suporte_1:
-        sem_suporte.append("estratos")
-    diagnosticos = [
-        f"• Pré-eleição em B: salto prévio de {_estimativa_pp(b1_placebo, 2)} (nível) e "
-        f"{_estimativa_pp(pre_b, 2)} (tendência 2023–24 vs. 2021–22).",
-        f"• Pós − pré (2025 − 2021–24): {_pp_sinal(diff_h2_1.get('estimativa'), 2)}"
-        + (f" (IC {ic_diff})." if ic_diff != "n.d." else "."),
-    ]
-    if len(sem_suporte) > 1:
-        diagnosticos.append(f"• Sem suporte em {', '.join(sem_suporte[:-1])} ou {sem_suporte[-1]}.")
-    elif sem_suporte:
-        diagnosticos.append(f"• Sem suporte em {sem_suporte[0]}.")
-    for y_diag, linha_diag in zip((4.66, 5.32, 5.78), diagnosticos, strict=False):
+    if (h2["1"].get("estimativa") or 0) < 0:
         _texto(
             slide,
-            linha_diag,
-            7.75,
-            y_diag,
-            4.83,
-            0.58,
-            tamanho=12.5,
-            cor=INK,
+            "Sinal oposto ao previsto.",
+            x_contraste,
+            4.40,
+            largura_contraste,
+            0.38,
+            tamanho=18,
+            forte=True,
+        )
+    if (b1_placebo["estimativa"] or 0) < 0:
+        _texto(
+            slide,
+            "A coorte B já apresentava um salto negativo antes da eleição.",
+            x_contraste,
+            4.94,
+            largura_contraste,
+            0.72,
+            tamanho=17,
+            cor=CINZA,
         )
 
     fragilidades_nota = []
@@ -1835,6 +1654,8 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
         fragilidades_nota.append("sem administradores")
     if h2_1_det and h2_1_det.get("estimativa_meia_banda") is None:
         fragilidades_nota.append("meia banda")
+    if comparavel_1.get("estimavel") is False:
+        fragilidades_nota.append("estratos comparáveis")
     apoio_fragilidades = (
         [f"Recortes sem estimação válida a 1 passo: {', '.join(fragilidades_nota)}."]
         if fragilidades_nota
@@ -1860,7 +1681,7 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
         f"(p de Holm = {_numero(b1.get('p_holm'))}, média na banda "
         f"{_pct(media_b1, 2)}) e A tem "
         f"{_pp_sinal(a1.get('estimativa'), 2)} (p de Holm = {_numero(a1.get('p_holm'))}, média "
-        f"{_pct(media_a1, 2)}); os grupos diferem em porte.",
+        f"{_pct(media_a1, 2)}). Os grupos diferem em porte e podem compartilhar firmas.",
         "Três diagnósticos de 1 passo: nível pré-eleitoral de "
         f"{_estimativa_pp({'estimativa': h2['1'].get('placebo_estimativa')}, 2)} no contraste "
         f"({_estimativa_pp(b1_placebo, 2)} em B); tendência pré-eleitoral de "
@@ -1871,7 +1692,10 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
         f"é de {_pct(sobrep_0)} na faixa direta e {_pct(sobrep_1)} a 1 passo; no recorte "
         f"comparável a 1 passo restam {_numero(comp_b1.get('municipios_tratados'), 0)}/"
         f"{_numero(comp_b1.get('municipios_controle'), 0)} municípios, abaixo do mínimo de 10.",
-        f"Na banda principal a 1 passo, o suporte é pequeno "
+        f"Municípios na banda principal a 1 passo (derrota/vitória de A): "
+        f"{_numero(b1.get('municipios_tratados'), 0)}/{_numero(b1.get('municipios_controle'), 0)} "
+        f"em B e {_numero(a1.get('municipios_tratados'), 0)}/"
+        f"{_numero(a1.get('municipios_controle'), 0)} em A. O suporte por rede é pequeno "
         f"({_numero(b1.get('redes_tratadas'), 0)}/{_numero(b1.get('redes_controle'), 0)} redes "
         f"em B; {_numero(a1.get('redes_tratadas'), 0)}/{_numero(a1.get('redes_controle'), 0)} "
         f"em A; p de rede = {_numero(b1.get('p_valor_rede'))}), com "
@@ -1897,233 +1721,67 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
         "p.p.: pontos percentuais da fatia dos empenhos no elemento de despesa.",
         fundo=PALIDO,
     )
-    _texto(
-        slide,
-        "A perda de fatia em H1 e o efeito da distância em H2 seguem em aberto.",
-        MARGEM,
-        1.64,
-        CORPO,
-        0.42,
-        tamanho=19,
-        fonte=FONTE_TITULO,
-        cor=ACCENT,
-        forte=True,
+    usa_diff_h2 = diff_h2_1.get("estimativa") is not None
+    linha_h2 = diff_h2_1 if usa_diff_h2 else pre_h2
+    periodo_h2 = (
+        "A 1 passo, pós − pré (2025 − 2021–24)"
+        if usa_diff_h2
+        else "A 1 passo, variação pré-eleitoral (2023–24 vs. 2021–22)"
     )
-    largura_card = (CORPO - 0.36) / 2
-    x_h1 = MARGEM
-    x_h2 = MARGEM + largura_card + 0.36
-    for x_card in (x_h1, x_h2):
-        card = slide.shapes.add_shape(
-            MSO_SHAPE.RECTANGLE, Inches(x_card), Inches(2.16), Inches(largura_card), Inches(3.72)
-        )
-        _sem_estilo(card)
-        card.fill.solid()
-        card.fill.fore_color.rgb = BRANCO
-        card.line.color.rgb = LINHA
-        card.line.width = Pt(0.8)
+    conclusao_h1 = (
+        "O intervalo admite perdas e ganhos de fatia." if _status(h1) == "inclui zero" else ""
+    )
+    conclusao_h2 = "O efeito da distância segue em aberto."
+    if usa_diff_h2 and _status(linha_h2) == "inclui zero":
+        conclusao_h2 = "O intervalo inclui zero. " + conclusao_h2
 
-    # Card H1
-    _texto(
-        slide,
-        "H1  ·  LIGAÇÃO DIRETA",
-        x_h1 + 0.26,
-        2.36,
-        3.40,
-        0.26,
-        tamanho=12,
-        cor=ACCENT,
-        forte=True,
-    )
-    _selo(slide, "EM ABERTO", x_h1 + largura_card - 1.72, 2.30, 1.46)
-    _texto(
-        slide,
-        _estimativa_pp(h1),
-        x_h1 + 0.26,
-        2.70,
-        largura_card - 0.52,
-        0.64,
-        tamanho=38,
-        fonte=FONTE_TITULO,
-        cor=ACCENT,
-    )
-    _texto(
-        slide,
-        _ic_pp(h1),
-        x_h1 + 0.26,
-        3.36,
-        largura_card - 0.52,
-        0.26,
-        tamanho=13,
-        cor=CINZA,
-    )
-    _mini_barra_ic(slide, h1, x_h1 + 0.26, 3.72, largura_card - 0.52, 0.86)
-    _texto(
-        slide,
-        "•  O intervalo inclui perdas e ganhos relevantes.",
-        x_h1 + 0.26,
-        4.80,
-        largura_card - 0.52,
-        0.34,
-        tamanho=13.5,
-        cor=INK,
-    )
-    if h1.get("emd") is not None:
+    largura_coluna = 5.38
+    _traco(slide, 6.66, 2.02, 6.66, 5.18)
+    for x, rotulo, periodo, estimativa, intervalo, conclusao in (
+        (
+            MARGEM,
+            "H1 / Ligação direta",
+            "Contraste em 2025",
+            _estimativa_pp(h1),
+            _ic_pp(h1),
+            conclusao_h1,
+        ),
+        (
+            7.15,
+            "H2 / Distância ao vencedor",
+            periodo_h2,
+            _pp_sinal(linha_h2.get("estimativa"), 2),
+            _ic_pp(linha_h2, 2),
+            conclusao_h2,
+        ),
+    ):
+        _texto(slide, rotulo, x, 2.02, largura_coluna, 0.42, tamanho=19, cor=ACCENT, forte=True)
+        _texto(slide, periodo, x, 2.60, largura_coluna, 0.35, tamanho=16, cor=CINZA)
         _texto(
             slide,
-            f"•  Efeito mínimo detectável de {_pp(h1['emd'])} p.p.",
-            x_h1 + 0.26,
-            5.26,
-            largura_card - 0.52,
-            0.34,
-            tamanho=13.5,
-            cor=INK,
+            estimativa,
+            x,
+            3.02,
+            largura_coluna,
+            0.82,
+            tamanho=44,
+            fonte=FONTE_TITULO,
+            cor=ACCENT,
         )
+        _texto(slide, intervalo, x, 3.93, largura_coluna, 0.36, tamanho=17, cor=CINZA)
+        if conclusao:
+            _texto(slide, conclusao, x, 4.57, largura_coluna, 0.70, tamanho=18)
 
-    # Card H2
+    _traco(slide, MARGEM, 5.69, LARGURA - MARGEM, 5.69)
+    _texto(slide, "LIMITAÇÕES", MARGEM, 5.95, 1.45, 0.28, tamanho=12, cor=ACCENT, forte=True)
     _texto(
         slide,
-        "H2  ·  DISTÂNCIA AO VENCEDOR",
-        x_h2 + 0.26,
-        2.36,
-        3.40,
-        0.26,
-        tamanho=12,
-        cor=ACCENT,
-        forte=True,
-    )
-    _selo(slide, "EXPLORATÓRIO", x_h2 + largura_card - 2.08, 2.30, 1.82)
-    _texto(
-        slide,
-        _estimativa_pp(h2["1"], 2),
-        x_h2 + 0.26,
-        2.70,
-        largura_card - 0.52,
-        0.64,
-        tamanho=38,
-        fonte=FONTE_TITULO,
-        cor=ACCENT,
-    )
-    _texto(
-        slide,
-        f"{_ic_pp(h2['1'], 2)} · sinal oposto ao previsto" if sinal_oposto else _ic_pp(h2["1"], 2),
-        x_h2 + 0.26,
-        3.36,
-        largura_card - 0.52,
-        0.26,
-        tamanho=12.5,
-        cor=ACCENT if sinal_oposto else CINZA,
-    )
-    caixa_placebo = slide.shapes.add_shape(
-        MSO_SHAPE.ROUNDED_RECTANGLE,
-        Inches(x_h2 + 0.26),
-        Inches(3.72),
-        Inches(largura_card - 0.52),
-        Inches(0.96),
-    )
-    _sem_estilo(caixa_placebo)
-    caixa_placebo.fill.solid()
-    caixa_placebo.fill.fore_color.rgb = PALIDO
-    caixa_placebo.line.fill.background()
-    usa_diff_h2 = diff_h2_1.get("estimativa") is not None
-    linha_box = diff_h2_1 if usa_diff_h2 else pre_h2
-    _texto(
-        slide,
-        "VARIAÇÃO PÓS − PRÉ (2025 − 2021–24)"
-        if usa_diff_h2
-        else "VARIAÇÃO PRÉ-ELEITORAL (2023–24 VS. 2021–22)",
-        x_h2 + 0.44,
-        3.82,
-        3.44,
-        0.22,
-        tamanho=11,
-        cor=CINZA,
-        forte=True,
-    )
-    _texto(
-        slide,
-        "Contraste (B − A)/2 a 1 passo",
-        x_h2 + 0.44,
-        4.08,
-        3.10,
-        0.24,
-        tamanho=12,
-        cor=CINZA,
-    )
-    _texto(
-        slide,
-        _pp_sinal(diff_h2_1.get("estimativa"), 2) if usa_diff_h2 else _estimativa_pp(pre_h2, 2),
-        x_h2 + largura_card - 2.16,
-        3.88,
-        1.72,
-        0.46,
-        tamanho=24,
-        fonte=FONTE_TITULO,
-        cor=ACCENT,
-        forte=True,
-        alinhar=PP_ALIGN.RIGHT,
-    )
-    _texto(
-        slide,
-        _ic_pp(linha_box, 2),
-        x_h2 + 0.44,
-        4.36,
-        3.90,
-        0.22,
-        tamanho=11,
-        cor=CINZA,
-    )
-    nivel_h2_1 = h2["1"].get("placebo_estimativa")
-    texto_antes = (
-        f"•  Antes do voto: {_estimativa_pp(pre_h2, 2)} na tendência e "
-        f"{_pp(nivel_h2_1, 2)} p.p. no nível."
-        if nivel_h2_1 is not None
-        else f"•  Antes do voto: {_estimativa_pp(pre_h2, 2)} na tendência."
-    )
-    _texto(
-        slide,
-        texto_antes,
-        x_h2 + 0.26,
-        4.80,
-        largura_card - 0.52,
-        0.44,
-        tamanho=12.5,
-        cor=INK,
-    )
-    _texto(
-        slide,
-        "•  A queda do efeito com a distância segue em aberto.",
-        x_h2 + 0.26,
-        5.32,
-        largura_card - 0.52,
-        0.40,
-        tamanho=12.5,
-        cor=INK,
-    )
-
-    _traco(slide, MARGEM, 6.00, LARGURA - MARGEM, 6.00)
-    _texto(slide, "LIMITAÇÕES", 0.75, 6.10, 1.35, 0.28, tamanho=11, cor=ACCENT, forte=True)
-    taxa_a = numeros.valor("links_pc1", ("taxa_cruzamento", "A"), "valor")
-    taxa_b = numeros.valor("links_pc1", ("taxa_cruzamento", "B"), "valor")
-    parte_empenhos = (
-        f"1 ano de empenhos ({percentual(frac_excluido)} pessoal/credores públicos; "
-        f"{percentual(taxa_vinc)} ligados a ajustes)"
-        if frac_excluido is not None and taxa_vinc is not None
-        else "1 ano de empenhos"
-    )
-    parte_doadores = (
-        f"cruzamento parcial de doadores ({percentual(taxa_a)} A; {percentual(taxa_b)} B) "
-        "e firmas sem QSA"
-        if taxa_a is not None and taxa_b is not None
-        else "cruzamento parcial de doadores e firmas sem QSA"
-    )
-    _texto(
-        slide,
-        f"{parte_empenhos} · {parte_doadores} · componente gigante e troca burocrática.",
-        2.10,
-        6.08,
-        10.483,
-        0.44,
-        tamanho=11.5,
+        "Um ano pós-eleição, cobertura parcial dos vínculos e concentração no componente gigante.",
+        2.25,
+        5.91,
+        10.25,
+        0.52,
+        tamanho=15,
         cor=CINZA,
     )
     link = _texto(
@@ -2140,6 +1798,8 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
     run = link.text_frame.paragraphs[0].runs[0]
     run.hyperlink.address = "https://github.com/rafaelt0/redes-empresariais-alternancia-politica"
     run.font.color.rgb = ACCENT
+    taxa_a = numeros.valor("links_pc1", ("taxa_cruzamento", "A"), "valor")
+    taxa_b = numeros.valor("links_pc1", ("taxa_cruzamento", "B"), "valor")
     _nota(
         notas,
         "Voz 4",
@@ -2152,6 +1812,9 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
         "Três limitações explicam essa cautela: um único ano de empenhos com contratos herdados "
         "e folha, cruzamento parcial de doadores e empresas sem QSA, e a concentração no "
         "componente gigante somada à troca burocrática. Obrigado.",
+        f"Em 2025, {_pct(frac_excluido)} do valor com CNPJ válido corresponde a pessoal ou "
+        f"credores públicos e {_pct(taxa_vinc)} está ligado a ajustes. O cruzamento liga "
+        f"{_pct(taxa_a)} dos doadores de A e {_pct(taxa_b)} dos de B a empresas.",
         f"Resumo H2 a 1 passo: {_estimativa_pp(h2['1'], 2)} em 2025, "
         f"{_pp_sinal(diff_h2_1.get('estimativa'), 2)} em pós − pré ({_ic_pp(diff_h2_1, 2)}) e "
         f"{_estimativa_pp(pre_h2, 2)} na tendência pré-eleitoral ({_ic_pp(pre_h2, 2)}).",
