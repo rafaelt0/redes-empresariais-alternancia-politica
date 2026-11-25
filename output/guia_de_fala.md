@@ -144,13 +144,13 @@ Na H2, olhamos a distância societária a A e a B antes da eleição e calculamo
 
 A um passo, o contraste em 2025 foi de -4,06 p.p., com intervalo de -7,16 a -0,97 — ou seja, sinal oposto ao previsto, puxado pela queda em B (-8,07 p.p.), enquanto A fica perto de zero (+0,06 p.p.).
 
-Além disso, o recorte comparável por estratos fica sem suporte a um passo, e o diagnóstico pré-eleitoral mostra que B já apresentava salto negativo antes da eleição: -11,00 p.p. em nível e -7,68 p.p. na tendência. Quando fazemos pós menos pré no contraste, o efeito vira +1,25 p.p., e sem autofinanciamento cai para -2,85 p.p., ambos cruzando o zero.
+Além disso, o recorte comparável por estratos fica sem suporte a um passo, e o diagnóstico pré-eleitoral mostra que B já apresentava salto negativo antes da eleição: -11,00 p.p. em nível e -7,68 p.p. na tendência. Quando fazemos pós menos pré, o contraste passa para +1,25 p.p., com intervalo que inclui zero.
 
 **Se perguntarem**
 
 - Decomposição a 1 passo: B tem -8,07 p.p. (p de Holm = 0,077, média na banda 2,18%) e A tem +0,06 p.p. (p de Holm = 1,000, média 0,28%); os grupos diferem em porte.
 - Três diagnósticos de 1 passo: nível pré-eleitoral de -5,05 p.p. no contraste (-11,00 p.p. em B); tendência pré-eleitoral de -2,75 p.p. (-7,68 p.p. em B); e pós − pré de +1,25 p.p. (IC de 95% de -4,08 a 6,58 p.p.).
-- Fragilidade a 1 passo: sem autofinanciamento dá -2,85 p.p. (IC de 95% de -6,25 a 0,55 p.p.); fica sem estimação válida em apenas setembro, sem pontos de articulação, sem administradores e meia banda.
+- Recortes sem estimação válida a 1 passo: apenas setembro, sem pontos de articulação, sem administradores, meia banda.
 - Nos estratos (município × elemento × quintil prévio), a sobreposição de mercado e porte é de 6,3% na faixa direta e 15,1% a 1 passo; no recorte comparável a 1 passo restam 6/5 municípios, abaixo do mínimo de 10.
 - Na banda principal a 1 passo, o suporte é pequeno (6/7 redes em B; 8/6 em A; p de rede = n.d.), com 66,7% do peso de B e 60,5% do peso de A no componente gigante.
 
