@@ -249,7 +249,7 @@ def test_deck_contextualiza_o_emd_de_h1_com_a_coorte_direta(tmp_path: Path) -> N
     assert "Equivale a" not in slide_sem_contexto
 
 
-def test_slide_conclusao_emparelha_o_contraste_pre_eleitoral(tmp_path: Path) -> None:
+def test_slides_h2_separam_contraste_em_2025_do_pos_menos_pre(tmp_path: Path) -> None:
     caminhos = _caminhos(tmp_path)
     tabelas = caminhos.resultados / "tables"
     tabelas.mkdir(parents=True)
@@ -334,17 +334,19 @@ def test_slide_conclusao_emparelha_o_contraste_pre_eleitoral(tmp_path: Path) -> 
     conclusao = " ".join(
         forma.text_frame.text for forma in prs.slides[8].shapes if forma.has_text_frame
     )
-    assert "CONTRASTE A 1 PASSO EM 2025" in distancia
+    assert "A um passo" in distancia
+    assert "-4,06 p.p." in distancia
+    assert "IC de 95% de -7,16 a -0,97 p.p." in distancia
     assert "Sinal oposto ao previsto" in distancia
-    assert "B: -8,07 p.p. (11/17 mun., 67% no gigante)" in distancia
-    assert "A: +0,06 p.p. (12/13 mun., 60% no gigante)" in distancia
-    assert "DIAGNÓSTICO E SENSIBILIDADE (1 PASSO)" in distancia
-    assert "Estratos (município × elemento × quintil prévio): 1 passo sem suporte." in distancia
-    assert "VARIAÇÃO PÓS − PRÉ (2025 − 2021–24)" in conclusao
+    assert "A coorte B já apresentava um salto negativo antes da eleição." in distancia
+    assert "-8,07 p.p." not in distancia
+    assert "11/17 em B e 12/13 em A" in notas[7].texto()
+    assert "estratos comparáveis" in notas[7].texto()
+    assert "A 1 passo, pós − pré (2025 − 2021–24)" in conclusao
     assert "+1,25 p.p." in conclusao
     assert "IC de 95% de -4,08 a 6,58 p.p." in conclusao
-    assert "Antes do voto: -3,12 p.p. na tendência e -5,05 p.p. no nível." in conclusao
-    assert "LIMITAÇÕES" in conclusao
+    assert "O intervalo inclui zero. O efeito da distância segue em aberto." in conclusao
+    assert "-4,06 p.p." not in conclusao
     assert "o recorte comparável por estratos fica sem suporte a um passo" in notas[7].fala
     assert "vira +1,25 p.p. na variação pós menos pré" in notas[8].fala
 
@@ -353,7 +355,7 @@ def test_slide_conclusao_emparelha_o_contraste_pre_eleitoral(tmp_path: Path) -> 
     conclusao_fallback = " ".join(
         forma.text_frame.text for forma in prs_fallback.slides[8].shapes if forma.has_text_frame
     )
-    assert "VARIAÇÃO PRÉ-ELEITORAL (2023–24 VS. 2021–22)" in conclusao_fallback
+    assert "A 1 passo, variação pré-eleitoral (2023–24 vs. 2021–22)" in conclusao_fallback
     assert "-3,12 p.p." in conclusao_fallback
     assert "IC de 95% de -8,00 a 2,00 p.p." in conclusao_fallback
 
@@ -424,16 +426,12 @@ def test_deck_ordena_os_cinco_blocos_e_preserva_hierarquia(tmp_path: Path) -> No
     assert "H4" not in notas[6].fala
     assert any("H4" in ponto for ponto in notas[6].apoio)
     assert "análise exploratória" in distancia.lower()
-    assert "Testar se o efeito diminui exige comparar as faixas entre si." in distancia
+    assert "Testar o gradiente exige comparar as faixas entre si." in distancia
     assert "pontos percentuais da fatia dos empenhos no elemento de despesa" in distancia
-    assert "DIAGNÓSTICO E SENSIBILIDADE (1 PASSO)" in distancia
     assert "pontos percentuais da fatia dos empenhos no elemento de despesa" in conclusao
-    assert "EM ABERTO" in conclusao
-    assert "EXPLORATÓRIO" in conclusao
-    assert "Contraste (B − A)/2 a 1 passo" in conclusao
-    assert "VARIAÇÃO PRÉ-ELEITORAL (2023–24 VS. 2021–22)" in conclusao
+    assert "H1 / Ligação direta" in conclusao
+    assert "H2 / Distância ao vencedor" in conclusao
     assert "LIMITAÇÕES" in conclusao
-    assert "SÓ A COORTE B" not in conclusao
     titulos = [slide.shapes[0].text_frame.text for slide in list(prs.slides)[-2:]]
     assert "distância" in titulos[0]
     assert "concluir" in titulos[1]
