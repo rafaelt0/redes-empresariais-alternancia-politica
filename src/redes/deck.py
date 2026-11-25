@@ -1596,13 +1596,6 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
         categoria="vencedor_faixa_1",
         resultado="variacao_participacao",
     )
-    auto_h2_1 = _celula(
-        sem_auto,
-        hipotese="H2",
-        tipo="contraste",
-        categoria="vencedor_faixa_1",
-        resultado="participacao_2025",
-    )
     set_h2_1 = _celula(
         apenas_set,
         hipotese="H2",
@@ -1802,7 +1795,6 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
     )
     b1_placebo = {"estimativa": b1.get("placebo_estimativa")}
     ic_diff = _intervalo(diff_h2_1, 2)
-    ic_auto = _intervalo(auto_h2_1, 2)
     sem_suporte = []
     if apenas_set is not None and not set_h2_1.get("estimavel", True):
         sem_suporte.append("set/24")
@@ -1812,22 +1804,17 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
         sem_suporte.append("sem adm.")
     if sem_suporte_1:
         sem_suporte.append("estratos")
-    if len(sem_suporte) > 1:
-        texto_sem = f" Sem suporte em {', '.join(sem_suporte[:-1])} ou {sem_suporte[-1]}."
-    elif sem_suporte:
-        texto_sem = f" Sem suporte em {sem_suporte[0]}."
-    else:
-        texto_sem = ""
-    diagnosticos = (
+    diagnosticos = [
         f"• Pré-eleição em B: salto prévio de {_estimativa_pp(b1_placebo, 2)} (nível) e "
         f"{_estimativa_pp(pre_b, 2)} (tendência 2023–24 vs. 2021–22).",
         f"• Pós − pré (2025 − 2021–24): {_pp_sinal(diff_h2_1.get('estimativa'), 2)}"
         + (f" (IC {ic_diff})." if ic_diff != "n.d." else "."),
-        f"• Sem autofinanciamento: {_estimativa_pp(auto_h2_1, 2)}"
-        + (f" (IC {ic_auto})." if ic_auto != "n.d." else ".")
-        + texto_sem,
-    )
-    for y_diag, linha_diag in zip((4.66, 5.32, 5.78), diagnosticos, strict=True):
+    ]
+    if len(sem_suporte) > 1:
+        diagnosticos.append(f"• Sem suporte em {', '.join(sem_suporte[:-1])} ou {sem_suporte[-1]}.")
+    elif sem_suporte:
+        diagnosticos.append(f"• Sem suporte em {sem_suporte[0]}.")
+    for y_diag, linha_diag in zip((4.66, 5.32, 5.78), diagnosticos, strict=False):
         _texto(
             slide,
             linha_diag,
@@ -1848,13 +1835,11 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
         fragilidades_nota.append("sem administradores")
     if h2_1_det and h2_1_det.get("estimativa_meia_banda") is None:
         fragilidades_nota.append("meia banda")
-    if len(fragilidades_nota) > 1:
-        lista_frag = f"{', '.join(fragilidades_nota[:-1])} e {fragilidades_nota[-1]}"
-        texto_frag = f"; fica sem estimação válida em {lista_frag}"
-    elif fragilidades_nota:
-        texto_frag = f"; fica sem estimação válida em {fragilidades_nota[0]}"
-    else:
-        texto_frag = ""
+    apoio_fragilidades = (
+        [f"Recortes sem estimação válida a 1 passo: {', '.join(fragilidades_nota)}."]
+        if fragilidades_nota
+        else []
+    )
     _nota(
         notas,
         "Voz 4",
@@ -1869,9 +1854,8 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
         "Além disso, o recorte comparável por estratos fica sem suporte a um passo, e o "
         "diagnóstico pré-eleitoral mostra que B já apresentava salto negativo antes da eleição: "
         f"{_estimativa_pp(b1_placebo, 2)} em nível e {_estimativa_pp(pre_b, 2)} na tendência. "
-        f"Quando fazemos pós menos pré no contraste, o efeito vira "
-        f"{_pp_sinal(diff_h2_1.get('estimativa'), 2)}, e sem autofinanciamento cai para "
-        f"{_estimativa_pp(auto_h2_1, 2)}, ambos cruzando o zero.",
+        "Quando fazemos pós menos pré, o contraste passa para "
+        f"{_pp_sinal(diff_h2_1.get('estimativa'), 2)}, com intervalo que inclui zero.",
         f"Decomposição a 1 passo: B tem {_estimativa_pp(b1, 2)} "
         f"(p de Holm = {_numero(b1.get('p_holm'))}, média na banda "
         f"{_pct(media_b1, 2)}) e A tem "
@@ -1882,8 +1866,7 @@ def construir(caminhos: Caminhos, numeros: Numeros) -> tuple[Apresentacao, list[
         f"({_estimativa_pp(b1_placebo, 2)} em B); tendência pré-eleitoral de "
         f"{_estimativa_pp(pre_h2, 2)} ({_estimativa_pp(pre_b, 2)} em B); e pós − pré de "
         f"{_pp_sinal(diff_h2_1.get('estimativa'), 2)} ({_ic_pp(diff_h2_1, 2)}).",
-        f"Fragilidade a 1 passo: sem autofinanciamento dá {_estimativa_pp(auto_h2_1, 2)} "
-        f"({_ic_pp(auto_h2_1, 2)}){texto_frag}.",
+        *apoio_fragilidades,
         "Nos estratos (município × elemento × quintil prévio), a sobreposição de mercado e porte "
         f"é de {_pct(sobrep_0)} na faixa direta e {_pct(sobrep_1)} a 1 passo; no recorte "
         f"comparável a 1 passo restam {_numero(comp_b1.get('municipios_tratados'), 0)}/"
